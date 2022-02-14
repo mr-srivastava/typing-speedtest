@@ -18,6 +18,7 @@ function App() {
       const calcWpm = Math.round(w / (1 - timer / 60));
       setWpm(calcWpm);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [finished, timer]);
 
   function getCorrectSymbols() {
