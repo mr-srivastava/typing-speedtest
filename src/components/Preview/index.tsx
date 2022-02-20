@@ -13,7 +13,8 @@ const Preview = (props: PreviewProps) => {
       {textArr.map((s, i) => {
         let hightlightColor = "";
         if (i < userInput.length) {
-          hightlightColor = s === userInput[i] ? "bg-green-300" : "bg-red-300";
+          const isCorrect = s === userInput[i];
+          hightlightColor = isCorrect ? "bg-green-300" : "bg-red-300";
         }
         return (
           <span key={i} className={`${hightlightColor}`}>
