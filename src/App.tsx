@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Preview from "./components/Preview";
 import Clock from "./components/Clock";
 import getText from "./getText";
@@ -14,16 +14,6 @@ function App() {
   const [finished, setFinished] = useState<boolean>(false);
   const [correctWordCount, setCorrectWordCount] = useState<number>(0);
   const [totalWordCount, setTotalWordCount] = useState<number>(0);
-
-  // useEffect(() => {
-  //   if (finished) {
-  //     const calcWpm = Math.round(
-  //       correctWordCount / (AVG_WORD_LEN * (1 - timer / 60))
-  //     );
-  //     setWpm(calcWpm);
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [finished]);
 
   function onRestart() {
     setText(defaultText);
