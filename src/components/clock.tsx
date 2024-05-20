@@ -1,13 +1,6 @@
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { Orbitron } from "next/font/google";
 import { cn } from "@/lib/utils";
-
-const orbitron = Orbitron({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-orbitron",
-  weight: ["400", "500", "600", "700", "800", "900"],
-});
+import { orbitron } from "@/app/layout";
 
 const MIN_IN_SEC = 60;
 
