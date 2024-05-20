@@ -5,9 +5,10 @@ import TypingStats from "@/components/stats";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import getText from "@/lib/text";
+import { ResetIcon } from "@radix-ui/react-icons";
 import { useState } from "react";
 
-export default function Home() {
+export default function Octane() {
   const defaultText = getText();
   const [text, setText] = useState<string>(defaultText);
   const [timer, setTimer] = useState<number>(60);
@@ -56,7 +57,7 @@ export default function Home() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[--background]">
       <Header
         timer={timer}
         setTimer={setTimer}
@@ -67,13 +68,27 @@ export default function Home() {
 
       <main className="flex min-h-screen flex-col max-w-6xl">
         <Preview text={text} userInput={userInput} />
+        <div className="flex w-full justify-end mt-5">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={onRestart}
+            disabled={!started}
+          >
+            <ResetIcon />
+          </Button>
+        </div>
         <Textarea
-          className="w-full px-3 py-3 resize-none my-5"
+          className="w-full min-h-[150px] px-3 py-3 resize-none mt-2"
           placeholder="Start typing..."
           value={userInput}
           onChange={onInputChange}
           readOnly={finished}
         />
+        <p className="text-sm text-muted-foreground">
+          Start typing for the test to begin.
+        </p>
+
         {finished && (
           <TypingStats
             correctWordCount={correctWordCount}
@@ -81,11 +96,6 @@ export default function Home() {
             timer={timer}
           />
         )}
-        <div className="flex w-full">
-          <Button onClick={onRestart} disabled={!started}>
-            Restart
-          </Button>
-        </div>
       </main>
     </div>
   );

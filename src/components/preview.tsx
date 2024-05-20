@@ -17,7 +17,12 @@ const Preview = (props: PreviewProps) => {
           hightlightColor = isCorrect ? "bg-green-300" : "bg-red-300";
         }
         return (
-          <span key={i} className={`${hightlightColor}`}>
+          <span
+            key={i}
+            className={`${
+              hightlightColor ? hightlightColor + " dark:text-black" : ""
+            }`}
+          >
             {s}
           </span>
         );
