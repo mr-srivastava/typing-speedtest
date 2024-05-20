@@ -1,6 +1,5 @@
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
-import { orbitron } from "@/app/layout";
 
 const MIN_IN_SEC = 60;
 
@@ -53,12 +52,7 @@ const Clock = (props: IClockProps) => {
 
   return (
     <div className="w-full px-3 py-3 text-right">
-      <span
-        className={cn(
-          `text-3xl ${isNearExpiry ? "text-red-500" : ""}`,
-          orbitron.variable
-        )}
-      >
+      <span className={cn(`text-3xl ${isNearExpiry ? "text-red-500" : ""}`)}>
         {getTime()}
       </span>
     </div>
