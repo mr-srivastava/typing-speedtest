@@ -1,8 +1,25 @@
-import React, { useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Orbitron } from "next/font/google";
+import { cn } from "@/lib/utils";
+
+const orbitron = Orbitron({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-orbitron",
+  weight: ["400", "500", "600", "700", "800", "900"],
+});
 
 const MIN_IN_SEC = 60;
 
-const Clock = (props: any) => {
+interface IClockProps {
+  timer: number;
+  setTimer: Dispatch<SetStateAction<number>>;
+  started: boolean;
+  finished: boolean;
+  handleTimerExpiry: () => void;
+}
+
+const Clock = (props: IClockProps) => {
   const { timer, setTimer } = props;
   const [isNearExpiry, setIsNearExpiry] = useState<boolean>(false);
   useEffect(() => {
@@ -44,9 +61,10 @@ const Clock = (props: any) => {
   return (
     <div className="w-full px-3 py-3 text-right">
       <span
-        className={`text-3xl font-[Orbitron] ${
-          isNearExpiry ? "text-red-500" : ""
-        }`}
+        className={cn(
+          `text-3xl ${isNearExpiry ? "text-red-500" : ""}`,
+          orbitron.variable
+        )}
       >
         {getTime()}
       </span>
