@@ -17,7 +17,7 @@ const Header = (props: IHeaderProps) => {
   return (
     <header className="flex w-full max-w-6xl items-center justify-center mb-10">
       <Button
-        className="flex space-x-1 px-3 py-3 items-center hover:bg-white"
+        className="flex space-x-1 px-3 py-3 items-center hover:bg-transparent"
         variant={"ghost"}
         asChild
       >
