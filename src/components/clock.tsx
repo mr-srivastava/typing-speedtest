@@ -14,6 +14,7 @@ interface IClockProps {
 const Clock = (props: IClockProps) => {
   const { timer, setTimer } = props;
   const [isNearExpiry, setIsNearExpiry] = useState<boolean>(false);
+
   useEffect(() => {
     if (timer === 0) {
       props.handleTimerExpiry();
@@ -37,6 +38,12 @@ const Clock = (props: IClockProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.finished, props.started, timer]);
 
+  /**
+   * Formats a number with two digits.
+   *
+   * @param {number} num - The number to be formatted.
+   * @return {string} The formatted number as a string with two digits.
+   */
   function formatNumberWithTwoDigit(num: number) {
     return num.toLocaleString("en-US", {
       minimumIntegerDigits: 2,
@@ -44,6 +51,11 @@ const Clock = (props: IClockProps) => {
     });
   }
 
+  /**
+   * Returns a formatted string representing the time in minutes and seconds.
+   *
+   * @return {string} The time in the format "MM:SS".
+   */
   function getTime() {
     const minutes = formatNumberWithTwoDigit(Math.floor(timer / MIN_IN_SEC));
     const seconds = formatNumberWithTwoDigit(timer % MIN_IN_SEC);

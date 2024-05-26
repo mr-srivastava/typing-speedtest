@@ -2,9 +2,21 @@
 import { BackgroundBeams } from "@/components/ui/background-beams";
 import { Button } from "@/components/ui/moving-border";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React from "react";
 
 export default function Home() {
+  const router = useRouter();
+
+  /**
+   * Handles the click event by navigating to the "/octane" route.
+   *
+   * @return {void} This function does not return anything.
+   */
+  function handleClick() {
+    router.push("/octane");
+  }
+
   return (
     <div className="h-screen w-full bg-neutral-950 relative flex flex-col items-center justify-center antialiased">
       <div className="max-w-2xl mx-auto p-4">
@@ -16,7 +28,7 @@ export default function Home() {
           your skills to the test.
         </p>
         <div className="flex items-center justify-center relative gap-x-16 pt-10 z-10">
-          <Button variant={"secondary"} asChild>
+          <Button variant={"secondary"} asChild onClick={handleClick}>
             <Link href={"/octane"} className="whitespace-nowrap">
               Think You&apos;re Fast? Prove It!
             </Link>
