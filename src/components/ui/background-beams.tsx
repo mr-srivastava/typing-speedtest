@@ -4,6 +4,12 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 export const BackgroundBeams = React.memo(
+  /**
+   * Renders a decorative SVG background with animated gradient paths
+   * @param {object} props - The component props
+   * @param {string} [props.className] - Optional CSS class name to apply to the container
+   * @returns {JSX.Element} A div containing an SVG with animated gradient paths
+   */
   ({ className }: { className?: string }) => {
     const paths = [
       "M-380 -189C-380 -189 -312 216 152 343C616 470 684 875 684 875",
@@ -79,6 +85,11 @@ export const BackgroundBeams = React.memo(
             strokeWidth="0.5"
           ></path>
 
+          /**
+           * Renders a collection of SVG paths with animated motion
+           * @param {Array} paths - An array of SVG path strings to be rendered
+           * @returns {Array} An array of motion.path components, each representing an SVG path with gradient stroke
+           */
           {paths.map((path, index) => (
             <motion.path
               key={`path-` + index}
@@ -89,6 +100,11 @@ export const BackgroundBeams = React.memo(
             ></motion.path>
           ))}
           <defs>
+            /**
+             * Renders a series of animated linear gradients based on an array of paths
+             * @param {Array} paths - An array of path objects to create gradients for
+             * @returns {Array} An array of motion.linearGradient components
+             */
             {paths.map((path, index) => (
               <motion.linearGradient
                 id={`linearGradient-${index}`}
