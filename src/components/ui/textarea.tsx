@@ -6,6 +6,13 @@ export interface TextareaProps
   extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {}
 
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
+  /**
+   * Renders a customizable textarea component with specific styling
+   * @param {Object} props - The props object
+   * @param {string} [props.className] - Additional CSS classes to apply to the textarea
+   * @param {React.Ref} ref - Reference to the textarea element
+   * @returns {JSX.Element} A styled textarea component
+   */
   ({ className, ...props }, ref) => {
     return (
       <textarea
