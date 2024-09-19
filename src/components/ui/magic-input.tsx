@@ -4,6 +4,15 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
+/**
+ * MagicInput component for creating an animated input field with placeholder cycling and text vanishing effects.
+ * @param {Object} props - The properties passed to the component.
+ * @param {string[]} props.placeholders - An array of placeholder strings to cycle through.
+ * @param {function} props.onChange - Callback function triggered when the input value changes.
+ * @param {function} props.onSubmit - Callback function triggered when the form is submitted.
+ * @param {boolean} [props.isButtonShown=false] - Flag to determine if the submit button should be shown.
+ * @returns {JSX.Element} A form containing an animated input field with optional submit button.
+ */
 export function MagicInput({
   placeholders,
   onChange,
@@ -17,17 +26,50 @@ export function MagicInput({
 }) {
   const [currentPlaceholder, setCurrentPlaceholder] = useState(0);
 
+  /**
+   * Sets up an animation effect to cycle through placeholders
+   * @param {void} No parameters
+   * @returns {function} Cleanup function to clear the interval when the component unmounts
+   */
   useEffect(() => {
+    ```
+    /**
+     /**
+      * Updates the current placeholder index by incrementing it and wrapping around to the beginning if necessary.
+      * @param {function} setCurrentPlaceholder - React state setter function for updating the current placeholder index.
+      * @returns {void} This function doesn't return a value; it updates state.
+      */
+     * Starts an animation that cycles through placeholders at regular intervals.
+     * @returns {Function} A cleanup function that clears the animation interval when called.
+     */
+    ```
     const startAnimation = () => {
+      /**
+       * Sets up an interval to cycle through placeholders
+       * @param {Function} setCurrentPlaceholder - React state setter function to update the current placeholder
+       * @param {Array} placeholders - Array of placeholder strings to cycle through
+       * @returns {number} Interval ID for clearing the interval if needed
+       */
       const interval = setInterval(() => {
         setCurrentPlaceholder((prev) => (prev + 1) % placeholders.length);
       }, 1500);
-      return () => clearInterval(interval);
+      ```
+      /**
+       * Cleanup function to clear the interval
+       * @returns {Function} A function that clears the interval when called
+       */
+      
+      ```      return () => clearInterval(interval);
     };
 
     startAnimation();
   }, [placeholders.length]);
 
+  /**
+   * Draws text on a canvas and processes the resulting image data
+   * @param {void} - No parameters
+   * @returns {void} This function doesn't return a value, but updates the newDataRef with processed image data
+   */
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const newDataRef = useRef<any[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -72,8 +114,24 @@ export function MagicInput({
               pixelData[e + 1],
               pixelData[e + 2],
               pixelData[e + 3],
+            /**
+             * Maps the newData array to create a new array of objects with modified properties
+             * @param {Array} newData - An array of objects containing x, y, and color properties
+             /**
+              * React hook that triggers the draw function when the value or draw function changes
+              * @param {function} draw - The function to be called for drawing
+              * @param {any} value - The value that, when changed, triggers a redraw
+              * @returns {void} This effect does not return anything
+              */
+             * @returns {Array} An array of objects with x, y, r, and color properties, where color is converted to rgba format
+             */
             ],
           });
+        /**
+         * Animates particles moving across a canvas, gradually reducing their size and removing them when they reach the left side.
+         * @param {number} start - The starting x-coordinate for the animation.
+         * @returns {void} This function doesn't return a value, but updates the canvas and state.
+         */
         }
       }
     }
@@ -91,7 +149,17 @@ export function MagicInput({
   }, [value, draw]);
 
   const animate = (start: number) => {
+    /**
+     * Animates a frame by updating and rendering particles on a canvas.
+     * @param {number} [pos=0] - The current horizontal position for clearing and rendering.
+     * @returns {void} This function does not return a value.
+     */
     const animateFrame = (pos: number = 0) => {
+      /**
+       * Animates and updates particles on a canvas, moving them from right to left
+       * @param {number} pos - The current x-position boundary for particle animation
+       * @returns {void} This function doesn't return a value, it updates the canvas and recursively calls itself
+       */
       requestAnimationFrame(() => {
         const newArr = [];
         for (let i = 0; i < newDataRef.current.length; i++) {
@@ -113,6 +181,14 @@ export function MagicInput({
         const ctx = canvasRef.current?.getContext("2d");
         if (ctx) {
           ctx.clearRect(pos, 0, 800, 800);
+          ```
+          /**
+           * Renders rectangles on a canvas context based on the current data
+           * @param {CanvasRenderingContext2D} ctx - The 2D rendering context for the drawing surface
+           * @param {number} pos - The x-position threshold for rendering rectangles
+           * @returns {void} This function does not return a value
+           */
+          ```
           newDataRef.current.forEach((t) => {
             const { x: n, y: i, r: s, color: color } = t;
             if (n > pos) {
@@ -135,12 +211,31 @@ export function MagicInput({
     animateFrame(start);
   };
 
+  /**
+   * Handles the keydown event for an input element, specifically for the Enter key press.
+   * @param {React.KeyboardEvent<HTMLInputElement>} e - The keyboard event object.
+   * @returns {void} This function doesn't return a value.
+   */
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && !animating) {
       vanishAndSubmit();
     }
   };
 
+  /**
+   * Handles the vanish and submit action for the input.
+   * This function sets the animating state, draws the current state,
+   * retrieves the input value, and initiates an animation if a value exists.
+   * @param {void} - This function doesn't take any parameters.
+   * @returns {void} This function doesn't return a value.
+   */
+  /**
+   * Reducer function to find the maximum x value in an array of objects
+   * @param {number} prev - The current maximum x value
+   * @param {Object} current - The current object being processed
+   * @param {number} current.x - The x value of the current object
+   * @returns {number} The new maximum x value
+   */
   const vanishAndSubmit = () => {
     setAnimating(true);
     draw();
@@ -155,6 +250,11 @@ export function MagicInput({
     }
   };
 
+  /**
+   * Handles the form submission event.
+   * @param {React.FormEvent<HTMLFormElement>} e - The form submission event object.
+   * @returns {void} This function doesn't return a value.
+   */
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     vanishAndSubmit();
@@ -176,6 +276,13 @@ export function MagicInput({
         ref={canvasRef}
       />
       <input
+        ```
+        /**
+         * Handles the change event for an input element
+         * @param {Event} e - The change event object
+         * @returns {void} This function doesn't return a value
+         */
+        ```
         onChange={(e) => {
           if (!animating) {
             setValue(e.target.value);
