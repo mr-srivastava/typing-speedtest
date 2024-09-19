@@ -1,3 +1,7 @@
+/**
+ * Returns a random inspirational quote from a predefined list of texts.
+ * @returns {string} A randomly selected inspirational quote.
+ */
 export default function getText() {
   const texts = [
     "Here's to the crazy ones. The misfits. The rebels. The troublemakers." +
