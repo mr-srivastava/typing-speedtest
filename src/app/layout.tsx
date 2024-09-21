@@ -16,6 +16,7 @@ export const metadata: Metadata = {
     "Ready to dominate the keyboard? Our fun typing speed test will put your skills to the test.",
 };
 
+
 export default function RootLayout({
   children,
 }: Readonly<{

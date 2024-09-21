@@ -33,10 +33,11 @@ interface IRadialChartProps {
   title?: string;
   description?: string;
   value?: number;
+  maxValue?: number;
 }
 
 export const RadialBarChartComponent: React.FC<IRadialChartProps> = (props) => {
-  const { title, description, value = 0 } = props;
+  const { title, description, value = 0, maxValue = 100 } = props;
 
   const chartData = [{ browser: "safari", value, fill: "var(--color-safari)" }];
 
@@ -64,7 +65,7 @@ export const RadialBarChartComponent: React.FC<IRadialChartProps> = (props) => {
           <RadialBarChart
             data={chartData}
             startAngle={0}
-            endAngle={(value / 100) * 360}
+            endAngle={(value / maxValue) * 360}
             innerRadius={80}
             outerRadius={110}
           >
