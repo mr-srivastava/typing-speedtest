@@ -3,15 +3,15 @@ import React from "react";
 import Header from "@/components/header";
 import Preview from "@/components/preview";
 import TypingStats from "@/components/stats";
-import TypingInput from "@/components/typing-input";
 import RestartButton from "@/components/restart-button";
 import { useTypingTest } from "@/hooks/useTypingTest";
+import TypingInput from "@/components/typing-input";
 
-interface OctaneProps {
+interface IOctaneProps {
   defaultTimer?: number;
 }
 
-export default function Octane({ defaultTimer = 60 }: OctaneProps) {
+export default function Octane({ defaultTimer = 60 }: IOctaneProps) {
   const {
     text,
     timer,
