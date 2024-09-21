@@ -1,4 +1,3 @@
-import { TrendingUp } from "lucide-react";
 import {
   Label,
   PolarGrid,
@@ -19,35 +18,52 @@ import { ChartConfig, ChartContainer } from "@/components/ui/chart";
 
 export const description = "A radial chart with text";
 
-const chartConfig = {
-  value: {
-    label: "value",
-  },
-  safari: {
-    label: "Safari",
-    color: "hsl(var(--chart-2))",
-  },
-} satisfies ChartConfig;
-
 interface IRadialChartProps {
   title?: string;
   description?: string;
   value?: number;
   maxValue?: number;
+  chartConfig?: ChartConfig;
+  feedbackThresholds?: { [key: string]: number };
+  feedbackMessages?: { [key: string]: string };
+  averageInfo?: string;
+  dataKey?: string;
+  fillColor?: string;
+  showPercentage?: boolean;
 }
 
-export const RadialBarChartComponent: React.FC<IRadialChartProps> = (props) => {
-  const { title, description, value = 0, maxValue = 100 } = props;
-
-  const chartData = [{ browser: "safari", value, fill: "var(--color-safari)" }];
+export const RadialBarChartComponent: React.FC<IRadialChartProps> = ({
+  title,
+  description,
+  value = 0,
+  maxValue = 100,
+  chartConfig = {
+    value: { label: "value" },
+    safari: { label: "Safari", color: "hsl(var(--chart-2))" },
+  },
+  feedbackThresholds = { excellent: 92, average: 90 },
+  feedbackMessages = {
+    excellent: "Excellent! Your accuracy is top-notch.",
+    average: "Keep practicing! You're close to average.",
+    belowAverage: "Focus on accuracy. Reduce those errors.",
+  },
+  averageInfo = "The average typing accuracy for humans is around 92%.",
+  dataKey = "value",
+  fillColor = "var(--color-safari)",
+  showPercentage = false,
+}) => {
+  const chartData = [{ [dataKey]: value, fill: fillColor }];
 
   function getFeedbackMessage(value: number) {
-    if (value > 92) {
-      return "Excellent! Your accuracy is top-notch.";
-    } else if (value <= 92 && value > 90) {
-      return "Keep practicing! You're close to average.";
+    if (value > feedbackThresholds.excellent) {
+      return feedbackMessages.excellent;
+    } else if (
+      value <= feedbackThresholds.excellent &&
+      value > feedbackThresholds.average
+    ) {
+      return feedbackMessages.average;
     } else {
-      return "Focus on accuracy. Reduce those errors.";
+      return feedbackMessages.belowAverage;
     }
   }
 
@@ -76,7 +92,7 @@ export const RadialBarChartComponent: React.FC<IRadialChartProps> = (props) => {
               className="first:fill-muted last:fill-background"
               polarRadius={[86, 74]}
             />
-            <RadialBar dataKey="value" background cornerRadius={10} />
+            <RadialBar dataKey={dataKey} background cornerRadius={10} />
             <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
               <Label
                 content={({ viewBox }) => {
@@ -93,7 +109,8 @@ export const RadialBarChartComponent: React.FC<IRadialChartProps> = (props) => {
                           y={viewBox.cy}
                           className="fill-foreground text-4xl font-bold"
                         >
-                          {value.toLocaleString()}%
+                          {value.toLocaleString()}
+                          {showPercentage && "%"}
                         </tspan>
                       </text>
                     );
@@ -105,12 +122,10 @@ export const RadialBarChartComponent: React.FC<IRadialChartProps> = (props) => {
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
-        <div className="flex items-center gap-2 font-medium leading-none">
+        <div className="flex items-center gap-2 font-medium">
           {getFeedbackMessage(value)}
         </div>
-        <div className="leading-none text-muted-foreground">
-          The average typing accuracy for humans is around 92%.
-        </div>
+        <div className=" text-muted-foreground">{averageInfo}</div>
       </CardFooter>
     </Card>
   );

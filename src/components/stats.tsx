@@ -26,10 +26,32 @@ const TypingStats = (props: ITypingStatsProps) => {
       <h2 className="font-bold text-xl">Results</h2>
       <div className="flex flex-col w-full justify-evenly items-center space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
         <div className="w-full max-w-[350px]">
-          <RadialBarChartComponent value={wpm} maxValue={80} title="Words per minute" />
+          <RadialBarChartComponent
+            value={wpm}
+            maxValue={120}
+            title="Words per minute"
+            feedbackThresholds={{ excellent: 60, average: 40 }}
+            feedbackMessages={{
+              excellent: "Impressive speed! You're a typing wizard.",
+              average: "Good pace! Keep practicing to improve.",
+              belowAverage: "Focus on increasing your typing speed.",
+            }}
+            averageInfo="The average typing speed is around 40 WPM."
+          />
         </div>
         <div className="w-full max-w-[350px]">
-          <RadialBarChartComponent value={accuracy} title="Accuracy" />
+          <RadialBarChartComponent
+            value={accuracy}
+            title="Accuracy"
+            showPercentage
+            feedbackThresholds={{ excellent: 92, average: 90 }}
+            feedbackMessages={{
+              excellent: "Excellent! Your accuracy is top-notch.",
+              average: "Keep practicing! You're close to average.",
+              belowAverage: "Focus on accuracy. Reduce those errors.",
+            }}
+            averageInfo="The average typing accuracy for humans is around 92%."
+          />
         </div>
       </div>
     </div>
