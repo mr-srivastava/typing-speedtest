@@ -49,7 +49,7 @@ export const RadialBarChartComponent: React.FC<IRadialChartProps> = ({
   },
   averageInfo = "The average typing accuracy for humans is around 92%.",
   dataKey = "value",
-  fillColor = "var(--color-safari)",
+  fillColor = "hsl(var(--good))",
   showPercentage = false,
 }) => {
   const chartData = [{ [dataKey]: value, fill: fillColor }];

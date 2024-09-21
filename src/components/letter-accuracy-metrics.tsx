@@ -164,15 +164,15 @@ export function LetterAccuracyMetrics({
       >
         <div className="flex items-center">
           <div className="w-4 h-4 rounded-full bg-[hsl(var(--good))] mr-2"></div>
-          Above Average
+          <span>Above Average</span>
         </div>
         <div className="flex items-center">
           <div className="w-4 h-4 rounded-full bg-[hsl(var(--poor))] mr-2"></div>
-          Near Average
+          <span>Near Average</span>
         </div>
         <div className="flex items-center">
           <div className="w-4 h-4 rounded-full bg-[hsl(var(--needs-improvement))] mr-2"></div>
-          Below Average
+          <span>Below Average</span>
         </div>
       </motion.div>
     </div>
