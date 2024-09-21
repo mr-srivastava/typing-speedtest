@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import Header from "@/components/header";
 import Preview from "@/components/preview";
 import TypingStats from "@/components/stats";
@@ -7,11 +7,15 @@ import RestartButton from "@/components/restart-button";
 import { useTypingTest } from "@/hooks/useTypingTest";
 import TypingInput from "@/components/typing-input";
 
-interface IOctaneProps {
-  defaultTimer?: number;
+const defaultTimer = 60;
+
+// Add this interface
+interface LetterMetrics {
+  correct: number;
+  total: number;
 }
 
-export default function Octane({ defaultTimer = 60 }: IOctaneProps) {
+export default function Octane() {
   const {
     text,
     timer,
@@ -26,6 +30,21 @@ export default function Octane({ defaultTimer = 60 }: IOctaneProps) {
     setTimer,
     handleTimerExpiry,
   } = useTypingTest(defaultTimer);
+
+  // Use useMemo to memoize typedLetterAccuracy
+  const typedLetterAccuracy = useMemo(() => {
+    return letterAccuracy as Record<string, LetterMetrics>;
+  }, [letterAccuracy]);
+
+  // Use useCallback for logging
+  const logLetterAccuracy = useCallback(() => {
+    console.log("Letter Level Accuracy", typedLetterAccuracy);
+  }, [typedLetterAccuracy]);
+
+  // Call the logging function
+  React.useEffect(() => {
+    logLetterAccuracy();
+  }, [logLetterAccuracy]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-[--background]">
@@ -50,7 +69,7 @@ export default function Octane({ defaultTimer = 60 }: IOctaneProps) {
             correctWordCount={correctWordCount}
             totalWordCount={totalWordCount}
             timer={timer}
-            // letterAccuracy={letterAccuracy}
+            letterAccuracyData={typedLetterAccuracy}
           />
         )}
       </main>

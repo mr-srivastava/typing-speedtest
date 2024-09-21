@@ -28,6 +28,9 @@
     --chart-3: 142 88% 28%;
     --chart-4: 137 55% 15%;
     --chart-5: 141 40% 9%;
+    --good: 142 76% 36%;
+    --poor: 41 96% 40%;
+    --needs-improvement: 0 72% 51%;
     --radius: 0.5rem;
   }
 
@@ -56,6 +59,9 @@
     --chart-3: 140 74% 24%;
     --chart-4: 137 55% 15%;
     --chart-5: 141 40% 9%;
+    --good: 142 76% 36%;
+    --poor: 41 96% 40%;
+    --needs-improvement: 0 72% 51%;
     --radius: 0.5rem;
   }
 }

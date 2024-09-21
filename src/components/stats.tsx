@@ -1,16 +1,23 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useCallback } from "react";
 import { RadialBarChartComponent } from "./radial-chart";
+import { LetterAccuracyMetrics } from "./letter-accuracy-metrics";
 
 const AVG_WORD_LEN = 5;
+
+interface LetterMetrics {
+  correct: number;
+  total: number;
+}
 
 interface ITypingStatsProps {
   correctWordCount: number;
   totalWordCount: number;
   timer: number;
+  letterAccuracyData: Record<string, LetterMetrics>;
 }
 
-const TypingStats = (props: ITypingStatsProps) => {
-  const { correctWordCount, totalWordCount, timer } = props;
+const TypingStats = React.memo((props: ITypingStatsProps) => {
+  const { correctWordCount, totalWordCount, timer, letterAccuracyData } = props;
 
   const wpm = useMemo(
     () => Math.round(correctWordCount / (AVG_WORD_LEN * (1 - timer / 60))) || 0,
@@ -21,41 +28,70 @@ const TypingStats = (props: ITypingStatsProps) => {
     () => Math.round((correctWordCount / totalWordCount) * 100) || 0,
     [correctWordCount, totalWordCount]
   );
+
+  const renderRadialChart = useCallback(
+    (
+      value: number,
+      title: string,
+      maxValue?: number,
+      showPercentage?: boolean,
+      feedbackThresholds?: any,
+      feedbackMessages?: any,
+      averageInfo?: string
+    ) => (
+      <div className="w-full max-w-[350px]">
+        <RadialBarChartComponent
+          value={value}
+          maxValue={maxValue}
+          title={title}
+          showPercentage={showPercentage}
+          feedbackThresholds={feedbackThresholds}
+          feedbackMessages={feedbackMessages}
+          averageInfo={averageInfo}
+        />
+      </div>
+    ),
+    []
+  );
+
   return (
     <div className="w-full text-center space-y-4 my-10">
-      <h2 className="font-bold text-xl">Results</h2>
+      <h2 className="text-3xl font-bold mb-6 text-center"> Metrics</h2>
       <div className="flex flex-col w-full justify-evenly items-center space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
-        <div className="w-full max-w-[350px]">
-          <RadialBarChartComponent
-            value={wpm}
-            maxValue={120}
-            title="Words per minute"
-            feedbackThresholds={{ excellent: 60, average: 40 }}
-            feedbackMessages={{
-              excellent: "Impressive speed! You're a typing wizard.",
-              average: "Good pace! Keep practicing to improve.",
-              belowAverage: "Focus on increasing your typing speed.",
-            }}
-            averageInfo="The average typing speed is around 40 WPM."
-          />
-        </div>
-        <div className="w-full max-w-[350px]">
-          <RadialBarChartComponent
-            value={accuracy}
-            title="Accuracy"
-            showPercentage
-            feedbackThresholds={{ excellent: 92, average: 90 }}
-            feedbackMessages={{
-              excellent: "Excellent! Your accuracy is top-notch.",
-              average: "Keep practicing! You're close to average.",
-              belowAverage: "Focus on accuracy. Reduce those errors.",
-            }}
-            averageInfo="The average typing accuracy for humans is around 92%."
-          />
-        </div>
+        {renderRadialChart(
+          wpm,
+          "Words per minute",
+          120,
+          false,
+          { excellent: 60, average: 40 },
+          {
+            excellent: "Impressive speed! You're a typing wizard.",
+            average: "Good pace! Keep practicing to improve.",
+            belowAverage: "Focus on increasing your typing speed.",
+          },
+          "The average typing speed is around 40 WPM."
+        )}
+        {renderRadialChart(
+          accuracy,
+          "Accuracy",
+          undefined,
+          true,
+          { excellent: 92, average: 90 },
+          {
+            excellent: "Excellent! Your accuracy is top-notch.",
+            average: "Keep practicing! You're close to average.",
+            belowAverage: "Focus on accuracy. Reduce those errors.",
+          },
+          "The average typing accuracy for humans is around 92%."
+        )}
+      </div>
+      <div>
+        <LetterAccuracyMetrics letterAccuracyData={letterAccuracyData} />
       </div>
     </div>
   );
-};
+});
+
+TypingStats.displayName = "TypingStats";
 
 export default TypingStats;

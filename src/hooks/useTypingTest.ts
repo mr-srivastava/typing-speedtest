@@ -1,6 +1,11 @@
 import { useState, useCallback, useMemo } from "react";
 import getText from "@/lib/text";
 
+interface LetterMetrics {
+  correct: number;
+  total: number;
+}
+
 export function useTypingTest(defaultTimer: number) {
   const defaultText = useMemo(() => getText(), []);
   const [text, setText] = useState<string>(defaultText);
@@ -10,9 +15,7 @@ export function useTypingTest(defaultTimer: number) {
   const [finished, setFinished] = useState<boolean>(false);
   const [correctWordCount, setCorrectWordCount] = useState<number>(0);
   const [totalWordCount, setTotalWordCount] = useState<number>(0);
-  const [letterAccuracy, setLetterAccuracy] = useState<
-    Record<string, { correct: number; total: number }>
-  >({});
+  const [letterAccuracy, setLetterAccuracy] = useState<Record<string, LetterMetrics>>({});
 
   const onRestart = useCallback(() => {
     setText(defaultText);
