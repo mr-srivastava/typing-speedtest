@@ -1,4 +1,5 @@
 "use client";
+import React, { useState, useCallback, useMemo } from "react";
 import Header from "@/components/header";
 import Preview from "@/components/preview";
 import TypingStats from "@/components/stats";
@@ -6,10 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import getText from "@/lib/text";
 import { ResetIcon } from "@radix-ui/react-icons";
-import { useState } from "react";
 
 export default function Octane() {
-  const defaultText = getText();
+  const defaultText = useMemo(() => getText(), []);
   const [text, setText] = useState<string>(defaultText);
   const [timer, setTimer] = useState<number>(60);
   const [userInput, setUserInput] = useState<string>("");
@@ -18,43 +18,51 @@ export default function Octane() {
   const [correctWordCount, setCorrectWordCount] = useState<number>(0);
   const [totalWordCount, setTotalWordCount] = useState<number>(0);
 
-  function onRestart() {
+  const onRestart = useCallback(() => {
     setText(defaultText);
     setCorrectWordCount(0);
     setTotalWordCount(0);
     setUserInput("");
     setStarted(false);
     setFinished(false);
-  }
+    setTimer(60);
+  }, [defaultText]);
 
-  function onInputChange(e: any) {
-    const v = e.target.value;
-    const isCorrect = e.nativeEvent.data === text[v.length - 1];
-    handleWordCount(isCorrect);
-    startTimer();
-    setUserInput(v);
-    checkIfFinished(v);
-  }
-  function startTimer() {
+  const startTimer = useCallback(() => {
     setStarted(true);
-  }
+  }, []);
 
-  function handleTimerExpiry() {
+  const handleTimerExpiry = useCallback(() => {
     setFinished(true);
-  }
+  }, []);
 
-  function checkIfFinished(input: string) {
-    if (input.split("").length === text.split("").length) {
-      setFinished(true);
-    }
-  }
+  const checkIfFinished = useCallback(
+    (input: string) => {
+      if (input.length === text.length) {
+        setFinished(true);
+      }
+    },
+    [text]
+  );
 
-  function handleWordCount(isCorrect: boolean) {
+  const handleWordCount = useCallback((isCorrect: boolean) => {
     setTotalWordCount((prev) => prev + 1);
     if (isCorrect) {
       setCorrectWordCount((prev) => prev + 1);
     }
-  }
+  }, []);
+
+  const onInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      const v = e.target.value;
+      const isCorrect = e.nativeEvent.data === text[v.length - 1];
+      handleWordCount(isCorrect);
+      startTimer();
+      setUserInput(v);
+      checkIfFinished(v);
+    },
+    [text, handleWordCount, startTimer, checkIfFinished]
+  );
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-[--background]">
@@ -71,6 +79,7 @@ export default function Octane() {
         <div className="flex w-full justify-end mt-5">
           <Button
             variant="outline"
+            className=" rounded-lg"
             size="icon"
             onClick={onRestart}
             disabled={!started}
@@ -79,15 +88,12 @@ export default function Octane() {
           </Button>
         </div>
         <Textarea
-          className="w-full min-h-[150px] px-3 py-3 resize-none mt-2"
-          placeholder="Start typing..."
+          className="w-full rounded-lg min-h-[250px] overflow-hidden px-3 py-3 resize-none mt-2 bg-grey-100/20"
+          placeholder="Start typing for the test to begin"
           value={userInput}
           onChange={onInputChange}
           readOnly={finished}
         />
-        <p className="text-sm text-muted-foreground">
-          Start typing for the test to begin.
-        </p>
 
         {finished && (
           <TypingStats

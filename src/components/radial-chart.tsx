@@ -52,7 +52,7 @@ export const RadialBarChartComponent: React.FC<IRadialChartProps> = (props) => {
   }
 
   return (
-    <Card className="flex flex-col">
+    <Card className="flex flex-col shadow-md shadow-gray-500/20">
       <CardHeader className="items-center pb-0 ">
         {title && <CardTitle>{title.toUpperCase()}</CardTitle>}
         {description && <CardDescription>{description}</CardDescription>}
@@ -95,13 +95,6 @@ export const RadialBarChartComponent: React.FC<IRadialChartProps> = (props) => {
                         >
                           {value.toLocaleString()}%
                         </tspan>
-                        {/* <tspan
-                          x={viewBox.cx}
-                          y={(viewBox.cy || 0) + 24}
-                          className="fill-muted-foreground"
-                        >
-                          Accuracy
-                        </tspan> */}
                       </text>
                     );
                   }
