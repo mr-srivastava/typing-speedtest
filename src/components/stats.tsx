@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import StatsCard from "./stats-card";
+import { RadialBarChartComponent } from "./radial-chart";
 
 const AVG_WORD_LEN = 5;
 
@@ -27,7 +28,8 @@ const TypingStats = (props: ITypingStatsProps) => {
 
       <div className="flex flex-col w-full justify-between items-center space-y-4 sm:flex-row">
         <StatsCard stat={wpm} statLabel={"words per minute"} />
-        <StatsCard stat={`${accuracy}%`} statLabel={"accuracy"} />
+        {/* <StatsCard stat={`${accuracy}%`} statLabel={"accuracy"} /> */}
+        <RadialBarChartComponent value={accuracy} title="Accuracy" />
       </div>
     </div>
   );
