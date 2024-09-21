@@ -23,9 +23,7 @@ const Header = (props: IHeaderProps) => {
       >
         <Link href={"/"}>
           <Image src="/logo.svg" alt="Logo" width={24} height={24} />
-          <span className="w-max font-bold whitespace-nowrap">
-            Typing Speedtest
-          </span>
+          <span className="w-max font-bold whitespace-nowrap">Octane Type</span>
         </Link>
       </Button>
       <Clock

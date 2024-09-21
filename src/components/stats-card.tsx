@@ -8,7 +8,7 @@ interface IStatsCardProps {
 const StatsCard = (props: IStatsCardProps) => {
   const { stat, statLabel, description } = props;
   return (
-    <Card className="w-[350px]">
+    <Card className="">
       <CardHeader>
         <CardTitle className="text-4xl">{stat}</CardTitle>
         <CardDescription>{statLabel}</CardDescription>

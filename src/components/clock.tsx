@@ -1,5 +1,11 @@
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import { Orbitron } from "next/font/google";
+
+const orbitron = Orbitron({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800", "900"],
+});
 
 const MIN_IN_SEC = 60;
 
@@ -51,8 +57,13 @@ const Clock = (props: IClockProps) => {
   }
 
   return (
-    <div className="w-full px-3 py-3 text-right">
-      <span className={cn(`text-3xl ${isNearExpiry ? "text-red-500" : ""}`)}>
+    <div className="w-full px-3 py-3 text-right cursor-default">
+      <span
+        className={cn(
+          `text-3xl ${isNearExpiry ? "text-red-500" : ""}`,
+          orbitron.className
+        )}
+      >
         {getTime()}
       </span>
     </div>
