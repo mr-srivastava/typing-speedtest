@@ -15,33 +15,37 @@ interface IClockProps {
   started: boolean;
   finished: boolean;
   handleTimerExpiry: () => void;
+  timerDuration?: number;
 }
 
 const Clock = (props: IClockProps) => {
-  const { timer, setTimer } = props;
+  const { timer, setTimer, timerDuration = 60 } = props;
   const [isNearExpiry, setIsNearExpiry] = useState<boolean>(false);
   useEffect(() => {
     if (timer === 0) {
       props.handleTimerExpiry();
     }
-    if (timer < 60 && !props.started) {
-      setTimer(60);
+    if (timer < timerDuration && !props.started) {
+      setTimer(timerDuration);
       setIsNearExpiry(false);
     }
     const intervalId = setInterval(() => {
       if (!props.finished) {
         if (timer > 0 && props.started) {
-          if (timer !== 60 && timer % MIN_IN_SEC <= 10) {
+          if (timer !== timerDuration && timer % MIN_IN_SEC <= 10) {
             setIsNearExpiry(true);
           }
           setTimer((t: number) => t - 1);
+        } else if (timer === timerDuration) {
+          // Reset isNearExpiry when restarted
+          setIsNearExpiry(false);
         }
       }
     }, 1000);
 
     return () => clearInterval(intervalId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.finished, props.started, timer]);
+  }, [props.finished, props.started, timer, timerDuration]);
 
   function formatNumberWithTwoDigit(num: number) {
     return num.toLocaleString("en-US", {
