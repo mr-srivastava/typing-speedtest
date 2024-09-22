@@ -76,23 +76,23 @@ export const RadialBarChartComponent: React.FC<IRadialChartProps> = ({
       <CardContent className="flex-1 pb-0">
         <ChartContainer
           config={chartConfig}
-          className="mx-auto aspect-square max-h-[250px]"
+          className="mx-auto aspect-square max-h-[150px]"
         >
           <RadialBarChart
             data={chartData}
             startAngle={0}
             endAngle={(value / maxValue) * 360}
-            innerRadius={80}
-            outerRadius={110}
+            innerRadius={40}
+            outerRadius={55}
           >
             <PolarGrid
               gridType="circle"
               radialLines={false}
               stroke="none"
               className="first:fill-muted last:fill-background"
-              polarRadius={[86, 74]}
+              polarRadius={[43, 37]}
             />
-            <RadialBar dataKey={dataKey} background cornerRadius={10} />
+            <RadialBar dataKey={dataKey} background cornerRadius={5} />
             <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
               <Label
                 content={({ viewBox }) => {
@@ -107,7 +107,7 @@ export const RadialBarChartComponent: React.FC<IRadialChartProps> = ({
                         <tspan
                           x={viewBox.cx}
                           y={viewBox.cy}
-                          className="fill-foreground text-4xl font-bold"
+                          className="fill-foreground text-2xl font-bold"
                         >
                           {value.toLocaleString()}
                           {showPercentage && "%"}
@@ -121,7 +121,7 @@ export const RadialBarChartComponent: React.FC<IRadialChartProps> = ({
           </RadialBarChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col gap-2 text-sm">
+      <CardFooter className="flex-col gap-2 text-xs">
         <div className="flex items-center gap-2 font-medium">
           {getFeedbackMessage(value)}
         </div>

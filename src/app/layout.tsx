@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Epilogue } from "next/font/google";
+import { Epilogue, Kanit } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
@@ -10,12 +10,16 @@ const epilogue = Epilogue({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
 });
 
+const kanit = Kanit({
+  subsets: ["latin"],
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+});
+
 export const metadata: Metadata = {
   title: "Octance Typing Speedtest",
   description:
     "Ready to dominate the keyboard? Our fun typing speed test will put your skills to the test.",
 };
-
 
 export default function RootLayout({
   children,
@@ -27,7 +31,8 @@ export default function RootLayout({
       <body
         className={cn(
           "min-h-screen bg-background antialiased",
-          epilogue.className
+          // epilogue.className
+          kanit.className
         )}
       >
         <ThemeProvider

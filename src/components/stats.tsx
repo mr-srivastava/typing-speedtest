@@ -55,8 +55,7 @@ const TypingStats = React.memo((props: ITypingStatsProps) => {
   );
 
   return (
-    <div className="w-full text-center space-y-4 my-10">
-      <h2 className="text-3xl font-bold mb-6 text-center"> Metrics</h2>
+    <div className="w-full text-center space-y-2">
       <div className="flex flex-col w-full justify-evenly items-center space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
         {renderRadialChart(
           wpm,
