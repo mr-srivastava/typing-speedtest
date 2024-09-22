@@ -1,11 +1,12 @@
 "use client";
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import Header from "@/components/header";
 import Preview from "@/components/preview";
-import TypingStats from "@/components/stats";
 import RestartButton from "@/components/restart-button";
 import { useTypingTest } from "@/hooks/useTypingTest";
 import TypingInput from "@/components/typing-input";
+import { MetricsModal } from "@/components/metrics-modal";
+import { button as Btn } from "framer-motion/client";
 
 const defaultTimer = 60;
 
@@ -31,6 +32,8 @@ export default function Octane() {
     handleTimerExpiry,
   } = useTypingTest(defaultTimer);
 
+  const [isMetricsModalOpen, setIsMetricsModalOpen] = useState(false);
+
   // Use useMemo to memoize typedLetterAccuracy
   const typedLetterAccuracy = useMemo(() => {
     return letterAccuracy as Record<string, LetterMetrics>;
@@ -46,6 +49,21 @@ export default function Octane() {
     logLetterAccuracy();
   }, [logLetterAccuracy]);
 
+  React.useEffect(() => {
+    if (finished) {
+      setIsMetricsModalOpen(true);
+    }
+  }, [finished]);
+
+  const handleRestart = () => {
+    onRestart();
+    setIsMetricsModalOpen(false);
+  };
+
+  const handleViewMetrics = () => {
+    setIsMetricsModalOpen(true);
+  };
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-[--background]">
       <Header
@@ -58,20 +76,24 @@ export default function Octane() {
 
       <main className="flex min-h-screen flex-col max-w-6xl">
         <Preview text={text} userInput={userInput} />
-        <RestartButton onRestart={onRestart} disabled={!started} />
+        <RestartButton onRestart={handleRestart} disabled={!started} />
+        {started && finished && (
+          <Btn onClick={handleViewMetrics}>View Metrics</Btn>
+        )}
         <TypingInput
           value={userInput}
           onChange={onInputChange}
           readOnly={finished}
         />
-        {finished && (
-          <TypingStats
-            correctWordCount={correctWordCount}
-            totalWordCount={totalWordCount}
-            timer={timer}
-            letterAccuracyData={typedLetterAccuracy}
-          />
-        )}
+        <MetricsModal
+          isOpen={isMetricsModalOpen}
+          onOpenChange={setIsMetricsModalOpen}
+          correctWordCount={correctWordCount}
+          totalWordCount={totalWordCount}
+          timer={timer}
+          letterAccuracyData={typedLetterAccuracy}
+          onRestart={handleRestart}
+        />
       </main>
     </div>
   );

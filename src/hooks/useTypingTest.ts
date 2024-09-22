@@ -7,8 +7,7 @@ interface LetterMetrics {
 }
 
 export function useTypingTest(defaultTimer: number) {
-  const defaultText = useMemo(() => getText(), []);
-  const [text, setText] = useState<string>(defaultText);
+  const [text, setText] = useState<string>(getText());
   const [timer, setTimer] = useState<number>(defaultTimer);
   const [userInput, setUserInput] = useState<string>("");
   const [started, setStarted] = useState<boolean>(false);
@@ -18,7 +17,7 @@ export function useTypingTest(defaultTimer: number) {
   const [letterAccuracy, setLetterAccuracy] = useState<Record<string, LetterMetrics>>({});
 
   const onRestart = useCallback(() => {
-    setText(defaultText);
+    setText(getText());
     setCorrectWordCount(0);
     setTotalWordCount(0);
     setUserInput("");
@@ -26,7 +25,7 @@ export function useTypingTest(defaultTimer: number) {
     setFinished(false);
     setTimer(defaultTimer);
     setLetterAccuracy({});
-  }, [defaultText, defaultTimer]);
+  }, [defaultTimer]);
 
   const startTimer = useCallback(() => {
     setStarted(true);
