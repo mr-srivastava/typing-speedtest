@@ -1,12 +1,13 @@
-"use client";
-import React from "react";
+'use client';
+import React from 'react';
 import {
   Modal,
   ModalBody,
   ModalContent,
   ModalFooter,
-} from "./ui/animated-modal";
-import TypingStats from "./stats";
+} from './ui/animated-modal';
+import TypingStats from './stats';
+import { LetterMetrics } from '@/types/metrics';
 
 interface MetricsModalProps {
   isOpen: boolean;
@@ -14,7 +15,7 @@ interface MetricsModalProps {
   correctWordCount: number;
   totalWordCount: number;
   timer: number;
-  letterAccuracyData: Record<string, { correct: number; total: number }>;
+  letterAccuracyData: Record<string, LetterMetrics>;
   onRestart: () => void;
 }
 
@@ -29,7 +30,7 @@ export function MetricsModal({
 }: MetricsModalProps) {
   return (
     <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
-      <ModalBody title="Metrics" className="w-full max-w-4xl mx-auto">
+      <ModalBody title='Metrics' className='w-full max-w-4xl mx-auto'>
         <ModalContent>
           <TypingStats
             correctWordCount={correctWordCount}
@@ -38,10 +39,10 @@ export function MetricsModal({
             letterAccuracyData={letterAccuracyData}
           />
         </ModalContent>
-        <ModalFooter className="gap-4 justify-end">
+        <ModalFooter className='gap-4 justify-end'>
           <button
             onClick={onRestart}
-            className="bg-black text-white dark:bg-white dark:text-black text-sm px-4 py-2 rounded-md border border-black w-28"
+            className='bg-black text-white dark:bg-white dark:text-black text-sm px-4 py-2 rounded-md border border-black w-28'
           >
             Restart
           </button>

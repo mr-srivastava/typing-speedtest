@@ -22,7 +22,7 @@ export default function TypingInput({
 
   return (
     <Textarea
-      className="w-full rounded-lg min-h-[250px] overflow-hidden px-3 py-3 resize-none mt-2 bg-grey-100/20"
+      className="w-full rounded-lg min-h-[250px] overflow-hidden px-4 py-3 resize-none mt-2 bg-secondary/60 border border-border text-base md:text-lg font-mono caret-[hsl(var(--primary))] focus-visible:ring-2 focus-visible:ring-[hsl(var(--primary))] focus-visible:border-transparent"
       placeholder="Start typing for the test to begin"
       value={value}
       onChange={onChange}

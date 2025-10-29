@@ -1,10 +1,6 @@
 import { useState, useCallback, useMemo } from "react";
 import getText from "@/lib/text";
-
-interface LetterMetrics {
-  correct: number;
-  total: number;
-}
+import { LetterMetrics } from "@/types/metrics";
 
 export function useTypingTest(defaultTimer: number) {
   const [text, setText] = useState<string>(getText());

@@ -1,13 +1,11 @@
 import React, { useMemo, useCallback } from "react";
 import { RadialBarChartComponent } from "./radial-chart";
 import { LetterAccuracyMetrics } from "./letter-accuracy-metrics";
+import { LetterMetrics } from "@/types/metrics";
 
 const AVG_WORD_LEN = 5;
 
-interface LetterMetrics {
-  correct: number;
-  total: number;
-}
+// uses shared LetterMetrics
 
 interface ITypingStatsProps {
   correctWordCount: number;

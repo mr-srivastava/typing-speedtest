@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 interface PreviewProps {
   text: string;
@@ -7,20 +7,22 @@ interface PreviewProps {
 
 const Preview = (props: PreviewProps) => {
   const { text, userInput } = props;
-  const textArr = text.split("");
+  const textArr = text.split('');
   return (
-    <div className="px-3">
+    <div className='px-3'>
       {textArr.map((s, i) => {
-        let hightlightColor = "";
+        let highlightColor = '';
         if (i < userInput.length) {
           const isCorrect = s === userInput[i];
-          hightlightColor = isCorrect ? "bg-green-300" : "bg-red-300";
+          highlightColor = isCorrect
+            ? 'bg-[hsl(var(--good))]'
+            : 'bg-[hsl(var(--needs-improvement))]';
         }
         return (
           <span
             key={i}
             className={`${
-              hightlightColor ? hightlightColor + " dark:text-black" : ""
+              highlightColor ? highlightColor + ' opacity-80 dark:text-black' : ''
             }`}
           >
             {s}
