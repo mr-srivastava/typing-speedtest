@@ -1,11 +1,12 @@
 import React, { Dispatch, SetStateAction } from 'react';
-import Clock from './clock';
+import TimerDisplay from '@/components/molecules/TimerDisplay';
 import Image from 'next/image';
-import { Button } from './ui/button';
+import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import RestartButton from './restart-button';
+import RestartButton from '@/components/atoms/RestartButton';
+import { layoutClasses } from '@/lib/layout-utils';
 
-interface IHeaderProps {
+interface AppHeaderProps {
   timer?: number;
   setTimer?: Dispatch<SetStateAction<number>>;
   started?: boolean;
@@ -14,24 +15,27 @@ interface IHeaderProps {
   showRestart?: boolean;
   onRestart?: () => void;
   restartDisabled?: boolean;
+  className?: string;
 }
 
-const Header = (props: IHeaderProps) => {
-  const {
-    timer,
-    setTimer,
-    started,
-    finished,
-    handleTimerExpiry,
-    showRestart,
-    onRestart,
-    restartDisabled,
-  } = props;
+const AppHeader: React.FC<AppHeaderProps> = ({
+  timer,
+  setTimer,
+  started,
+  finished,
+  handleTimerExpiry,
+  showRestart,
+  onRestart,
+  restartDisabled,
+  className = '',
+}) => {
   return (
-    <header className='w-full'>
-      <div className='mx-auto max-w-6xl px-6 md:px-8 flex items-center justify-between h-16 md:h-20'>
+    <header className={`w-full ${className}`}>
+      <div
+        className={`mx-auto max-w-6xl px-6 md:px-8 ${layoutClasses.flexBetween} h-16 md:h-20`}
+      >
         <Button
-          className='flex space-x-2 px-2 md:px-3 py-2 items-center hover:bg-transparent'
+          className={`${layoutClasses.flexStart} space-x-2 px-2 md:px-3 py-2 hover:bg-transparent`}
           variant={'ghost'}
           asChild
         >
@@ -42,9 +46,9 @@ const Header = (props: IHeaderProps) => {
             </span>
           </Link>
         </Button>
-        <div className='flex items-center gap-2'>
+        <div className={`${layoutClasses.flexStart} ${layoutClasses.gap2}`}>
           {typeof timer === 'number' && setTimer && handleTimerExpiry ? (
-            <Clock
+            <TimerDisplay
               timer={timer}
               setTimer={setTimer}
               started={!!started}
@@ -55,10 +59,19 @@ const Header = (props: IHeaderProps) => {
           {showRestart && onRestart ? (
             <RestartButton onRestart={onRestart} disabled={!!restartDisabled} />
           ) : null}
+          {/* Future feature placeholder - Leaderboard */}
+          <Button
+            variant='ghost'
+            disabled
+            className='text-muted-foreground hidden sm:flex'
+          >
+            Leaderboard
+            <span className='ml-1 text-xs'>(Soon)</span>
+          </Button>
         </div>
       </div>
     </header>
   );
 };
 
-export default Header;
+export default AppHeader;
