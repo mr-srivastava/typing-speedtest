@@ -36,7 +36,7 @@ const LetterAccuracyChart: React.FC<LetterAccuracyChartProps> = ({
   const { sortedLetters: _sortedLetters, overallWeightedAccuracy } =
     useMemo(() => {
       const sorted = Object.entries(letterAccuracyData).sort((a, b) =>
-        a[0].localeCompare(b[0])
+        a[0].localeCompare(b[0]),
       );
       const overall = calculateOverallWeightedAccuracy(letterAccuracyData);
       return { sortedLetters: sorted, overallWeightedAccuracy: overall };
@@ -65,7 +65,7 @@ const LetterAccuracyChart: React.FC<LetterAccuracyChartProps> = ({
                 layoutClasses.flexCenter
               } text-white font-bold cursor-pointer transition-transform hover:scale-110 active:scale-95 ${getAccuracyColor(
                 metrics.correct,
-                metrics.total
+                metrics.total,
               )}`}
             >
               {letter.toUpperCase()}
@@ -157,8 +157,19 @@ const LetterAccuracyChart: React.FC<LetterAccuracyChartProps> = ({
     </motion.div>
   );
 
+  // Check if there's any actual data (not just empty entries)
+  const hasActualData = useMemo(() => {
+    if (!letterAccuracyData || Object.keys(letterAccuracyData).length === 0) {
+      return false;
+    }
+    // Check if any letter has been typed (total > 0)
+    return Object.values(letterAccuracyData).some(
+      (metrics) => metrics.total > 0,
+    );
+  }, [letterAccuracyData]);
+
   // Show message if no data available
-  if (!letterAccuracyData || Object.keys(letterAccuracyData).length === 0) {
+  if (!hasActualData) {
     return (
       <div className={`mt-5 text-center ${className}`}>
         <motion.div

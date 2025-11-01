@@ -51,6 +51,7 @@ interface MetricsModalProps {
   letterAccuracyData: Record<string, LetterMetrics>;
   sessionData?: EnhancedStoredData | null;
   onRestart: () => void;
+  mode?: 'this-test' | 'all-tests' | 'both';
   className?: string;
 }
 
@@ -64,12 +65,30 @@ const MetricsModal: React.FC<MetricsModalProps> = ({
   letterAccuracyData,
   sessionData,
   onRestart,
+  mode = 'both',
   className = '',
 }) => {
-  const [showCumulative, setShowCumulative] = useState(false);
+  // Determine initial view based on mode
+  const getInitialView = React.useCallback(() => {
+    if (mode === 'all-tests') return true;
+    if (mode === 'this-test') return false;
+    // For 'both' mode, default to this test
+    return false;
+  }, [mode]);
+
+  const [showCumulative, setShowCumulative] = useState(getInitialView);
+
+  // Reset view when mode changes
+  React.useEffect(() => {
+    setShowCumulative(getInitialView());
+  }, [mode, isOpen, getInitialView]);
+
   const hasCumulativeData = Boolean(
     sessionData && sessionData.cumulative.totalTests > 1,
   );
+
+  // Determine if toggle should be shown
+  const showToggle = mode === 'both' && hasCumulativeData;
 
   return (
     <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
@@ -78,11 +97,11 @@ const MetricsModal: React.FC<MetricsModalProps> = ({
         className={`w-full max-w-4xl mx-auto ${className}`}
       >
         <ModalContent>
-          {hasCumulativeData && (
+          {showToggle && (
             <ViewToggle
               showCumulative={showCumulative}
               onToggle={setShowCumulative}
-              totalTests={sessionData!.cumulative.totalTests}
+              totalTests={sessionData?.cumulative.totalTests ?? 0}
             />
           )}
 
@@ -93,7 +112,9 @@ const MetricsModal: React.FC<MetricsModalProps> = ({
             timerDuration={timerDuration}
             letterAccuracyData={letterAccuracyData}
             data={sessionData}
-            showCumulative={showCumulative && hasCumulativeData}
+            showCumulative={
+              mode === 'all-tests' ? true : showCumulative && hasCumulativeData
+            }
           />
         </ModalContent>
         <ModalFooter className='gap-4 justify-end'>
@@ -101,7 +122,7 @@ const MetricsModal: React.FC<MetricsModalProps> = ({
             onClick={onRestart}
             className='bg-black text-white dark:bg-white dark:text-black text-sm px-4 py-2 rounded-md border border-black w-28'
           >
-            Restart
+            {mode === 'all-tests' ? 'Close' : 'Restart'}
           </button>
         </ModalFooter>
       </ModalBody>

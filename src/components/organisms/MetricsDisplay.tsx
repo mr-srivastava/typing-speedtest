@@ -43,25 +43,25 @@ const MetricsDisplay: React.FC<MetricsDisplayProps> = ({
   const wpm = useMemo(
     () =>
       getWpmValue(correctWordCount, timer, data, showCumulative, timerDuration),
-    [correctWordCount, timer, data, showCumulative, timerDuration]
+    [correctWordCount, timer, data, showCumulative, timerDuration],
   );
 
   const accuracy = useMemo(
     () =>
       getAccuracyValue(correctWordCount, totalWordCount, data, showCumulative),
-    [correctWordCount, totalWordCount, data, showCumulative]
+    [correctWordCount, totalWordCount, data, showCumulative],
   );
 
   const displayLetterAccuracy = useMemo(
     () => getLetterAccuracyData(letterAccuracyData, data, showCumulative),
-    [letterAccuracyData, data, showCumulative]
+    [letterAccuracyData, data, showCumulative],
   );
 
   const renderRadialChart = useCallback(
     (
       value: number,
       title: string,
-      config: typeof wpmChartConfig | typeof accuracyChartConfig
+      config: typeof wpmChartConfig | typeof accuracyChartConfig,
     ) => (
       <div className='w-full max-w-[350px]'>
         <RadialChart
@@ -76,12 +76,12 @@ const MetricsDisplay: React.FC<MetricsDisplayProps> = ({
         />
       </div>
     ),
-    []
+    [],
   );
 
   const statsTitle = useMemo(
     () => generateStatsTitle(data, showCumulative),
-    [data, showCumulative]
+    [data, showCumulative],
   );
 
   // Overall stats metrics for display

@@ -47,15 +47,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
           </Link>
         </Button>
         <div className={`${layoutClasses.flexStart} ${layoutClasses.gap2}`}>
-          {typeof timer === 'number' && setTimer && handleTimerExpiry ? (
-            <TimerDisplay
-              timer={timer}
-              setTimer={setTimer}
-              started={!!started}
-              finished={!!finished}
-              handleTimerExpiry={handleTimerExpiry}
-            />
-          ) : null}
+          {typeof timer === 'number' ? <TimerDisplay timer={timer} /> : null}
           {showRestart && onRestart ? (
             <RestartButton onRestart={onRestart} disabled={!!restartDisabled} />
           ) : null}

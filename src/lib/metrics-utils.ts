@@ -68,8 +68,14 @@ export function getLetterAccuracyData(
   data?: EnhancedStoredData | null,
   showCumulative?: boolean,
 ): Record<string, LetterMetrics> {
-  if (showCumulative && data) {
-    return data.cumulative.letterStats;
+  if (showCumulative && data && data.cumulative.letterStats) {
+    // Check if cumulative data has any actual values
+    const hasData = Object.values(data.cumulative.letterStats).some(
+      (metrics) => metrics.total > 0,
+    );
+    if (hasData) {
+      return data.cumulative.letterStats;
+    }
   }
   return letterAccuracyData;
 }

@@ -23,6 +23,7 @@ interface HeroSectionProps {
     totalTimeSpent: number;
     firstTestDate: string;
   } | null;
+  onViewStats?: () => void;
   className?: string;
 }
 
@@ -31,6 +32,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
   isHydrated = true,
   hasSession = false,
   overallMetrics,
+  onViewStats,
   className = '',
 }) => {
   const showContent = isHydrated && !isLoading;
@@ -72,18 +74,30 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                   <OverallMetricsDisplay metrics={overallMetrics} />
                 )}
               </div>
-              <Button
-                variant={'default'}
-                size={'lg'}
-                className={buttonClasses.primaryCta}
-                asChild
-              >
-                <Link href={'/octane'} className='whitespace-nowrap'>
-                  {overallMetrics
-                    ? 'Beat Your Average!'
-                    : 'Start Your Speed Test!'}
-                </Link>
-              </Button>
+              <div className='flex flex-col sm:flex-row gap-3 items-center justify-center'>
+                <Button
+                  variant={'default'}
+                  size={'lg'}
+                  className={buttonClasses.primaryCta}
+                  asChild
+                >
+                  <Link href={'/octane'} className='whitespace-nowrap'>
+                    {overallMetrics
+                      ? 'Beat Your Average!'
+                      : 'Start Your Speed Test!'}
+                  </Link>
+                </Button>
+                {overallMetrics && onViewStats && (
+                  <Button
+                    variant={'outline'}
+                    size={'lg'}
+                    onClick={onViewStats}
+                    className='whitespace-nowrap'
+                  >
+                    View All Stats
+                  </Button>
+                )}
+              </div>
               <p
                 className={`${textClasses.mutedSmall} px-4 sm:px-0 text-center ${layoutShiftClasses.ctaSubtext}`}
               >

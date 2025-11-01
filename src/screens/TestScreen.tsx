@@ -54,7 +54,7 @@ const TestScreen: React.FC<TestScreenProps> = ({
         const wpm = Math.round(correctWordCount / (testDuration / 60)) || 0;
         const accuracy = calculateCurrentAccuracy(
           correctWordCount,
-          totalWordCount
+          totalWordCount,
         );
         const wordsTyped = Math.round(totalWordCount);
         const correctWords = Math.round(correctWordCount);
@@ -137,6 +137,7 @@ const TestScreen: React.FC<TestScreenProps> = ({
           letterAccuracyData={typedLetterAccuracy}
           sessionData={data}
           onRestart={handleRestart}
+          mode={data && data.cumulative.totalTests < 2 ? 'this-test' : 'both'}
         />
       </main>
     </div>
