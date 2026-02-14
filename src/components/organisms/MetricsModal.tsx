@@ -91,13 +91,13 @@ const MetricsModal: React.FC<MetricsModalProps> = ({
         className={`w-full max-w-4xl mx-auto ${className}`}
       >
         <ModalContent>
-          {showToggle && (
+          {showToggle ? (
             <ViewToggle
               showCumulative={showCumulative}
               onToggle={setShowCumulative}
               totalTests={sessionData?.cumulative.totalTests ?? 0}
             />
-          )}
+          ) : null}
 
           <MetricsDisplay
             correctWordCount={correctWordCount}

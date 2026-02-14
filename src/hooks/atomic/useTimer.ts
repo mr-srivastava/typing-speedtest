@@ -29,12 +29,8 @@ export function useTimer({
   // Use refs to store callbacks and values to avoid them being dependencies
   const onExpiryRef = useRef(onExpiry);
   const durationRef = useRef(duration);
-
-  // Update refs when values change
-  useEffect(() => {
-    onExpiryRef.current = onExpiry;
-    durationRef.current = duration;
-  }, [onExpiry, duration]);
+  onExpiryRef.current = onExpiry;
+  durationRef.current = duration;
 
   const start = useCallback(() => {
     setIsRunning(true);

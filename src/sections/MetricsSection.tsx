@@ -30,20 +30,20 @@ const MetricsSection: React.FC<MetricsSectionProps> = ({
   return (
     <section className={`w-full ${className}`}>
       {/* Section Header */}
-      {(title || subtitle) && (
+      {title || subtitle ? (
         <div className='text-center mb-6 space-y-2'>
-          {title && (
+          {title ? (
             <h2 className='text-2xl md:text-3xl font-bold text-foreground'>
               {title}
             </h2>
-          )}
-          {subtitle && (
+          ) : null}
+          {subtitle ? (
             <p className='text-muted-foreground text-sm md:text-base'>
               {subtitle}
             </p>
-          )}
+          ) : null}
         </div>
-      )}
+      ) : null}
 
       {/* Metrics Display */}
       <MetricsDisplay

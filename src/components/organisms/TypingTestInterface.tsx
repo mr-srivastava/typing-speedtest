@@ -44,7 +44,7 @@ const TypingTestInterface: React.FC<TypingTestInterfaceProps> = ({
         />
 
         {/* Restart Button positioned at bottom right of input */}
-        {showRestart && onRestart && (
+        {showRestart && onRestart ? (
           <div className='flex w-full justify-end mt-3'>
             <ActionButton
               variant='outline'
@@ -55,7 +55,7 @@ const TypingTestInterface: React.FC<TypingTestInterfaceProps> = ({
               className='rounded-lg'
             />
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   );

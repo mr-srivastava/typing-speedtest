@@ -60,7 +60,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ className = '' }) => {
       />
 
       {/* Metrics Modal */}
-      {hasSession && data && (
+      {hasSession && data ? (
         <MetricsModal
           isOpen={isMetricsModalOpen}
           onOpenChange={setIsMetricsModalOpen}
@@ -73,7 +73,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ className = '' }) => {
           onRestart={handleCloseMetrics}
           mode='all-tests'
         />
-      )}
+      ) : null}
 
       {/* Subtle primary glow */}
       <div

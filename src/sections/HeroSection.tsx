@@ -58,7 +58,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
         </h1>
 
         {/* Content with consistent layout */}
-        {showContent && (
+        {showContent ? (
           <>
             <p
               className={`text-muted-foreground max-w-2xl mx-auto mt-6 sm:mt-8 ${textClasses.heroSubtitle} relative z-10 leading-relaxed px-2 sm:px-0 ${layoutShiftClasses.heroDescription} ${layoutClasses.flexCenter}`}
@@ -70,9 +70,9 @@ const HeroSection: React.FC<HeroSectionProps> = ({
             <div className={layoutShiftClasses.heroActions}>
               {/* Reserve space for OverallMetrics to prevent layout shift */}
               <div className={layoutShiftClasses.metricsReserved}>
-                {overallMetrics && (
+                {overallMetrics ? (
                   <OverallMetricsDisplay metrics={overallMetrics} />
-                )}
+                ) : null}
               </div>
               <div className='flex flex-col sm:flex-row gap-3 items-center justify-center'>
                 <Button
@@ -87,7 +87,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                       : 'Start Your Speed Test!'}
                   </Link>
                 </Button>
-                {overallMetrics && onViewStats && (
+                {overallMetrics && onViewStats ? (
                   <Button
                     variant={'outline'}
                     size={'lg'}
@@ -96,7 +96,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                   >
                     View All Stats
                   </Button>
-                )}
+                ) : null}
               </div>
               <p
                 className={`${textClasses.mutedSmall} px-4 sm:px-0 text-center ${layoutShiftClasses.ctaSubtext}`}
@@ -107,10 +107,10 @@ const HeroSection: React.FC<HeroSectionProps> = ({
               </p>
             </div>
           </>
-        )}
+        ) : null}
 
         {/* Loading state with same layout */}
-        {showLoadingState && (
+        {showLoadingState ? (
           <>
             <p
               className={`text-muted-foreground max-w-2xl mx-auto mt-6 sm:mt-8 ${textClasses.heroSubtitle} relative z-10 leading-relaxed px-2 sm:px-0 ${layoutShiftClasses.heroDescription} flex items-center justify-center`}
@@ -140,10 +140,10 @@ const HeroSection: React.FC<HeroSectionProps> = ({
               </p>
             </div>
           </>
-        )}
+        ) : null}
 
         {/* Session-aware future features preview */}
-        {showContent && (
+        {showContent ? (
           <div className='mt-12 sm:mt-16 pt-6 sm:pt-8 border-t border-border/50'>
             <p className={`${textClasses.mutedSmall} mb-3 sm:mb-4`}>
               {hasSession ? 'More Features Coming Soon' : 'Coming Soon'}
@@ -162,16 +162,16 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                 </div>
               ))}
             </div>
-            {hasSession && (
+            {hasSession ? (
               <p
                 className={`${textClasses.mutedSubtle}/60 mt-3 sm:mt-4 px-4 sm:px-0`}
               >
                 Your scores are currently stored locally. Persistent tracking
                 coming soon!
               </p>
-            )}
+            ) : null}
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   );

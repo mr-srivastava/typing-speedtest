@@ -1,5 +1,5 @@
 'use client';
-import React, { useCallback, useMemo, useState, startTransition } from 'react';
+import React, { useCallback, useState, startTransition } from 'react';
 import dynamic from 'next/dynamic';
 import AppHeader from '@/components/organisms/AppHeader';
 import TestControlSection from '@/sections/TestControlSection';
@@ -10,7 +10,7 @@ import {
   type TypingTestFinishedSnapshot,
 } from '@/hooks/complex/useTypingTest';
 import { Button } from '@/components/ui/button';
-import { LetterMetrics, TestSession } from '@/types/metrics';
+import { TestSession } from '@/types/metrics';
 import { useSession } from '@/contexts/SessionContext';
 import { calculateCurrentAccuracy } from '@/lib/metrics-utils';
 
@@ -80,11 +80,6 @@ const TestScreen: React.FC<TestScreenProps> = ({
     onInputChange,
   } = useTypingTest(defaultTimer, { onFinished: handleFinished });
 
-  const typedLetterAccuracy = useMemo(
-    () => letterAccuracy as Record<string, LetterMetrics>,
-    [letterAccuracy]
-  );
-
   const handleRestart = useCallback(() => {
     onRestart();
     setIsMetricsModalOpen(false);
@@ -120,11 +115,11 @@ const TestScreen: React.FC<TestScreenProps> = ({
         />
 
         {/* View Metrics Button */}
-        {finished && (
+        {finished ? (
           <div className='mt-4'>
             <Button onClick={handleViewMetrics}>View Metrics</Button>
           </div>
-        )}
+        ) : null}
 
         {/* Metrics Modal */}
         <MetricsModal
@@ -135,7 +130,7 @@ const TestScreen: React.FC<TestScreenProps> = ({
           totalWordCount={totalWordCount}
           timer={timer}
           timerDuration={defaultTimer}
-          letterAccuracyData={typedLetterAccuracy}
+          letterAccuracyData={letterAccuracy}
           sessionData={data}
           onRestart={handleRestart}
           mode={data && data.cumulative.totalTests < 2 ? 'this-test' : 'both'}

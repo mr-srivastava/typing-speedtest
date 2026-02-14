@@ -69,7 +69,7 @@ export const ModalBody = ({
 
   return (
     <AnimatePresence>
-      {open && (
+      {open ? (
         <motion.div
           initial={{
             opacity: 0,
@@ -122,7 +122,7 @@ export const ModalBody = ({
             {children}
           </motion.div>
         </motion.div>
-      )}
+      ) : null}
     </AnimatePresence>
   );
 };

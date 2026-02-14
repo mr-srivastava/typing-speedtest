@@ -162,7 +162,9 @@ export function useTypingTest(
       const newAccuracy = { ...letterAccuracy };
       if (lastChar && lastChar.match(/[a-z]/i)) {
         const lowerChar = lastChar.toLowerCase();
-        if (!newAccuracy[lowerChar]) {
+        if (newAccuracy[lowerChar]) {
+          newAccuracy[lowerChar] = { ...newAccuracy[lowerChar] };
+        } else {
           newAccuracy[lowerChar] = { correct: 0, total: 0 };
         }
         newAccuracy[lowerChar].total++;
