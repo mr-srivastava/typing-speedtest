@@ -29,12 +29,12 @@ const TestControlSection: React.FC<TestControlSectionProps> = ({
       {/* Controls row: restart and timer */}
       <div className={layoutClasses.flexBetween}>
         <div className={`${layoutClasses.flexStart} ${layoutClasses.gap2}`}>
-          {showRestart && (
+          {showRestart ? (
             <RestartButton
               onRestart={onRestart}
               disabled={restartDisabled || (!started && !finished)}
             />
-          )}
+          ) : null}
         </div>
         <TimerDisplay timer={timer} timerDuration={timerDuration} />
       </div>

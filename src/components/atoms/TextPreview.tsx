@@ -14,6 +14,8 @@ const TextPreview: React.FC<TextPreviewProps> = ({
 }) => {
   const textArr = text.split('');
 
+  const lastTypedIndex = userInput.length > 0 ? userInput.length - 1 : -1;
+
   return (
     <div className={`px-3 ${className}`}>
       {textArr.map((s, i) => {
@@ -22,14 +24,15 @@ const TextPreview: React.FC<TextPreviewProps> = ({
           const isCorrect = s === userInput[i];
           highlightColor = getAccuracyColorClass(isCorrect);
         }
+        const isJustTyped = i === lastTypedIndex;
         return (
           <span
             key={i}
-            className={`${
+            className={`inline-block transition-colors duration-150 ${
               highlightColor
                 ? highlightColor + ' opacity-80 dark:text-black'
                 : ''
-            }`}
+            } ${isJustTyped ? 'animate-character-feedback' : ''}`}
           >
             {s}
           </span>

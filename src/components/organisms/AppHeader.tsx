@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction } from 'react';
+import React from 'react';
 import TimerDisplay from '@/components/molecules/TimerDisplay';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -8,10 +8,6 @@ import { layoutClasses } from '@/lib/layout-utils';
 
 interface AppHeaderProps {
   timer?: number;
-  setTimer?: Dispatch<SetStateAction<number>>;
-  started?: boolean;
-  finished?: boolean;
-  handleTimerExpiry?: () => void;
   showRestart?: boolean;
   onRestart?: () => void;
   restartDisabled?: boolean;
@@ -20,10 +16,6 @@ interface AppHeaderProps {
 
 const AppHeader: React.FC<AppHeaderProps> = ({
   timer,
-  setTimer,
-  started,
-  finished,
-  handleTimerExpiry,
   showRestart,
   onRestart,
   restartDisabled,

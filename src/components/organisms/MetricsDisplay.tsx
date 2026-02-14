@@ -13,9 +13,8 @@ import {
   getAccuracyValue,
   getLetterAccuracyData,
   generateStatsTitle,
-  wpmChartConfig,
-  accuracyChartConfig,
-} from '@/lib/utils';
+} from '@/lib/metrics-utils';
+import { wpmChartConfig, accuracyChartConfig } from '@/lib/utils';
 
 interface MetricsDisplayProps {
   correctWordCount: number;
@@ -100,7 +99,7 @@ const MetricsDisplay: React.FC<MetricsDisplayProps> = ({
   return (
     <div className={`w-full text-center space-y-4 ${className}`}>
       {/* Overall Stats Header */}
-      {overallMetrics && (
+      {overallMetrics ? (
         <div className={`${getOverallMetricsClasses().container} mb-6`}>
           <div className={getOverallMetricsClasses().statsRow}>
             <span className='text-muted-foreground'>Overall stats:</span>
@@ -115,12 +114,12 @@ const MetricsDisplay: React.FC<MetricsDisplayProps> = ({
             />
           </div>
         </div>
-      )}
+      ) : null}
 
       {/* Session Stats Title */}
-      {statsTitle && (
+      {statsTitle ? (
         <div className='text-sm text-muted-foreground mb-4'>{statsTitle}</div>
-      )}
+      ) : null}
 
       {/* Main Metrics Charts */}
       <div className={layoutClasses.responsiveFlex}>

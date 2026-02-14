@@ -4,8 +4,6 @@
 
 import { LetterMetrics, EnhancedStoredData } from '@/types/metrics';
 
-export const AVG_WORD_LEN = 5;
-
 /**
  * Calculate current WPM based on correct words and test duration
  */

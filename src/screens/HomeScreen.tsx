@@ -1,11 +1,21 @@
 'use client';
-import React, { useState } from 'react';
-import { BackgroundBeams } from '@/components/ui/background-beams';
+import React, { useState, useCallback, startTransition } from 'react';
+import dynamic from 'next/dynamic';
 import AppHeader from '@/components/organisms/AppHeader';
 import HeroSection from '@/sections/HeroSection';
-import MetricsModal from '@/components/organisms/MetricsModal';
 import { useSession } from '@/contexts/SessionContext';
 import { gradients } from '@/lib/utils';
+
+const BackgroundBeams = dynamic(
+  () =>
+    import('@/components/ui/background-beams').then((mod) => mod.BackgroundBeams),
+  { ssr: false }
+);
+
+const MetricsModal = dynamic(
+  () => import('@/components/organisms/MetricsModal').then((mod) => mod.default),
+  { ssr: false }
+);
 
 interface HomeScreenProps {
   className?: string;
@@ -14,6 +24,14 @@ interface HomeScreenProps {
 const HomeScreen: React.FC<HomeScreenProps> = ({ className = '' }) => {
   const { data, isLoading, isHydrated, hasSession } = useSession();
   const [isMetricsModalOpen, setIsMetricsModalOpen] = useState(false);
+
+  const handleViewStats = useCallback(() => {
+    startTransition(() => setIsMetricsModalOpen(true));
+  }, []);
+
+  const handleCloseMetrics = useCallback(() => {
+    setIsMetricsModalOpen(false);
+  }, []);
 
   // Extract overall metrics for display
   const overallMetrics = data
@@ -30,6 +48,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ className = '' }) => {
     <div
       className={`min-h-screen w-full bg-background relative flex flex-col antialiased ${className}`}
     >
+      <div className="grain-overlay" aria-hidden />
       <AppHeader />
 
       <HeroSection
@@ -37,11 +56,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ className = '' }) => {
         isHydrated={isHydrated}
         hasSession={hasSession}
         overallMetrics={overallMetrics}
-        onViewStats={hasSession ? () => setIsMetricsModalOpen(true) : undefined}
+        onViewStats={hasSession ? handleViewStats : undefined}
       />
 
       {/* Metrics Modal */}
-      {hasSession && data && (
+      {hasSession && data ? (
         <MetricsModal
           isOpen={isMetricsModalOpen}
           onOpenChange={setIsMetricsModalOpen}
@@ -51,10 +70,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ className = '' }) => {
           timerDuration={60}
           letterAccuracyData={{}}
           sessionData={data}
-          onRestart={() => setIsMetricsModalOpen(false)}
+          onRestart={handleCloseMetrics}
           mode='all-tests'
         />
-      )}
+      ) : null}
 
       {/* Subtle primary glow */}
       <div

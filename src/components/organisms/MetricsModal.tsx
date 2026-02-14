@@ -68,20 +68,14 @@ const MetricsModal: React.FC<MetricsModalProps> = ({
   mode = 'both',
   className = '',
 }) => {
-  // Determine initial view based on mode
-  const getInitialView = React.useCallback(() => {
+  // Initial view from mode; parent passes key so state resets when mode/isOpen changes
+  const getInitialView = () => {
     if (mode === 'all-tests') return true;
     if (mode === 'this-test') return false;
-    // For 'both' mode, default to this test
     return false;
-  }, [mode]);
+  };
 
   const [showCumulative, setShowCumulative] = useState(getInitialView);
-
-  // Reset view when mode changes
-  React.useEffect(() => {
-    setShowCumulative(getInitialView());
-  }, [mode, isOpen, getInitialView]);
 
   const hasCumulativeData = Boolean(
     sessionData && sessionData.cumulative.totalTests > 1,
@@ -97,13 +91,13 @@ const MetricsModal: React.FC<MetricsModalProps> = ({
         className={`w-full max-w-4xl mx-auto ${className}`}
       >
         <ModalContent>
-          {showToggle && (
+          {showToggle ? (
             <ViewToggle
               showCumulative={showCumulative}
               onToggle={setShowCumulative}
               totalTests={sessionData?.cumulative.totalTests ?? 0}
             />
-          )}
+          ) : null}
 
           <MetricsDisplay
             correctWordCount={correctWordCount}

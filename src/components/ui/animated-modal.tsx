@@ -41,27 +41,6 @@ export const useModal = () => {
   return context;
 };
 
-export const ModalTrigger = ({
-  children,
-  className,
-}: {
-  children: ReactNode;
-  className?: string;
-}) => {
-  const { setOpen } = useModal();
-  return (
-    <button
-      className={cn(
-        'px-4 py-2 rounded-md text-black dark:text-white text-center relative overflow-hidden',
-        className
-      )}
-      onClick={() => setOpen(true)}
-    >
-      {children}
-    </button>
-  );
-};
-
 export const ModalBody = ({
   children,
   className,
@@ -79,15 +58,18 @@ export const ModalBody = ({
     } else {
       document.body.style.overflow = 'auto';
     }
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
   }, [open]);
 
-  const modalRef = useRef(null);
+  const modalRef = useRef<HTMLDivElement | null>(null);
   const { setOpen } = useModal();
   useOutsideClick(modalRef, () => setOpen(false));
 
   return (
     <AnimatePresence>
-      {open && (
+      {open ? (
         <motion.div
           initial={{
             opacity: 0,
@@ -140,7 +122,7 @@ export const ModalBody = ({
             {children}
           </motion.div>
         </motion.div>
-      )}
+      ) : null}
     </AnimatePresence>
   );
 };
@@ -232,13 +214,14 @@ const CloseIcon = () => {
 // Hook to detect clicks outside of a component.
 // Add it in a separate file, I've added here for simplicity
 export const useOutsideClick = (
-  ref: React.RefObject<HTMLDivElement>,
-  callback: Function
+  ref: React.RefObject<HTMLDivElement | null>,
+  callback: (event: MouseEvent | TouchEvent) => void
 ) => {
   useEffect(() => {
-    const listener = (event: any) => {
+    const listener = (event: MouseEvent | TouchEvent) => {
       // DO NOTHING if the element being clicked is the target element or their children
-      if (!ref.current || ref.current.contains(event.target)) {
+      const target = event.target as Node | null;
+      if (!ref.current || !target || ref.current.contains(target)) {
         return;
       }
       callback(event);

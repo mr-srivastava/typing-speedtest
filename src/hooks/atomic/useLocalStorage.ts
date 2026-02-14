@@ -1,13 +1,15 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 export function useLocalStorage<T>(
   key: string,
   initialValue: T,
-  validator?: (value: any) => value is T,
+  validator?: (value: unknown) => value is T,
 ) {
   const [storedValue, setStoredValue] = useState<T>(initialValue);
   const [isLoading, setIsLoading] = useState(true);
   const [isHydrated, setIsHydrated] = useState(false);
+  const validatorRef = useRef(validator);
+  validatorRef.current = validator;
 
   useEffect(() => {
     setIsHydrated(true);
@@ -17,9 +19,10 @@ export function useLocalStorage<T>(
         const item = localStorage.getItem(key);
         if (item) {
           const parsed = JSON.parse(item);
+          const validate = validatorRef.current;
 
           // Use validator if provided, otherwise just check if parsed exists
-          if (validator ? validator(parsed) : parsed !== null) {
+          if (validate ? validate(parsed) : parsed !== null) {
             setStoredValue(parsed);
           } else {
             // Clear invalid data
@@ -39,7 +42,7 @@ export function useLocalStorage<T>(
     };
 
     loadFromStorage();
-  }, [key, validator]);
+  }, [key]);
 
   const setValue = useCallback(
     (value: T | ((val: T) => T)) => {

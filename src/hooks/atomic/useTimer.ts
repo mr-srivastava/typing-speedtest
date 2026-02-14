@@ -22,17 +22,15 @@ export function useTimer({
 }: UseTimerOptions = {}): UseTimerReturn {
   const [timer, setTimer] = useState<number>(duration);
   const [isRunning, setIsRunning] = useState<boolean>(false);
-  const [isNearExpiry, setIsNearExpiry] = useState<boolean>(false);
+
+  // Derived: last 10 seconds of countdown while running
+  const isNearExpiry = isRunning && timer > 0 && timer <= 10;
 
   // Use refs to store callbacks and values to avoid them being dependencies
   const onExpiryRef = useRef(onExpiry);
   const durationRef = useRef(duration);
-
-  // Update refs when values change
-  useEffect(() => {
-    onExpiryRef.current = onExpiry;
-    durationRef.current = duration;
-  }, [onExpiry, duration]);
+  onExpiryRef.current = onExpiry;
+  durationRef.current = duration;
 
   const start = useCallback(() => {
     setIsRunning(true);
@@ -45,7 +43,6 @@ export function useTimer({
   const reset = useCallback(() => {
     setIsRunning(false);
     setTimer(duration);
-    setIsNearExpiry(false);
   }, [duration]);
 
   const formatTime = useCallback(() => {
@@ -73,27 +70,12 @@ export function useTimer({
           onExpiryRef.current?.();
           return 0;
         }
-
-        const newTimer = prevTimer - 1;
-
-        // Check if near expiry (last 10 seconds of any minute)
-        if (newTimer !== durationRef.current && newTimer % 60 <= 10) {
-          setIsNearExpiry(true);
-        }
-
-        return newTimer;
+        return prevTimer - 1;
       });
     }, 1000);
 
     return () => clearInterval(intervalId);
   }, [isRunning]);
-
-  // Reset near expiry when timer is reset
-  useEffect(() => {
-    if (timer === duration) {
-      setIsNearExpiry(false);
-    }
-  }, [timer, duration]);
 
   return {
     timer,

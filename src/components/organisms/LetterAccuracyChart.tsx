@@ -10,7 +10,8 @@ import {
 import { motion } from 'framer-motion';
 import { PieChart, Pie, Cell } from 'recharts';
 import { LetterMetrics } from '@/types/metrics';
-import { calculateOverallWeightedAccuracy, pieChartColors } from '@/lib/utils';
+import { calculateOverallWeightedAccuracy } from '@/lib/metrics-utils';
+import { pieChartColors } from '@/lib/utils';
 import { layoutClasses } from '@/lib/layout-utils';
 import {
   accuracyLegendData,
