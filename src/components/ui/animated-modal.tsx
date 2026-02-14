@@ -79,6 +79,9 @@ export const ModalBody = ({
     } else {
       document.body.style.overflow = 'auto';
     }
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
   }, [open]);
 
   const modalRef = useRef(null);

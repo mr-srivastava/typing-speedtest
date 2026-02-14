@@ -1,17 +1,14 @@
 'use client';
-import React, {
-  useCallback,
-  useMemo,
-  useState,
-  useEffect,
-  startTransition,
-} from 'react';
+import React, { useCallback, useMemo, useState, startTransition } from 'react';
 import dynamic from 'next/dynamic';
 import AppHeader from '@/components/organisms/AppHeader';
 import TestControlSection from '@/sections/TestControlSection';
 import TypingSection from '@/sections/TypingSection';
 
-import { useTypingTest } from '@/hooks/complex/useTypingTest';
+import {
+  useTypingTest,
+  type TypingTestFinishedSnapshot,
+} from '@/hooks/complex/useTypingTest';
 import { Button } from '@/components/ui/button';
 import { LetterMetrics, TestSession } from '@/types/metrics';
 import { useSession } from '@/contexts/SessionContext';
@@ -31,6 +28,41 @@ const TestScreen: React.FC<TestScreenProps> = ({
   defaultTimer = 60,
   className = '',
 }) => {
+  const { saveTestSession, data } = useSession();
+  const [isMetricsModalOpen, setIsMetricsModalOpen] = useState(false);
+
+  const handleFinished = useCallback(
+    (snapshot: TypingTestFinishedSnapshot) => {
+      startTransition(() => setIsMetricsModalOpen(true));
+      try {
+        const testDuration = defaultTimer - snapshot.timer;
+        const wpm =
+          Math.round(snapshot.correctWordCount / (testDuration / 60)) || 0;
+        const accuracy = calculateCurrentAccuracy(
+          snapshot.correctWordCount,
+          snapshot.totalWordCount,
+        );
+        const wordsTyped = Math.round(snapshot.totalWordCount);
+        const correctWords = Math.round(snapshot.correctWordCount);
+
+        const testSession: TestSession = {
+          wpm,
+          accuracy,
+          testDate: new Date().toISOString(),
+          testDuration,
+          wordsTyped,
+          correctWords,
+          letterAccuracy: snapshot.letterAccuracy,
+        };
+
+        saveTestSession(testSession);
+      } catch (error) {
+        console.warn('Failed to save session data:', error);
+      }
+    },
+    [defaultTimer, saveTestSession]
+  );
+
   const {
     text,
     timer,
@@ -42,64 +74,16 @@ const TestScreen: React.FC<TestScreenProps> = ({
     letterAccuracy,
     onRestart,
     onInputChange,
-  } = useTypingTest(defaultTimer);
+  } = useTypingTest(defaultTimer, { onFinished: handleFinished });
 
-  const { saveTestSession, data } = useSession();
-  const [isMetricsModalOpen, setIsMetricsModalOpen] = useState(false);
-  const [hasSessionBeenSaved, setHasSessionBeenSaved] = useState(false);
-
-  // Use useMemo to memoize typedLetterAccuracy
-  const typedLetterAccuracy = useMemo(() => {
-    return letterAccuracy as Record<string, LetterMetrics>;
-  }, [letterAccuracy]);
-
-  // Handle test completion and session saving
-  useEffect(() => {
-    if (finished && !hasSessionBeenSaved) {
-      startTransition(() => setIsMetricsModalOpen(true));
-      setHasSessionBeenSaved(true);
-
-      // Save enhanced session data
-      try {
-        const testDuration = defaultTimer - timer;
-        const wpm = Math.round(correctWordCount / (testDuration / 60)) || 0;
-        const accuracy = calculateCurrentAccuracy(
-          correctWordCount,
-          totalWordCount,
-        );
-        const wordsTyped = Math.round(totalWordCount);
-        const correctWords = Math.round(correctWordCount);
-
-        const testSession: TestSession = {
-          wpm,
-          accuracy,
-          testDate: new Date().toISOString(),
-          testDuration,
-          wordsTyped,
-          correctWords,
-          letterAccuracy: typedLetterAccuracy,
-        };
-
-        saveTestSession(testSession);
-      } catch (error) {
-        console.warn('Failed to save session data:', error);
-      }
-    }
-  }, [
-    finished,
-    hasSessionBeenSaved,
-    correctWordCount,
-    totalWordCount,
-    timer,
-    defaultTimer,
-    typedLetterAccuracy,
-    saveTestSession,
-  ]);
+  const typedLetterAccuracy = useMemo(
+    () => letterAccuracy as Record<string, LetterMetrics>,
+    [letterAccuracy]
+  );
 
   const handleRestart = useCallback(() => {
     onRestart();
     setIsMetricsModalOpen(false);
-    setHasSessionBeenSaved(false); // Reset the flag for the next test
   }, [onRestart]);
 
   const handleViewMetrics = useCallback(() => {
@@ -140,6 +124,7 @@ const TestScreen: React.FC<TestScreenProps> = ({
 
         {/* Metrics Modal */}
         <MetricsModal
+          key={`${isMetricsModalOpen}-${data && data.cumulative.totalTests < 2 ? 'this-test' : 'both'}`}
           isOpen={isMetricsModalOpen}
           onOpenChange={setIsMetricsModalOpen}
           correctWordCount={correctWordCount}

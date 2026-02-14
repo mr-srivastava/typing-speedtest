@@ -1,10 +1,25 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import getText from '@/lib/text';
 import { LetterMetrics } from '@/types/metrics';
 import { useTimer } from '@/hooks/atomic/useTimer';
 import { useToggle } from '@/hooks/atomic/useToggle';
 
-export function useTypingTest(defaultTimer: number) {
+export interface TypingTestFinishedSnapshot {
+  correctWordCount: number;
+  totalWordCount: number;
+  timer: number;
+  letterAccuracy: Record<string, LetterMetrics>;
+}
+
+export interface UseTypingTestOptions {
+  onFinished?: (snapshot: TypingTestFinishedSnapshot) => void;
+}
+
+export function useTypingTest(
+  defaultTimer: number,
+  options: UseTypingTestOptions = {}
+) {
+  const { onFinished } = options;
   const [text, setText] = useState<string>(getText());
   const [userInput, setUserInput] = useState<string>('');
   const [correctWordCount, setCorrectWordCount] = useState<number>(0);
@@ -13,12 +28,32 @@ export function useTypingTest(defaultTimer: number) {
     Record<string, LetterMetrics>
   >({});
 
-  // Use atomic hooks for boolean states first
   const {
     value: finished,
     setTrue: setFinished,
     setFalse: clearFinished,
   } = useToggle(false);
+
+  const onFinishedRef = useRef(onFinished);
+  onFinishedRef.current = onFinished;
+
+  const snapshotRef = useRef<TypingTestFinishedSnapshot>({
+    correctWordCount: 0,
+    totalWordCount: 0,
+    timer: 0,
+    letterAccuracy: {},
+  });
+
+  const finishTest = useCallback(
+    (override?: Partial<TypingTestFinishedSnapshot>) => {
+      setFinished();
+      const snapshot = override
+        ? { ...snapshotRef.current, ...override }
+        : snapshotRef.current;
+      onFinishedRef.current?.(snapshot);
+    },
+    [setFinished]
+  );
 
   // Use atomic hooks for timer
   const {
@@ -30,8 +65,17 @@ export function useTypingTest(defaultTimer: number) {
     isRunning: timerStarted,
   } = useTimer({
     duration: defaultTimer,
-    onExpiry: () => setFinished(),
+    onExpiry: () => finishTest(),
   });
+
+  useEffect(() => {
+    snapshotRef.current = {
+      correctWordCount,
+      totalWordCount,
+      timer,
+      letterAccuracy,
+    };
+  }, [correctWordCount, totalWordCount, timer, letterAccuracy]);
 
   // Derived state for started - using timer's isRunning
   const started = timerStarted;
@@ -47,17 +91,36 @@ export function useTypingTest(defaultTimer: number) {
   }, [clearFinished, resetTimer]);
 
   const handleTimerExpiry = useCallback(() => {
-    setFinished();
-  }, [setFinished]);
+    finishTest();
+  }, [finishTest]);
 
   const checkIfFinished = useCallback(
     (input: string) => {
       if (input.length === text.length) {
-        setFinished();
-        stopTimer(); // Stop the timer when text is completed
+        const typedWords = input
+          .trim()
+          .split(/\s+/)
+          .filter((word) => word.length > 0);
+        const textWords = text
+          .trim()
+          .split(/\s+/)
+          .filter((word) => word.length > 0);
+        let correctWords = 0;
+        for (let i = 0; i < typedWords.length; i++) {
+          if (i < textWords.length && typedWords[i] === textWords[i]) {
+            correctWords++;
+          }
+        }
+        stopTimer();
+        finishTest({
+          correctWordCount: correctWords,
+          totalWordCount: typedWords.length,
+          timer,
+          letterAccuracy,
+        });
       }
     },
-    [text, setFinished, stopTimer],
+    [text, timer, letterAccuracy, finishTest, stopTimer],
   );
 
   const updateWordCounts = useCallback(
