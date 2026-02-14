@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import getText from '@/lib/text';
 import { LetterMetrics } from '@/types/metrics';
 import { useTimer } from '@/hooks/atomic/useTimer';
@@ -68,14 +68,13 @@ export function useTypingTest(
     onExpiry: () => finishTest(),
   });
 
-  useEffect(() => {
-    snapshotRef.current = {
-      correctWordCount,
-      totalWordCount,
-      timer,
-      letterAccuracy,
-    };
-  }, [correctWordCount, totalWordCount, timer, letterAccuracy]);
+  // Keep snapshot ref in sync with current state so onExpiry gets fresh data
+  snapshotRef.current = {
+    correctWordCount,
+    totalWordCount,
+    timer,
+    letterAccuracy,
+  };
 
   // Derived state for started - using timer's isRunning
   const started = timerStarted;
@@ -91,7 +90,10 @@ export function useTypingTest(
   }, [clearFinished, resetTimer]);
 
   const checkIfFinished = useCallback(
-    (input: string) => {
+    (
+      input: string,
+      finalLetterAccuracy?: Record<string, LetterMetrics>
+    ) => {
       if (input.length === text.length) {
         const typedWords = input
           .trim()
@@ -112,7 +114,7 @@ export function useTypingTest(
           correctWordCount: correctWords,
           totalWordCount: typedWords.length,
           timer,
-          letterAccuracy,
+          letterAccuracy: finalLetterAccuracy ?? letterAccuracy,
         });
       }
     },
@@ -155,24 +157,23 @@ export function useTypingTest(
       updateWordCounts(v);
       startTimer();
       setUserInput(v);
-      checkIfFinished(v);
 
-      setLetterAccuracy((prev) => {
-        const newAccuracy = { ...prev };
-        if (lastChar && lastChar.match(/[a-z]/i)) {
-          const lowerChar = lastChar.toLowerCase();
-          if (!newAccuracy[lowerChar]) {
-            newAccuracy[lowerChar] = { correct: 0, total: 0 };
-          }
-          newAccuracy[lowerChar].total++;
-          if (isCorrect) {
-            newAccuracy[lowerChar].correct++;
-          }
+      // Compute accuracy including this keystroke so checkIfFinished gets final state
+      const newAccuracy = { ...letterAccuracy };
+      if (lastChar && lastChar.match(/[a-z]/i)) {
+        const lowerChar = lastChar.toLowerCase();
+        if (!newAccuracy[lowerChar]) {
+          newAccuracy[lowerChar] = { correct: 0, total: 0 };
         }
-        return newAccuracy;
-      });
+        newAccuracy[lowerChar].total++;
+        if (isCorrect) {
+          newAccuracy[lowerChar].correct++;
+        }
+      }
+      setLetterAccuracy(newAccuracy);
+      checkIfFinished(v, newAccuracy);
     },
-    [text, updateWordCounts, startTimer, checkIfFinished],
+    [text, letterAccuracy, updateWordCounts, startTimer, checkIfFinished],
   );
 
   return {
