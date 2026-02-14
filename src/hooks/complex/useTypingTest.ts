@@ -90,10 +90,6 @@ export function useTypingTest(
     setLetterAccuracy({});
   }, [clearFinished, resetTimer]);
 
-  const handleTimerExpiry = useCallback(() => {
-    finishTest();
-  }, [finishTest]);
-
   const checkIfFinished = useCallback(
     (input: string) => {
       if (input.length === text.length) {
@@ -190,7 +186,5 @@ export function useTypingTest(
     letterAccuracy,
     onRestart,
     onInputChange,
-    setTimer,
-    handleTimerExpiry,
   };
 }

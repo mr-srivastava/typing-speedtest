@@ -41,27 +41,6 @@ export const useModal = () => {
   return context;
 };
 
-export const ModalTrigger = ({
-  children,
-  className,
-}: {
-  children: ReactNode;
-  className?: string;
-}) => {
-  const { setOpen } = useModal();
-  return (
-    <button
-      className={cn(
-        'px-4 py-2 rounded-md text-black dark:text-white text-center relative overflow-hidden',
-        className
-      )}
-      onClick={() => setOpen(true)}
-    >
-      {children}
-    </button>
-  );
-};
-
 export const ModalBody = ({
   children,
   className,

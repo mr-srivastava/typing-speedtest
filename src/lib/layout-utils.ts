@@ -70,22 +70,6 @@ export const layoutShiftClasses = {
 } as const;
 
 /**
- * Common feature list patterns
- */
-export const featureClasses = {
-  // Feature list container
-  featureList:
-    'flex flex-wrap justify-center gap-3 sm:gap-4 text-xs sm:text-sm px-4 sm:px-0',
-
-  // Individual feature item
-  featureItem: 'flex items-center gap-2 text-muted-foreground/70',
-
-  // Feature bullet point
-  featureBullet:
-    'w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-muted-foreground/30',
-} as const;
-
-/**
  * Common animation and transition patterns
  */
 export const animationClasses = {
@@ -109,12 +93,3 @@ export const gradientClasses = {
   heroTextGradient:
     'bg-clip-text text-transparent bg-gradient-to-b from-neutral-100 to-neutral-400 dark:from-neutral-200 dark:to-neutral-500',
 } as const;
-
-/**
- * Utility function to combine layout classes
- */
-export function combineLayoutClasses(
-  ...classes: (keyof typeof layoutClasses)[]
-): string {
-  return classes.map((cls) => layoutClasses[cls]).join(' ');
-}

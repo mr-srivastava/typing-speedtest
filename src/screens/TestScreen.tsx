@@ -37,7 +37,11 @@ const TestScreen: React.FC<TestScreenProps> = ({
       try {
         const testDuration = defaultTimer - snapshot.timer;
         const wpm =
-          Math.round(snapshot.correctWordCount / (testDuration / 60)) || 0;
+          testDuration <= 0
+            ? 0
+            : Math.round(
+                snapshot.correctWordCount / (testDuration / 60),
+              );
         const accuracy = calculateCurrentAccuracy(
           snapshot.correctWordCount,
           snapshot.totalWordCount,
