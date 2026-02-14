@@ -31,7 +31,7 @@ export const layoutClasses = {
 export const textClasses = {
   // Responsive text sizes
   heroTitle:
-    'text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl',
+    'font-display text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl',
   heroSubtitle: 'text-sm sm:text-base md:text-lg lg:text-xl',
   smallResponsive: 'text-xs sm:text-sm',
 

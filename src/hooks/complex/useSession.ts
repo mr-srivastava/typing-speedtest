@@ -55,14 +55,17 @@ function updateCumulativeStats(
   };
 }
 
-function validateStoredData(value: any): value is EnhancedStoredData {
+function validateStoredData(value: unknown): value is EnhancedStoredData {
+  if (typeof value !== 'object' || value === null) return false;
+  const o = value as Record<string, unknown>;
+  const lastSession = o.lastSession as Record<string, unknown> | undefined;
+  const cumulative = o.cumulative as Record<string, unknown> | undefined;
   return (
-    value &&
-    value.lastSession &&
-    value.cumulative &&
-    typeof value.lastSession.wpm === 'number' &&
-    typeof value.lastSession.accuracy === 'number' &&
-    typeof value.cumulative.totalTests === 'number'
+    lastSession != null &&
+    cumulative != null &&
+    typeof lastSession.wpm === 'number' &&
+    typeof lastSession.accuracy === 'number' &&
+    typeof cumulative.totalTests === 'number'
   );
 }
 

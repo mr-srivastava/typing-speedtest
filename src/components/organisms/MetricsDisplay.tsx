@@ -13,9 +13,8 @@ import {
   getAccuracyValue,
   getLetterAccuracyData,
   generateStatsTitle,
-  wpmChartConfig,
-  accuracyChartConfig,
-} from '@/lib/utils';
+} from '@/lib/metrics-utils';
+import { wpmChartConfig, accuracyChartConfig } from '@/lib/utils';
 
 interface MetricsDisplayProps {
   correctWordCount: number;

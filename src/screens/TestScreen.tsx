@@ -1,15 +1,26 @@
 'use client';
-import React, { useCallback, useMemo, useState, useEffect } from 'react';
+import React, {
+  useCallback,
+  useMemo,
+  useState,
+  useEffect,
+  startTransition,
+} from 'react';
+import dynamic from 'next/dynamic';
 import AppHeader from '@/components/organisms/AppHeader';
 import TestControlSection from '@/sections/TestControlSection';
 import TypingSection from '@/sections/TypingSection';
 
 import { useTypingTest } from '@/hooks/complex/useTypingTest';
-import MetricsModal from '@/components/organisms/MetricsModal';
 import { Button } from '@/components/ui/button';
 import { LetterMetrics, TestSession } from '@/types/metrics';
 import { useSession } from '@/contexts/SessionContext';
-import { calculateCurrentAccuracy } from '@/lib/utils';
+import { calculateCurrentAccuracy } from '@/lib/metrics-utils';
+
+const MetricsModal = dynamic(
+  () => import('@/components/organisms/MetricsModal').then((mod) => mod.default),
+  { ssr: false }
+);
 
 interface TestScreenProps {
   defaultTimer?: number;
@@ -45,7 +56,7 @@ const TestScreen: React.FC<TestScreenProps> = ({
   // Handle test completion and session saving
   useEffect(() => {
     if (finished && !hasSessionBeenSaved) {
-      setIsMetricsModalOpen(true);
+      startTransition(() => setIsMetricsModalOpen(true));
       setHasSessionBeenSaved(true);
 
       // Save enhanced session data
@@ -92,11 +103,12 @@ const TestScreen: React.FC<TestScreenProps> = ({
   }, [onRestart]);
 
   const handleViewMetrics = useCallback(() => {
-    setIsMetricsModalOpen(true);
+    startTransition(() => setIsMetricsModalOpen(true));
   }, []);
 
   return (
-    <div className={`min-h-screen bg-background ${className}`}>
+    <div className={`min-h-screen bg-background relative ${className}`}>
+      <div className="grain-overlay" aria-hidden />
       <AppHeader />
 
       <main className='mx-auto w-full max-w-6xl px-6 md:px-8'>

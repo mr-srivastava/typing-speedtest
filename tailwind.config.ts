@@ -5,14 +5,22 @@ const {
 } = require('tailwindcss/lib/util/flattenColorPalette');
 
 // This plugin adds each Tailwind color as a global CSS variable, e.g. var(--gray-200).
-function addVariablesForColors({ addBase, theme }: any) {
-  let allColors = flattenColorPalette(theme('colors'));
-  let newVars = Object.fromEntries(
+interface TailwindPluginContext {
+  addBase: (styles: Record<string, Record<string, unknown>>) => void;
+  theme: (path: string) => unknown;
+}
+
+function addVariablesForColors({ addBase, theme }: TailwindPluginContext) {
+  const allColors = flattenColorPalette(theme('colors')) as Record<
+    string,
+    string
+  >;
+  const newVars = Object.fromEntries(
     Object.entries(allColors).map(([key, val]) => [`--${key}`, val])
   );
 
   addBase({
-    ':root': newVars,
+    ':root': newVars as Record<string, unknown>,
   });
 }
 
@@ -39,6 +47,7 @@ const config = {
       },
       fontFamily: {
         sans: ['var(--font-epilogue)', ...fontFamily.sans],
+        display: ['var(--font-kanit)', ...fontFamily.sans],
       },
       colors: {
         border: 'hsl(var(--border))',
@@ -92,10 +101,15 @@ const config = {
           from: { height: 'var(--radix-accordion-content-height)' },
           to: { height: '0' },
         },
+        'character-feedback': {
+          '0%, 100%': { transform: 'scale(1)' },
+          '50%': { transform: 'scale(1.08)' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
+        'character-feedback': 'character-feedback 0.2s ease-out',
       },
     },
   },

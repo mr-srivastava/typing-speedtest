@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 export function useLocalStorage<T>(
   key: string,
   initialValue: T,
-  validator?: (value: any) => value is T,
+  validator?: (value: unknown) => value is T,
 ) {
   const [storedValue, setStoredValue] = useState<T>(initialValue);
   const [isLoading, setIsLoading] = useState(true);
