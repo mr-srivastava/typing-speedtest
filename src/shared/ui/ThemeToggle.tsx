@@ -25,25 +25,6 @@ interface ThemeToggleProps {
 
 const ThemeToggle: React.FC<ThemeToggleProps> = ({ className = '' }) => {
   const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = React.useState(false);
-
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return (
-      <Button
-        variant='outline'
-        size='icon'
-        className={className}
-        disabled
-        aria-label='Toggle theme'
-      >
-        <lightThemeOption.icon className={size.icon} />
-      </Button>
-    );
-  }
 
   return (
     <DropdownMenu>
@@ -53,6 +34,7 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({ className = '' }) => {
           size='icon'
           className={cn('relative', className)}
           aria-label='Toggle theme'
+          suppressHydrationWarning
         >
           <lightThemeOption.icon
             className={`${size.icon} opacity-100 transition-opacity duration-ui ease-out dark:opacity-0`}
@@ -66,6 +48,7 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({ className = '' }) => {
         <DropdownMenuRadioGroup
           value={theme ?? DEFAULT_THEME}
           onValueChange={setTheme}
+          suppressHydrationWarning
         >
           {THEME_OPTIONS.map(({ value, label, icon: Icon }) => (
             <DropdownMenuRadioItem key={value} value={value} className='gap-2'>

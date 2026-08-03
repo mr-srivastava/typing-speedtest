@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   createTypingTest,
   type TypingTestFinishedSnapshot,
+  type TypingTestPhase,
   type TypingTestState,
 } from './create-typing-test';
 import getText from './text-provider';
@@ -52,24 +53,25 @@ export function useTypingTest(
   );
 
   const [state, setState] = useState<TypingTestState>(() => engine.getState());
-  const prevPhaseRef = useRef(state.phase);
 
-  const sync = useCallback(() => {
-    const next = engine.getState();
-    setState({ ...next });
-    return next;
-  }, [engine]);
+  const sync = useCallback(
+    (prevPhase?: TypingTestPhase) => {
+      const next = engine.getState();
+      setState({ ...next });
 
-  useEffect(() => {
-    if (
-      prevPhaseRef.current !== 'finished' &&
-      state.phase === 'finished' &&
-      state.snapshot
-    ) {
-      onFinishedRef.current?.(state.snapshot);
-    }
-    prevPhaseRef.current = state.phase;
-  }, [state.phase, state.snapshot]);
+      if (
+        prevPhase !== undefined &&
+        prevPhase !== 'finished' &&
+        next.phase === 'finished' &&
+        next.snapshot
+      ) {
+        onFinishedRef.current?.(next.snapshot);
+      }
+
+      return next;
+    },
+    [engine],
+  );
 
   useEffect(() => {
     if (state.phase !== 'active') {
@@ -77,8 +79,9 @@ export function useTypingTest(
     }
 
     const intervalId = setInterval(() => {
+      const prevPhase = engine.getState().phase;
       engine.dispatch({ type: 'tick' });
-      sync();
+      sync(prevPhase);
     }, 1000);
 
     return () => clearInterval(intervalId);
@@ -86,8 +89,9 @@ export function useTypingTest(
 
   const setInput = useCallback(
     (value: string) => {
+      const prevPhase = engine.getState().phase;
       engine.dispatch({ type: 'input', value });
-      sync();
+      sync(prevPhase);
     },
     [engine, sync],
   );
