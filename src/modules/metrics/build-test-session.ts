@@ -3,13 +3,14 @@ import type { TypingTestFinishedSnapshot } from '@/modules/typing-test/typing-en
 import {
   calculateCurrentAccuracy,
   calculateCurrentWpm,
+  getElapsedSecondsForWpm,
 } from './calculate';
 
 export function buildTestSession(
   snapshot: TypingTestFinishedSnapshot,
   timerDuration: number,
 ): TestSession {
-  const testDuration = timerDuration - snapshot.timer;
+  const testDuration = getElapsedSecondsForWpm(timerDuration, snapshot.timer);
   return {
     wpm: calculateCurrentWpm(snapshot.correctWordCount, testDuration),
     accuracy: calculateCurrentAccuracy(

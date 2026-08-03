@@ -39,8 +39,6 @@ export function useSession(store: SessionStore) {
       hasSession: !!data,
       recordTest,
       clearSession,
-      // Back-compat alias used during migration
-      saveTestSession: recordTest,
     }),
     [data, isLoading, isHydrated, recordTest, clearSession],
   );

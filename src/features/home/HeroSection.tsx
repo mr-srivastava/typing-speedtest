@@ -25,6 +25,12 @@ interface HeroSectionProps {
   className?: string;
 }
 
+const DEFAULT_DESCRIPTION =
+  'Ready to dominate the keyboard? Our fun typing speed test will put your skills to the test.';
+const DEFAULT_CTA = 'Start Your Speed Test!';
+const DEFAULT_SUBTEXT =
+  'Test your typing skills instantly — no login needed!';
+
 const HeroSection: React.FC<HeroSectionProps> = ({
   isLoading = false,
   isHydrated = true,
@@ -34,7 +40,15 @@ const HeroSection: React.FC<HeroSectionProps> = ({
   className = '',
 }) => {
   const showContent = isHydrated && !isLoading;
-  const showLoadingState = !isHydrated || isLoading;
+  const hasMetrics = showContent && !!overallMetrics;
+
+  const description = hasMetrics
+    ? `Welcome back! Ready to improve your ${overallMetrics.wpm} WPM average?`
+    : DEFAULT_DESCRIPTION;
+  const ctaLabel = hasMetrics ? 'Beat Your Average!' : DEFAULT_CTA;
+  const subtext = hasMetrics
+    ? 'Challenge yourself to improve your overall performance'
+    : DEFAULT_SUBTEXT;
 
   return (
     <div
@@ -46,136 +60,81 @@ const HeroSection: React.FC<HeroSectionProps> = ({
     >
       <div className={layoutShiftClasses.heroContainer}>
         <div className='flex flex-1 min-h-0 flex-col justify-center'>
-        <h1
-          className={cn(
-            'relative z-10 font-extrabold leading-[1.1] sm:leading-tight drop-shadow-xs',
-            textClasses.heroTitle,
-          )}
-        >
-          <span className={cn(gradientClasses.heroTextGradient, 'block sm:inline')}>
-            Unleash Your
-          </span>
-          <br className='hidden sm:block' />
-          <span
+          <h1
             className={cn(
-              themeColorClasses.primary,
-              'drop-shadow-xs block sm:inline mt-1 sm:mt-0',
+              'relative z-10 font-extrabold leading-[1.1] sm:leading-tight drop-shadow-xs',
+              textClasses.heroTitle,
             )}
           >
-            Typing Fury!
-          </span>
-        </h1>
-
-        {/* Content with consistent layout */}
-        {showContent ? (
-          <>
-            <p
+            <span
+              className={cn(gradientClasses.heroTextGradient, 'block sm:inline')}
+            >
+              Unleash Your
+            </span>
+            <br className='hidden sm:block' />
+            <span
               className={cn(
-                'text-muted-foreground max-w-2xl mx-auto mt-3 sm:mt-4 relative z-10 leading-relaxed px-2 sm:px-0',
-                textClasses.heroSubtitle,
-                layoutShiftClasses.heroDescription,
-                layoutClasses.flexCenter,
+                themeColorClasses.primary,
+                'drop-shadow-xs block sm:inline mt-1 sm:mt-0',
               )}
             >
-              {overallMetrics
-                ? `Welcome back! Ready to improve your ${overallMetrics.wpm} WPM average?`
-                : 'Ready to dominate the keyboard? Our fun typing speed test will put your skills to the test.'}
-            </p>
-            <div className={layoutShiftClasses.heroActions}>
-              {/* Reserve space for OverallMetrics to prevent layout shift */}
-              <div className={layoutShiftClasses.metricsReserved}>
-                {overallMetrics ? (
-                  <OverallStatsBlock metrics={overallMetrics} />
-                ) : null}
-              </div>
-              <div className='flex flex-col sm:flex-row gap-3 items-center justify-center'>
-                <Button
-                  variant={'default'}
-                  size={'lg'}
-                  className={cn(
-                    buttonClasses.heroCta,
-                    buttonClasses.primaryCta,
-                  )}
-                  asChild
-                >
-                  <Link href={'/octane'} className='whitespace-nowrap'>
-                    {overallMetrics
-                      ? 'Beat Your Average!'
-                      : 'Start Your Speed Test!'}
-                  </Link>
-                </Button>
-                {overallMetrics && onViewStats ? (
-                  <Button
-                    variant={'outline'}
-                    size={'lg'}
-                    onClick={onViewStats}
-                    className={buttonClasses.heroCta}
-                  >
-                    View All Stats
-                  </Button>
-                ) : null}
-              </div>
-              <p
-                className={cn(
-                  textClasses.mutedSmall,
-                  'px-4 sm:px-0 text-center',
-                  layoutShiftClasses.ctaSubtext,
-                )}
-              >
-                {overallMetrics
-                  ? 'Challenge yourself to improve your overall performance'
-                  : 'Test your typing skills instantly — no login needed!'}
-              </p>
+              Typing Fury!
+            </span>
+          </h1>
+
+          <p
+            className={cn(
+              'text-muted-foreground max-w-2xl mx-auto mt-3 sm:mt-4 relative z-10 leading-relaxed px-2 sm:px-0',
+              textClasses.heroSubtitle,
+              layoutShiftClasses.heroDescription,
+              showContent ? layoutClasses.flexCenter : 'flex items-center justify-center',
+            )}
+          >
+            {description}
+          </p>
+
+          <div className={layoutShiftClasses.heroActions}>
+            <div className={layoutShiftClasses.metricsReserved}>
+              {hasMetrics ? (
+                <OverallStatsBlock metrics={overallMetrics} />
+              ) : null}
             </div>
-          </>
-        ) : null}
 
-        {/* Loading state with same layout */}
-        {showLoadingState ? (
-          <>
-            <p
-              className={cn(
-                'text-muted-foreground max-w-2xl mx-auto mt-3 sm:mt-4 relative z-10 leading-relaxed px-2 sm:px-0 flex items-center justify-center',
-                textClasses.heroSubtitle,
-                layoutShiftClasses.heroDescription,
-              )}
-            >
-              Ready to dominate the keyboard? Our fun typing speed test will put
-              your skills to the test.
-            </p>
-            <div className={layoutShiftClasses.heroActions}>
-              {/* Reserve space for OverallMetrics to prevent layout shift */}
-              <div className={layoutShiftClasses.metricsReserved}>
-                {/* Empty space reserved */}
-              </div>
+            <div className='flex flex-col sm:flex-row gap-3 items-center justify-center'>
               <Button
-                variant={'default'}
-                size={'lg'}
-                className={cn(
-                  buttonClasses.heroCta,
-                  buttonClasses.primaryCta,
-                )}
+                variant='default'
+                size='lg'
+                className={cn(buttonClasses.heroCta, buttonClasses.primaryCta)}
                 asChild
               >
-                <Link href={'/octane'} className='whitespace-nowrap'>
-                  Start Your Speed Test!
+                <Link href='/octane' className='whitespace-nowrap'>
+                  {ctaLabel}
                 </Link>
               </Button>
-              <p
-                className={cn(
-                  textClasses.mutedSmall,
-                  'px-4 sm:px-0 text-center',
-                  layoutShiftClasses.ctaSubtext,
-                )}
-              >
-                Test your typing skills instantly — no login needed!
-              </p>
+              {hasMetrics && onViewStats ? (
+                <Button
+                  variant='outline'
+                  size='lg'
+                  onClick={onViewStats}
+                  className={buttonClasses.heroCta}
+                >
+                  View All Stats
+                </Button>
+              ) : null}
             </div>
-          </>
-        ) : null}
+
+            <p
+              className={cn(
+                textClasses.mutedSmall,
+                'px-4 sm:px-0 text-center',
+                layoutShiftClasses.ctaSubtext,
+              )}
+            >
+              {subtext}
+            </p>
+          </div>
         </div>
 
-        {/* Session-aware future features preview — pinned to bottom of fold */}
         {showContent ? (
           <div className='shrink-0 pt-4 pb-4 sm:pb-6 border-t border-border/50'>
             <p className={cn(textClasses.mutedSmall, 'mb-2')}>
@@ -188,9 +147,9 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                   ? 'Persistent Progress Tracking'
                   : 'Progress Tracking',
                 'Custom Challenges',
-              ].map((feature, index) => (
-                <div key={index} className={getFeatureListClasses().item}>
-                  <div className={getFeatureListClasses().bullet}></div>
+              ].map((feature) => (
+                <div key={feature} className={getFeatureListClasses().item}>
+                  <div className={getFeatureListClasses().bullet} />
                   <span>{feature}</span>
                 </div>
               ))}

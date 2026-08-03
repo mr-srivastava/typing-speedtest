@@ -1,10 +1,7 @@
 import { logWarning } from '@/shared/lib/log';
-import {
-  createInitialCumulativeStats,
-  updateCumulativeStats,
-} from '../aggregate';
+import { mergeTestRecord } from '../record-test';
 import type { SessionStore } from '../session-store';
-import type { EnhancedStoredData, TestSession } from '../types';
+import type { EnhancedStoredData } from '../types';
 import { validateStoredData } from '../validate';
 
 export const SESSION_STORAGE_KEY = 'octane-type-last-session';
@@ -72,22 +69,8 @@ export function createLocalStorageSessionStore(
       return cache;
     },
 
-    recordTest(test: TestSession): EnhancedStoredData {
-      const current = this.load();
-      let updated: EnhancedStoredData;
-
-      if (current) {
-        updated = {
-          lastSession: test,
-          cumulative: updateCumulativeStats(current.cumulative, test),
-        };
-      } else {
-        updated = {
-          lastSession: test,
-          cumulative: createInitialCumulativeStats(test),
-        };
-      }
-
+    recordTest(test) {
+      const updated = mergeTestRecord(this.load(), test);
       cache = updated;
       writeToStorage(key, updated);
       return updated;

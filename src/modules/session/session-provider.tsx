@@ -12,7 +12,6 @@ interface SessionContextType {
   isHydrated: boolean;
   hasSession: boolean;
   recordTest: (testSession: TestSession) => void;
-  saveTestSession: (testSession: TestSession) => void;
   clearSession: () => void;
 }
 

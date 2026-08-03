@@ -37,17 +37,21 @@ export function createTypingTest(config: {
 }): TypingTest {
   const { duration, getText } = config;
 
-  let state: TypingTestState = {
-    phase: 'idle',
-    referenceText: getText(),
-    input: '',
-    timerRemaining: duration,
-    duration,
-    correctWordCount: 0,
-    totalWordCount: 0,
-    letterAccuracy: {},
-    snapshot: null,
-  };
+  function createInitialState(): TypingTestState {
+    return {
+      phase: 'idle',
+      referenceText: getText(),
+      input: '',
+      timerRemaining: duration,
+      duration,
+      correctWordCount: 0,
+      totalWordCount: 0,
+      letterAccuracy: {},
+      snapshot: null,
+    };
+  }
+
+  let state: TypingTestState = createInitialState();
 
   function finish(snapshot: TypingTestFinishedSnapshot) {
     state = {
@@ -59,17 +63,7 @@ export function createTypingTest(config: {
 
   function dispatch(event: TypingTestEvent): TypingTestState {
     if (event.type === 'restart') {
-      state = {
-        phase: 'idle',
-        referenceText: getText(),
-        input: '',
-        timerRemaining: duration,
-        duration,
-        correctWordCount: 0,
-        totalWordCount: 0,
-        letterAccuracy: {},
-        snapshot: null,
-      };
+      state = createInitialState();
       return state;
     }
 

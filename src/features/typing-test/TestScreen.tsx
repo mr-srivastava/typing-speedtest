@@ -12,6 +12,7 @@ import {
   buildTestSession,
   calculateCurrentAccuracy,
   calculateCurrentWpm,
+  getElapsedSecondsForWpm,
   type LiveTestMetrics,
 } from '@/modules/metrics';
 import { layoutClasses } from '@/shared/layout/layout-utils';
@@ -69,14 +70,13 @@ const TestScreen: React.FC<TestScreenProps> = ({
     ],
   );
 
-  const elapsedSeconds = timer.duration - timer.remaining;
   const liveWpm = useMemo(
     () =>
       calculateCurrentWpm(
         metrics.correctWordCount,
-        elapsedSeconds > 0 ? elapsedSeconds : 1,
+        getElapsedSecondsForWpm(timer.duration, timer.remaining),
       ),
-    [metrics.correctWordCount, elapsedSeconds],
+    [metrics.correctWordCount, timer.duration, timer.remaining],
   );
   const liveAccuracy = useMemo(
     () =>
