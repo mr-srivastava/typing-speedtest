@@ -1,7 +1,27 @@
 import { themeColors } from '@/shared/lib/theme';
 
-export const wpmChartConfig = {
-  value: 200,
+export interface RadialMetricFeedbackMessages {
+  excellent: string;
+  average: string;
+  belowAverage: string;
+}
+
+export interface RadialMetricFeedbackThresholds {
+  excellent: number;
+  average: number;
+}
+
+export interface RadialMetricConfig {
+  maxValue: number;
+  showPercentage: boolean;
+  feedbackThresholds: RadialMetricFeedbackThresholds;
+  feedbackMessages: RadialMetricFeedbackMessages;
+  averageInfo: string;
+  fillColor: string;
+}
+
+export const wpmChartConfig: RadialMetricConfig = {
+  maxValue: 200,
   showPercentage: false,
   feedbackThresholds: { excellent: 80, average: 40 },
   feedbackMessages: {
@@ -13,8 +33,8 @@ export const wpmChartConfig = {
   fillColor: themeColors.success,
 };
 
-export const accuracyChartConfig = {
-  value: 100,
+export const accuracyChartConfig: RadialMetricConfig = {
+  maxValue: 100,
   showPercentage: true,
   feedbackThresholds: { excellent: 95, average: 90 },
   feedbackMessages: {

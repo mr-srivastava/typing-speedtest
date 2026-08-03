@@ -65,5 +65,5 @@ export const getLetterAccuracyColorClass = (
 };
 
 export const getTimerWarningClass = (isNearExpiry: boolean): string => {
-  return isNearExpiry ? themeColorClasses.warning : '';
+  return isNearExpiry ? themeColorClasses.warningAnimated : '';
 };

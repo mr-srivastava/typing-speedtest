@@ -1,8 +1,7 @@
 import type { EnhancedStoredData, LetterMetrics } from '@/modules/session/types';
 import {
   calculateCurrentAccuracy,
-  calculateCurrentWpm,
-  getElapsedSecondsForWpm,
+  calculateLiveWpm,
 } from './calculate';
 import type {
   LiveTestMetrics,
@@ -108,9 +107,10 @@ export function resolveMetricsDisplay(input: {
   const wpm =
     showingCumulative && session
       ? session.cumulative.weightedWPM
-      : calculateCurrentWpm(
+      : calculateLiveWpm(
           live.correctWordCount,
-          getElapsedSecondsForWpm(live.timerDuration, live.timerRemaining),
+          live.timerDuration,
+          live.timerRemaining,
         );
 
   const accuracy =

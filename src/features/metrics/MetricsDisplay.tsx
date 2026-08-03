@@ -37,26 +37,16 @@ const MetricsDisplay: React.FC<MetricsDisplayProps> = ({
         <div className={cn('w-full', widthTokens.chart)}>
           <RadialChart
             value={model.wpm}
-            maxValue={wpmChartConfig.value}
             title='Words per minute'
-            showPercentage={wpmChartConfig.showPercentage}
-            feedbackThresholds={wpmChartConfig.feedbackThresholds}
-            feedbackMessages={wpmChartConfig.feedbackMessages}
-            averageInfo={wpmChartConfig.averageInfo}
-            fillColor={wpmChartConfig.fillColor}
+            metricConfig={wpmChartConfig}
             compact={compact}
           />
         </div>
         <div className={cn('w-full', widthTokens.chart)}>
           <RadialChart
             value={model.accuracy}
-            maxValue={accuracyChartConfig.value}
             title='Accuracy'
-            showPercentage={accuracyChartConfig.showPercentage}
-            feedbackThresholds={accuracyChartConfig.feedbackThresholds}
-            feedbackMessages={accuracyChartConfig.feedbackMessages}
-            averageInfo={accuracyChartConfig.averageInfo}
-            fillColor={accuracyChartConfig.fillColor}
+            metricConfig={accuracyChartConfig}
             compact={compact}
           />
         </div>

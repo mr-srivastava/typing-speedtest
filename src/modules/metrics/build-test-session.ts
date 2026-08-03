@@ -2,7 +2,7 @@ import type { TestSession } from '@/modules/session/types';
 import type { TypingTestFinishedSnapshot } from '@/modules/typing-test/typing-engine';
 import {
   calculateCurrentAccuracy,
-  calculateCurrentWpm,
+  calculateLiveWpm,
   getElapsedSecondsForWpm,
 } from './calculate';
 
@@ -12,7 +12,11 @@ export function buildTestSession(
 ): TestSession {
   const testDuration = getElapsedSecondsForWpm(timerDuration, snapshot.timer);
   return {
-    wpm: calculateCurrentWpm(snapshot.correctWordCount, testDuration),
+    wpm: calculateLiveWpm(
+      snapshot.correctWordCount,
+      timerDuration,
+      snapshot.timer,
+    ),
     accuracy: calculateCurrentAccuracy(
       snapshot.correctWordCount,
       snapshot.totalWordCount,

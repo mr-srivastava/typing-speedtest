@@ -6,9 +6,9 @@ export type {
 } from './types';
 export {
   calculateCurrentWpm,
+  calculateLiveWpm,
   calculateCurrentAccuracy,
   calculateOverallWeightedAccuracy,
-  getElapsedSeconds,
   getElapsedSecondsForWpm,
 } from './calculate';
 export { buildTestSession } from './build-test-session';

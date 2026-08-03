@@ -6,8 +6,7 @@ import { Button } from '@/shared/ui/button';
 import { cn } from '@/shared/lib/cn';
 import {
   DEFAULT_THEME,
-  lightThemeOption,
-  darkThemeOption,
+  getThemeOption,
   THEME_OPTIONS,
 } from '@/shared/lib/theme-config';
 import { size } from '@/shared/lib/tokens';
@@ -25,6 +24,8 @@ interface ThemeToggleProps {
 
 const ThemeToggle: React.FC<ThemeToggleProps> = ({ className = '' }) => {
   const { theme, setTheme } = useTheme();
+  const lightThemeOption = getThemeOption('light');
+  const darkThemeOption = getThemeOption('dark');
 
   return (
     <DropdownMenu>

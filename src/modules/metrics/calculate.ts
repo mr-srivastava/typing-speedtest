@@ -1,7 +1,7 @@
 import type { LetterMetrics } from '@/modules/session/types';
 
 /** Elapsed test time in seconds (non-negative). */
-export function getElapsedSeconds(
+function getElapsedSeconds(
   timerDuration: number,
   timerRemaining: number,
 ): number {
@@ -22,10 +22,21 @@ export function getElapsedSecondsForWpm(
 
 export function calculateCurrentWpm(
   correctWordCount: number,
-  testDuration: number,
+  elapsedSeconds: number,
 ): number {
-  if (testDuration <= 0) return 0;
-  return Math.round(correctWordCount / (testDuration / 60)) || 0;
+  if (elapsedSeconds <= 0) return 0;
+  return Math.round((correctWordCount * 60) / elapsedSeconds);
+}
+
+export function calculateLiveWpm(
+  correctWordCount: number,
+  timerDuration: number,
+  timerRemaining: number,
+): number {
+  return calculateCurrentWpm(
+    correctWordCount,
+    getElapsedSecondsForWpm(timerDuration, timerRemaining),
+  );
 }
 
 export function calculateCurrentAccuracy(
@@ -33,18 +44,20 @@ export function calculateCurrentAccuracy(
   totalWordCount: number,
 ): number {
   if (totalWordCount === 0) return 0;
-  return Math.round((correctWordCount / totalWordCount) * 100) || 0;
+  return Math.round((correctWordCount / totalWordCount) * 100);
 }
 
 export function calculateOverallWeightedAccuracy(
   letterAccuracyData: Record<string, LetterMetrics>,
 ): number {
-  const entries = Object.values(letterAccuracyData);
-  if (entries.length === 0) return 0;
+  let totalCorrect = 0;
+  let totalAttempts = 0;
 
-  const totalCorrect = entries.reduce((sum, metrics) => sum + metrics.correct, 0);
-  const totalAttempts = entries.reduce((sum, metrics) => sum + metrics.total, 0);
+  for (const { correct, total } of Object.values(letterAccuracyData)) {
+    totalCorrect += correct;
+    totalAttempts += total;
+  }
 
   if (totalAttempts === 0) return 0;
-  return (totalCorrect / totalAttempts) * 100;
+  return Math.round((totalCorrect / totalAttempts) * 100);
 }

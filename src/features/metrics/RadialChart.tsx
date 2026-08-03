@@ -15,22 +15,21 @@ import {
 } from '@/shared/ui/card';
 import { ChartConfig, ChartContainer } from '@/shared/ui/chart';
 import { cn } from '@/shared/lib/cn';
+import type { RadialMetricConfig } from '@/shared/lib/chart-config';
 import { themeColors } from '@/shared/lib/theme';
 import { layoutClasses } from '@/shared/layout/layout-utils';
 import { size } from '@/shared/lib/tokens';
+
+const rechartsConfig: ChartConfig = {
+  value: { label: 'value' },
+  safari: { label: 'Safari', color: themeColors.chart2 },
+};
 
 interface RadialChartProps {
   title?: string;
   description?: string;
   value?: number;
-  maxValue?: number;
-  chartConfig?: ChartConfig;
-  feedbackThresholds?: { [key: string]: number };
-  feedbackMessages?: { [key: string]: string };
-  averageInfo?: string;
-  dataKey?: string;
-  fillColor?: string;
-  showPercentage?: boolean;
+  metricConfig: RadialMetricConfig;
   /** Tighter layout for modals — one feedback line, no average blurb, lighter chrome */
   compact?: boolean;
   className?: string;
@@ -40,25 +39,19 @@ const RadialChart: React.FC<RadialChartProps> = ({
   title,
   description,
   value = 0,
-  maxValue = 100,
-  chartConfig = {
-    value: { label: 'value' },
-    safari: { label: 'Safari', color: themeColors.chart2 },
-  },
-  feedbackThresholds = { excellent: 92, average: 90 },
-  feedbackMessages = {
-    excellent: 'Excellent! Your accuracy is top-notch.',
-    average: "Keep practicing! You're close to average.",
-    belowAverage: 'Focus on accuracy. Reduce those errors.',
-  },
-  averageInfo = 'The average typing accuracy for humans is around 92%.',
-  dataKey = 'value',
-  fillColor = themeColors.success,
-  showPercentage = false,
+  metricConfig,
   compact = false,
   className = '',
 }) => {
-  const chartData = [{ [dataKey]: value, fill: fillColor }];
+  const {
+    maxValue,
+    showPercentage,
+    feedbackThresholds,
+    feedbackMessages,
+    averageInfo,
+    fillColor,
+  } = metricConfig;
+  const chartData = [{ value, fill: fillColor }];
 
   function getFeedbackMessage(current: number) {
     if (current > feedbackThresholds.excellent) {
@@ -88,7 +81,7 @@ const RadialChart: React.FC<RadialChartProps> = ({
       </CardHeader>
       <CardContent className='flex-1 pb-0'>
         <ChartContainer
-          config={chartConfig}
+          config={rechartsConfig}
           className={cn(
             'mx-auto aspect-square',
             compact ? size.chartCompact : size.chartDefault,
@@ -108,7 +101,7 @@ const RadialChart: React.FC<RadialChartProps> = ({
               className='first:fill-muted last:fill-background'
               polarRadius={[43, 37]}
             />
-            <RadialBar dataKey={dataKey} background cornerRadius={5} />
+            <RadialBar dataKey='value' background cornerRadius={5} />
             <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
               <Label
                 content={({ viewBox }) => {

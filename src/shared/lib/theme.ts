@@ -11,16 +11,12 @@ export const themeColors = {
 export const themeColorClasses = {
   primary: 'text-primary',
   success: 'text-success',
-  warning: 'text-warning animate-pulse',
+  warning: 'text-warning',
+  warningAnimated: 'text-warning animate-pulse',
   successBg: 'bg-success text-on-status',
   warningBg: 'bg-warning text-on-status',
   dangerBg: 'bg-danger text-on-status',
 };
-
-export const pieChartColors = [
-  'hsl(var(--success))',
-  'hsl(var(--danger))',
-];
 
 export const gradients = {
   primaryRadial:

@@ -10,8 +10,10 @@ export type Theme = (typeof THEME_OPTIONS)[number]['value'];
 
 export const DEFAULT_THEME: Theme = 'dark';
 
-export const ENABLE_SYSTEM = THEME_OPTIONS.some(
-  (option) => option.value === 'system',
-);
-
-export const [lightThemeOption, darkThemeOption] = THEME_OPTIONS;
+export function getThemeOption(value: Theme) {
+  const option = THEME_OPTIONS.find((entry) => entry.value === value);
+  if (!option) {
+    throw new Error(`Unknown theme: ${value}`);
+  }
+  return option;
+}

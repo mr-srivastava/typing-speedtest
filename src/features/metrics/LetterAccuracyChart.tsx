@@ -161,7 +161,7 @@ const LetterAccuracyChart: React.FC<LetterAccuracyChartProps> = ({
       >
         <p className='text-sm font-medium text-foreground'>Key accuracy</p>
         <p className='text-xs text-muted-foreground mt-1'>
-          Weighted average {overallWeightedAccuracy.toFixed(0)}% · Hover or tap
+          Weighted average {overallWeightedAccuracy}% · Hover or tap
           a key for details
         </p>
       </motion.div>
