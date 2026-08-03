@@ -1,19 +1,18 @@
-'use client';
 import React from 'react';
 import MetricGroup from '@/shared/ui/MetricGroup';
 import {
   getOverallMetricsClasses,
   getFormattedMetricsData,
-  OverallMetricsData,
+  type OverallMetricsData,
 } from '@/features/metrics/metrics-display-utils';
 import { cn } from '@/shared/lib/cn';
 
-interface OverallMetricsDisplayProps {
+interface OverallStatsBlockProps {
   metrics: OverallMetricsData;
   className?: string;
 }
 
-const OverallMetricsDisplay: React.FC<OverallMetricsDisplayProps> = ({
+const OverallStatsBlock: React.FC<OverallStatsBlockProps> = ({
   metrics,
   className = '',
 }) => {
@@ -36,4 +35,4 @@ const OverallMetricsDisplay: React.FC<OverallMetricsDisplayProps> = ({
   );
 };
 
-export default OverallMetricsDisplay;
+export default OverallStatsBlock;

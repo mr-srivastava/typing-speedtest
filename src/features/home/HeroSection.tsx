@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/shared/ui/button';
-import OverallMetricsDisplay from '@/features/metrics/OverallMetricsDisplay';
+import OverallStatsBlock from '@/features/metrics/OverallStatsBlock';
 import Link from 'next/link';
 import {
   getFeatureListClasses,
@@ -85,7 +85,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
               {/* Reserve space for OverallMetrics to prevent layout shift */}
               <div className={layoutShiftClasses.metricsReserved}>
                 {overallMetrics ? (
-                  <OverallMetricsDisplay metrics={overallMetrics} />
+                  <OverallStatsBlock metrics={overallMetrics} />
                 ) : null}
               </div>
               <div className='flex flex-col sm:flex-row gap-3 items-center justify-center'>

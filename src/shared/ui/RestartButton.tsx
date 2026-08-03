@@ -15,13 +15,14 @@ const RestartButton: React.FC<RestartButtonProps> = ({
   className = '',
 }) => {
   return (
-    <div className={cn('flex w-full justify-end mt-5', className)}>
+    <div className={cn('flex items-center', className)}>
       <Button
         variant='outline'
-        className='rounded-lg'
         size='icon'
+        className='rounded-lg'
         onClick={onRestart}
         disabled={disabled}
+        aria-label='Restart test'
       >
         <ResetIcon />
       </Button>

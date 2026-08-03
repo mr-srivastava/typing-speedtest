@@ -30,6 +30,8 @@ interface RadialChartProps {
   dataKey?: string;
   fillColor?: string;
   showPercentage?: boolean;
+  /** Tighter layout for modals — one feedback line, no average blurb, lighter chrome */
+  compact?: boolean;
   className?: string;
 }
 
@@ -52,33 +54,44 @@ const RadialChart: React.FC<RadialChartProps> = ({
   dataKey = 'value',
   fillColor = themeColors.good,
   showPercentage = false,
+  compact = false,
   className = '',
 }) => {
   const chartData = [{ [dataKey]: value, fill: fillColor }];
 
-  function getFeedbackMessage(value: number) {
-    if (value > feedbackThresholds.excellent) {
+  function getFeedbackMessage(current: number) {
+    if (current > feedbackThresholds.excellent) {
       return feedbackMessages.excellent;
-    } else if (
-      value <= feedbackThresholds.excellent &&
-      value > feedbackThresholds.average
-    ) {
-      return feedbackMessages.average;
-    } else {
-      return feedbackMessages.belowAverage;
     }
+    if (current > feedbackThresholds.average) {
+      return feedbackMessages.average;
+    }
+    return feedbackMessages.belowAverage;
   }
 
   return (
-    <Card className={cn('flex flex-col shadow-md shadow-gray-500/20', className)}>
-      <CardHeader className='items-center pb-0'>
-        {title && <CardTitle>{title.toUpperCase()}</CardTitle>}
-        {description && <CardDescription>{description}</CardDescription>}
+    <Card
+      className={cn(
+        'flex flex-col border-border/60 shadow-none',
+        compact && 'bg-transparent',
+        className,
+      )}
+    >
+      <CardHeader className={cn('items-center', compact ? 'pb-0 pt-3' : 'pb-0')}>
+        {title ? (
+          <CardTitle className={cn(compact && 'text-sm font-medium')}>
+            {title}
+          </CardTitle>
+        ) : null}
+        {description ? <CardDescription>{description}</CardDescription> : null}
       </CardHeader>
       <CardContent className='flex-1 pb-0'>
         <ChartContainer
           config={chartConfig}
-          className='mx-auto aspect-square max-h-[150px]'
+          className={cn(
+            'mx-auto aspect-square',
+            compact ? 'max-h-[130px]' : 'max-h-[150px]',
+          )}
         >
           <RadialBarChart
             data={chartData}
@@ -112,28 +125,36 @@ const RadialChart: React.FC<RadialChartProps> = ({
                           className='fill-foreground text-2xl font-bold'
                         >
                           {value.toLocaleString()}
-                          {showPercentage && '%'}
+                          {showPercentage ? '%' : ''}
                         </tspan>
                       </text>
                     );
                   }
+                  return null;
                 }}
               />
             </PolarRadiusAxis>
           </RadialBarChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className='flex-col gap-2 text-xs'>
+      <CardFooter
+        className={cn(
+          'flex-col text-xs',
+          compact ? 'gap-1 pt-1 pb-3' : 'gap-2',
+        )}
+      >
         <div
           className={cn(
             layoutClasses.flexStart,
             layoutClasses.gap2,
-            'font-medium',
+            'font-medium text-center justify-center',
           )}
         >
           {getFeedbackMessage(value)}
         </div>
-        <div className='text-muted-foreground'>{averageInfo}</div>
+        {!compact && averageInfo ? (
+          <div className='text-muted-foreground text-center'>{averageInfo}</div>
+        ) : null}
       </CardFooter>
     </Card>
   );

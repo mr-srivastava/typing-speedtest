@@ -1,3 +1,4 @@
+import { logWarning } from '@/shared/lib/log';
 import {
   createInitialCumulativeStats,
   updateCumulativeStats,
@@ -42,7 +43,7 @@ function writeToStorage(key: string, data: EnhancedStoredData): void {
   try {
     localStorage.setItem(key, JSON.stringify(data));
   } catch (error) {
-    console.warn(`Failed to save ${key} to localStorage:`, error);
+    logWarning(`Failed to save ${key} to localStorage:`, error);
   }
 }
 
@@ -54,7 +55,7 @@ function removeFromStorage(key: string): void {
   try {
     localStorage.removeItem(key);
   } catch (error) {
-    console.warn(`Failed to remove ${key} from localStorage:`, error);
+    logWarning(`Failed to remove ${key} from localStorage:`, error);
   }
 }
 

@@ -5,8 +5,13 @@ import {
   ModalBody,
   ModalContent,
   ModalFooter,
+  useModal,
 } from '@/shared/ui/animated-modal';
 import MetricsDisplay from '@/features/metrics/MetricsDisplay';
+import {
+  getMetricsModalActionLabel,
+  getMetricsModalTitle,
+} from '@/features/metrics/metrics-modal-utils';
 import type { EnhancedStoredData } from '@/modules/session';
 import {
   resolveMetricsDisplay,
@@ -14,6 +19,7 @@ import {
   type MetricsPreference,
 } from '@/modules/metrics';
 import { Button } from '@/shared/ui/button';
+import { radiusClasses } from '@/shared/layout/layout-utils';
 import { cn } from '@/shared/lib/cn';
 
 interface ViewToggleProps {
@@ -24,26 +30,49 @@ interface ViewToggleProps {
 
 function ViewToggle({ showCumulative, onToggle, totalTests }: ViewToggleProps) {
   return (
-    <div className='flex justify-center mb-6'>
-      <div className='flex bg-muted rounded-lg p-1'>
-        <Button
-          variant={!showCumulative ? 'default' : 'ghost'}
-          size='sm'
-          onClick={() => onToggle(false)}
-          className='text-sm'
-        >
-          This Test
-        </Button>
-        <Button
-          variant={showCumulative ? 'default' : 'ghost'}
-          size='sm'
-          onClick={() => onToggle(true)}
-          className='text-sm'
-        >
-          All Tests ({totalTests})
-        </Button>
-      </div>
+    <div className={cn('flex bg-muted p-1', radiusClasses.surface)}>
+      <Button
+        variant={!showCumulative ? 'default' : 'ghost'}
+        size='sm'
+        onClick={() => onToggle(false)}
+      >
+        This Test
+      </Button>
+      <Button
+        variant={showCumulative ? 'default' : 'ghost'}
+        size='sm'
+        onClick={() => onToggle(true)}
+      >
+        All Tests ({totalTests})
+      </Button>
     </div>
+  );
+}
+
+function MetricsModalFooter({
+  actionLabel,
+  onRestart,
+}: {
+  actionLabel: string;
+  onRestart: () => void;
+}) {
+  const { setOpen } = useModal();
+  const isRestart = actionLabel === 'Restart';
+
+  return (
+    <ModalFooter className='gap-3'>
+      {isRestart ? (
+        <Button variant='ghost' onClick={() => setOpen(false)}>
+          Close
+        </Button>
+      ) : null}
+      <Button
+        onClick={isRestart ? onRestart : () => setOpen(false)}
+        className='min-w-28'
+      >
+        {actionLabel}
+      </Button>
+    </ModalFooter>
   );
 }
 
@@ -83,14 +112,25 @@ const MetricsModal: React.FC<MetricsModalProps> = ({
     [liveMetrics, sessionData, preference, locked],
   );
 
+  const modalTitle = getMetricsModalTitle(model, {
+    locked,
+    hasLiveMetrics: !!liveMetrics,
+  });
+
+  const actionLabel = getMetricsModalActionLabel(model, locked);
+  const subtitle =
+    modalTitle === 'Test Complete'
+      ? `${model.wpm} WPM · ${model.accuracy}% accuracy`
+      : model.statsTitle ?? undefined;
+
   return (
     <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
       <ModalBody
-        title='Metrics'
-        className={cn('w-full max-w-4xl mx-auto', className)}
-      >
-        <ModalContent>
-          {model.canToggle ? (
+        title={modalTitle}
+        subtitle={subtitle}
+        className={className}
+        toolbar={
+          model.canToggle ? (
             <ViewToggle
               showCumulative={model.showingCumulative}
               onToggle={(showCumulative) =>
@@ -98,18 +138,13 @@ const MetricsModal: React.FC<MetricsModalProps> = ({
               }
               totalTests={model.totalTests}
             />
-          ) : null}
-
-          <MetricsDisplay model={model} />
+          ) : null
+        }
+      >
+        <ModalContent>
+          <MetricsDisplay model={model} compact />
         </ModalContent>
-        <ModalFooter className='gap-4 justify-end'>
-          <button
-            onClick={onRestart}
-            className='bg-black text-white dark:bg-white dark:text-black text-sm px-4 py-2 rounded-md border border-black w-28'
-          >
-            {model.view.scope === 'cumulative' ? 'Close' : 'Restart'}
-          </button>
-        </ModalFooter>
+        <MetricsModalFooter actionLabel={actionLabel} onRestart={onRestart} />
       </ModalBody>
     </Modal>
   );

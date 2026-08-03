@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { logWarning } from '@/shared/lib/log';
 
 export function useLocalStorage<T>(
   key: string,
@@ -30,7 +31,7 @@ export function useLocalStorage<T>(
           }
         }
       } catch (error) {
-        console.warn(`Failed to load ${key} from localStorage:`, error);
+        logWarning(`Failed to load ${key} from localStorage:`, error);
         try {
           localStorage.removeItem(key);
         } catch {
@@ -53,7 +54,7 @@ export function useLocalStorage<T>(
         setStoredValue(valueToStore);
         localStorage.setItem(key, JSON.stringify(valueToStore));
       } catch (error) {
-        console.warn(`Failed to save ${key} to localStorage:`, error);
+        logWarning(`Failed to save ${key} to localStorage:`, error);
       }
     },
     [key, storedValue],
@@ -64,7 +65,7 @@ export function useLocalStorage<T>(
       localStorage.removeItem(key);
       setStoredValue(initialValue);
     } catch (error) {
-      console.warn(`Failed to remove ${key} from localStorage:`, error);
+      logWarning(`Failed to remove ${key} from localStorage:`, error);
     }
   }, [key, initialValue]);
 

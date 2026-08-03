@@ -62,7 +62,7 @@ export const getLetterAccuracyColorClass = (
   total: number,
   overallAccuracy: number,
 ): string => {
-  if (total === 0) return 'bg-gray-200 dark:bg-gray-700';
+  if (total === 0) return 'bg-muted';
 
   const accuracy = (correct / total) * 100;
 

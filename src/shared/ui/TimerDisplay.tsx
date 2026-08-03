@@ -1,7 +1,8 @@
 import React from 'react';
-import { cn } from '@/shared/lib/cn';
 import { Orbitron } from 'next/font/google';
+import { radiusClasses, surfaceClasses } from '@/shared/layout/layout-utils';
 import { getTimerWarningClass } from '@/shared/layout/theme-display-utils';
+import { cn } from '@/shared/lib/cn';
 
 const orbitron = Orbitron({
   subsets: ['latin'],
@@ -21,7 +22,6 @@ const TimerDisplay: React.FC<TimerDisplayProps> = ({
   timerDuration = 60,
   className = '',
 }) => {
-  // Check if near expiry (last 10 seconds of any minute)
   const isNearExpiry = timer !== timerDuration && timer % MIN_IN_SEC <= 10;
 
   function formatNumberWithTwoDigit(num: number) {
@@ -41,10 +41,14 @@ const TimerDisplay: React.FC<TimerDisplayProps> = ({
     <div className={cn('px-2 py-1.5 text-right cursor-default', className)}>
       <span
         className={cn(
-          'inline-flex items-center rounded-full border border-border bg-secondary/60 backdrop-blur px-3 py-1 text-2xl md:text-3xl',
+          'inline-flex items-center backdrop-blur px-3 py-1 text-2xl md:text-3xl',
+          surfaceClasses.field,
+          radiusClasses.pill,
           getTimerWarningClass(isNearExpiry),
           orbitron.className,
         )}
+        aria-live='polite'
+        aria-label='Time remaining'
       >
         {getTime()}
       </span>

@@ -1,6 +1,9 @@
 'use client';
 import { cn } from '@/shared/lib/cn';
+import { radiusClasses } from '@/shared/layout/layout-utils';
+import { useOutsideClick } from '@/shared/hooks/useOutsideClick';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { X } from 'lucide-react';
 import React, {
   ReactNode,
   createContext,
@@ -8,6 +11,7 @@ import React, {
   useEffect,
   useRef,
 } from 'react';
+import { Button } from '@/shared/ui/button';
 
 interface ModalContextType {
   open: boolean;
@@ -44,12 +48,16 @@ export const ModalBody = ({
   children,
   className,
   title,
+  subtitle,
+  toolbar,
 }: {
   children: ReactNode;
   className?: string;
   title?: string;
+  subtitle?: string;
+  toolbar?: ReactNode;
 }) => {
-  const { open } = useModal();
+  const { open, setOpen } = useModal();
   const reduceMotion = useReducedMotion();
 
   useEffect(() => {
@@ -64,7 +72,6 @@ export const ModalBody = ({
   }, [open]);
 
   const modalRef = useRef<HTMLDivElement | null>(null);
-  const { setOpen } = useModal();
   useOutsideClick(modalRef, () => setOpen(false));
 
   const panelTransition = reduceMotion
@@ -86,24 +93,50 @@ export const ModalBody = ({
   return (
     <AnimatePresence>
       {open ? (
-        <div className='fixed inset-0 h-full w-full flex items-center justify-center z-50'>
+        <div className='fixed inset-0 z-50 flex h-full w-full items-center justify-center p-4'>
           <Overlay />
 
           <motion.div
             ref={modalRef}
             className={cn(
-              'min-h-[50%] max-h-[90%] md:max-w-[40%] bg-white dark:bg-neutral-950 border border-transparent dark:border-neutral-800 md:rounded-2xl relative z-50 flex flex-col flex-1 pointer-events-auto',
-              className
+              'relative z-50 flex w-full max-w-4xl max-h-[90%] min-h-[50%] flex-col border border-border bg-card text-card-foreground pointer-events-auto',
+              radiusClasses.panel,
+              className,
             )}
             initial={panelInitial}
             animate={panelAnimate}
             exit={panelExit}
             transition={panelTransition}
           >
-            <div className='flex justify-between items-center p-4'>
-              <h2 className='text-2xl font-bold'>{title}</h2>
-              <CloseIcon />
+            <div className='flex items-start justify-between gap-4 border-b border-border p-4'>
+              <div className='min-w-0'>
+                {title ? (
+                  <h2 className='text-xl sm:text-2xl font-bold leading-tight'>
+                    {title}
+                  </h2>
+                ) : null}
+                {subtitle ? (
+                  <p className='mt-1 text-sm text-muted-foreground'>
+                    {subtitle}
+                  </p>
+                ) : null}
+              </div>
+              <Button
+                type='button'
+                variant='ghost'
+                size='icon'
+                onClick={() => setOpen(false)}
+                aria-label='Close'
+                className='shrink-0'
+              >
+                <X className='h-4 w-4' />
+              </Button>
             </div>
+            {toolbar ? (
+              <div className='flex justify-center border-b border-border px-4 py-3'>
+                {toolbar}
+              </div>
+            ) : null}
             {children}
           </motion.div>
         </div>
@@ -122,8 +155,10 @@ export const ModalContent = ({
   return (
     <div
       className={cn(
-        'flex flex-col p-4 overflow-y-auto overflow-x-hidden',
-        className
+        // overflow-x must stay visible enough for in-content popovers;
+        // overflow-y-auto alone still clips x in most browsers, so pad children instead.
+        'flex min-h-0 flex-1 flex-col overflow-y-auto p-4 sm:p-5',
+        className,
       )}
     >
       {children}
@@ -141,8 +176,8 @@ export const ModalFooter = ({
   return (
     <div
       className={cn(
-        'flex justify-end p-4 bg-gray-100 dark:bg-neutral-900 sticky bottom-0',
-        className
+        'sticky bottom-0 flex justify-end border-t border-border bg-muted/50 p-4',
+        className,
       )}
     >
       {children}
@@ -158,62 +193,9 @@ const Overlay = ({ className }: { className?: string }) => {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
       className={cn(
-        'fixed inset-0 h-full w-full bg-black/50 backdrop-blur-md z-50 pointer-events-none',
-        className
+        'fixed inset-0 z-50 h-full w-full bg-foreground/50 backdrop-blur-md pointer-events-none',
+        className,
       )}
     />
   );
-};
-
-const CloseIcon = () => {
-  const { setOpen } = useModal();
-  return (
-    <button
-      onClick={() => setOpen(false)}
-      className='absolute top-4 right-4 group'
-    >
-      <svg
-        xmlns='http://www.w3.org/2000/svg'
-        width='24'
-        height='24'
-        viewBox='0 0 24 24'
-        fill='none'
-        stroke='currentColor'
-        strokeWidth='2'
-        strokeLinecap='round'
-        strokeLinejoin='round'
-        className='text-black dark:text-white h-4 w-4 transition-transform duration-200 ease-out fine-hover:scale-110 fine-hover:rotate-3'
-      >
-        <path stroke='none' d='M0 0h24v24H0z' fill='none' />
-        <path d='M18 6l-12 12' />
-        <path d='M6 6l12 12' />
-      </svg>
-    </button>
-  );
-};
-
-// Hook to detect clicks outside of a component.
-// Add it in a separate file, I've added here for simplicity
-export const useOutsideClick = (
-  ref: React.RefObject<HTMLDivElement | null>,
-  callback: (event: MouseEvent | TouchEvent) => void
-) => {
-  useEffect(() => {
-    const listener = (event: MouseEvent | TouchEvent) => {
-      // DO NOTHING if the element being clicked is the target element or their children
-      const target = event.target as Node | null;
-      if (!ref.current || !target || ref.current.contains(target)) {
-        return;
-      }
-      callback(event);
-    };
-
-    document.addEventListener('mousedown', listener);
-    document.addEventListener('touchstart', listener);
-
-    return () => {
-      document.removeEventListener('mousedown', listener);
-      document.removeEventListener('touchstart', listener);
-    };
-  }, [ref, callback]);
 };

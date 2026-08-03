@@ -4,6 +4,7 @@ import * as React from 'react';
 import { MoonIcon, SunIcon } from '@radix-ui/react-icons';
 import { useTheme } from 'next-themes';
 import { Button } from '@/shared/ui/button';
+import { cn } from '@/shared/lib/cn';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,14 +18,41 @@ interface ThemeToggleProps {
 
 const ThemeToggle: React.FC<ThemeToggleProps> = ({ className = '' }) => {
   const { setTheme } = useTheme();
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <Button
+        variant='outline'
+        size='icon'
+        className={className}
+        disabled
+        aria-label='Toggle theme'
+      >
+        <SunIcon className='h-[1.2rem] w-[1.2rem]' />
+      </Button>
+    );
+  }
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant='outline' size='icon' className={className}>
-          <SunIcon className='h-[1.2rem] w-[1.2rem] opacity-100 transition-opacity duration-200 dark:opacity-0' />
-          <MoonIcon className='absolute h-[1.2rem] w-[1.2rem] opacity-0 transition-opacity duration-200 dark:opacity-100' />
-          <span className='sr-only'>Toggle theme</span>
+        <Button
+          variant='outline'
+          size='icon'
+          className={cn('relative', className)}
+          aria-label='Toggle theme'
+        >
+          <SunIcon
+            className='h-[1.2rem] w-[1.2rem] opacity-100 transition-opacity duration-200 dark:opacity-0'
+          />
+          <MoonIcon
+            className='absolute h-[1.2rem] w-[1.2rem] opacity-0 transition-opacity duration-200 dark:opacity-100'
+          />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end'>

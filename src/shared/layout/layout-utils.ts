@@ -23,6 +23,37 @@ export const layoutClasses = {
   // Common padding/margin
   containerPadding: 'px-4 sm:px-6 md:px-8 lg:px-12',
   sectionSpacing: 'py-12 sm:py-16 md:py-20 lg:py-24',
+
+  // Shared page shell
+  pageShell: 'h-dvh w-full bg-background relative flex flex-col antialiased overflow-hidden',
+  contentShell: 'mx-auto w-full max-w-6xl',
+} as const;
+
+/**
+ * Border radius scale
+ */
+export const radiusClasses = {
+  control: 'rounded-md',
+  surface: 'rounded-lg',
+  card: 'rounded-xl',
+  panel: 'rounded-2xl',
+  pill: 'rounded-full',
+} as const;
+
+/**
+ * Elevation / shadow scale
+ */
+export const elevationClasses = {
+  surface: 'shadow',
+  raised: 'shadow-md',
+  overlay: 'shadow-xl',
+} as const;
+
+/**
+ * Recurring surface styles (inputs, previews, stat bars)
+ */
+export const surfaceClasses = {
+  field: `${radiusClasses.surface} bg-secondary/60 border border-border`,
 } as const;
 
 /**
@@ -91,5 +122,5 @@ export const animationClasses = {
 export const gradientClasses = {
   // Text gradients
   heroTextGradient:
-    'bg-clip-text text-transparent bg-gradient-to-b from-neutral-100 to-neutral-400 dark:from-neutral-200 dark:to-neutral-500',
+    'bg-clip-text text-transparent bg-gradient-to-b from-neutral-700 to-neutral-400 dark:from-neutral-200 dark:to-neutral-500',
 } as const;

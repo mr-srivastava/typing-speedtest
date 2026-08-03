@@ -2,6 +2,7 @@
  * Shared utilities for metrics display patterns
  */
 
+import type { CumulativeStats } from '@/modules/session/types';
 import { layoutClasses, textClasses } from '@/shared/layout/layout-utils';
 import { formatTimeSpent, formatDateRange } from '@/shared/lib/format';
 
@@ -11,6 +12,18 @@ export interface OverallMetricsData {
   totalTests: number;
   totalTimeSpent: number;
   firstTestDate: string;
+}
+
+export function toOverallMetricsData(
+  cumulative: CumulativeStats,
+): OverallMetricsData {
+  return {
+    wpm: cumulative.weightedWPM,
+    accuracy: cumulative.weightedAccuracy,
+    totalTests: cumulative.totalTests,
+    totalTimeSpent: cumulative.totalTimeSpent,
+    firstTestDate: cumulative.firstTestDate,
+  };
 }
 
 /**

@@ -1,13 +1,16 @@
+'use client';
 import React from 'react';
-import TimerDisplay from '@/shared/ui/TimerDisplay';
 import Image from 'next/image';
 import { Button } from '@/shared/ui/button';
 import Link from 'next/link';
 import RestartButton from '@/shared/ui/RestartButton';
+import ThemeToggle from '@/shared/ui/ThemeToggle';
+import TimerDisplay from '@/shared/ui/TimerDisplay';
 import { layoutClasses } from '@/shared/layout/layout-utils';
 import { cn } from '@/shared/lib/cn';
 
 interface AppHeaderProps {
+  variant?: 'default' | 'minimal';
   timer?: number;
   showRestart?: boolean;
   onRestart?: () => void;
@@ -16,17 +19,22 @@ interface AppHeaderProps {
 }
 
 const AppHeader: React.FC<AppHeaderProps> = ({
+  variant = 'default',
   timer,
   showRestart,
   onRestart,
   restartDisabled,
   className = '',
 }) => {
+  const isMinimal = variant === 'minimal';
+
   return (
     <header className={cn('w-full', className)}>
       <div
         className={cn(
-          'mx-auto max-w-6xl px-6 md:px-8 h-16 md:h-20',
+          layoutClasses.contentShell,
+          layoutClasses.containerPadding,
+          'h-16 md:h-20',
           layoutClasses.flexBetween,
         )}
       >
@@ -35,30 +43,38 @@ const AppHeader: React.FC<AppHeaderProps> = ({
             layoutClasses.flexStart,
             'space-x-2 px-2 md:px-3 py-2 hover:bg-transparent',
           )}
-          variant={'ghost'}
+          variant='ghost'
           asChild
         >
-          <Link href={'/'}>
+          <Link href='/'>
             <Image src='/logo.svg' alt='Logo' width={36} height={36} />
             <span className='w-max font-bold whitespace-nowrap text-base md:text-lg'>
               Octane Type
             </span>
           </Link>
         </Button>
+
         <div className={cn(layoutClasses.flexStart, layoutClasses.gap2)}>
-          {typeof timer === 'number' ? <TimerDisplay timer={timer} /> : null}
-          {showRestart && onRestart ? (
-            <RestartButton onRestart={onRestart} disabled={!!restartDisabled} />
+          {!isMinimal && typeof timer === 'number' ? (
+            <TimerDisplay timer={timer} />
           ) : null}
-          {/* Future feature placeholder - Leaderboard */}
-          <Button
-            variant='ghost'
-            disabled
-            className='text-muted-foreground hidden sm:flex'
-          >
-            Leaderboard
-            <span className='ml-1 text-xs'>(Soon)</span>
-          </Button>
+          {!isMinimal && showRestart && onRestart ? (
+            <RestartButton
+              onRestart={onRestart}
+              disabled={!!restartDisabled}
+            />
+          ) : null}
+          {!isMinimal ? (
+            <Button
+              variant='ghost'
+              disabled
+              className='text-muted-foreground hidden sm:flex'
+            >
+              Leaderboard
+              <span className='ml-1 text-xs'>(Soon)</span>
+            </Button>
+          ) : null}
+          <ThemeToggle />
         </div>
       </div>
     </header>

@@ -1,20 +1,21 @@
 'use client';
-import React, { useCallback, useState, startTransition, useMemo } from 'react';
+import React, { useCallback, useMemo, useState, startTransition } from 'react';
 import dynamic from 'next/dynamic';
 import AppHeader from '@/shared/ui/AppHeader';
-import TestControls from '@/features/typing-test/TestControls';
-import TypingArea from '@/features/typing-test/TypingArea';
-
+import TestPanel from '@/features/typing-test/TestPanel';
+import { AmbientBackground } from '@/shared/layout/AmbientBackground';
 import {
   useTypingTest,
   type TypingTestFinishedSnapshot,
 } from '@/modules/typing-test';
-import { Button } from '@/shared/ui/button';
 import { useSession } from '@/modules/session';
 import {
   buildTestSession,
+  calculateCurrentAccuracy,
+  calculateCurrentWpm,
   type LiveTestMetrics,
 } from '@/modules/metrics';
+import { layoutClasses } from '@/shared/layout/layout-utils';
 import { cn } from '@/shared/lib/cn';
 
 const MetricsModal = dynamic(
@@ -37,11 +38,7 @@ const TestScreen: React.FC<TestScreenProps> = ({
   const handleFinished = useCallback(
     (snapshot: TypingTestFinishedSnapshot) => {
       startTransition(() => setIsMetricsModalOpen(true));
-      try {
-        recordTest(buildTestSession(snapshot, defaultTimer));
-      } catch (error) {
-        console.warn('Failed to save session data:', error);
-      }
+      recordTest(buildTestSession(snapshot, defaultTimer));
     },
     [defaultTimer, recordTest],
   );
@@ -55,10 +52,6 @@ const TestScreen: React.FC<TestScreenProps> = ({
     actions.restart();
     setIsMetricsModalOpen(false);
   }, [actions]);
-
-  const handleViewMetrics = useCallback(() => {
-    startTransition(() => setIsMetricsModalOpen(true));
-  }, []);
 
   const liveMetrics: LiveTestMetrics = useMemo(
     () => ({
@@ -77,44 +70,62 @@ const TestScreen: React.FC<TestScreenProps> = ({
     ],
   );
 
+  const elapsedSeconds = timer.duration - timer.remaining;
+  const liveWpm = useMemo(
+    () =>
+      calculateCurrentWpm(
+        metrics.correctWordCount,
+        elapsedSeconds > 0 ? elapsedSeconds : 1,
+      ),
+    [metrics.correctWordCount, elapsedSeconds],
+  );
+  const liveAccuracy = useMemo(
+    () =>
+      calculateCurrentAccuracy(
+        metrics.correctWordCount,
+        metrics.totalWordCount,
+      ),
+    [metrics.correctWordCount, metrics.totalWordCount],
+  );
+
   return (
-    <div className={cn('min-h-screen bg-background relative', className)}>
-      <div className='grain-overlay' aria-hidden />
-      <AppHeader />
+    <div className={cn(layoutClasses.pageShell, className)}>
+      <AmbientBackground />
+      <AppHeader variant='minimal' className='shrink-0' />
 
-      <main className='mx-auto w-full max-w-6xl px-6 md:px-8'>
-        <TestControls
-          timer={timer.remaining}
-          started={status.started}
-          finished={status.finished}
-          onRestart={handleRestart}
-          timerDuration={timer.duration}
-          className='mt-4'
-        />
+      <main
+        className={cn(
+          layoutClasses.containerPadding,
+          'flex flex-1 min-h-0 items-center justify-center py-6',
+        )}
+      >
+        <div className='w-full max-w-3xl'>
+          <TestPanel
+            referenceText={content.text}
+            input={content.input}
+            onInputChange={actions.setInput}
+            readOnly={status.finished}
+            focusKey={content.text}
+            timer={timer.remaining}
+            timerDuration={timer.duration}
+            started={status.started}
+            finished={status.finished}
+            onRestart={handleRestart}
+            wpm={liveWpm}
+            accuracy={liveAccuracy}
+            correctWords={metrics.correctWordCount}
+          />
 
-        <TypingArea
-          text={content.text}
-          userInput={content.input}
-          onInputChange={actions.setInput}
-          readOnly={status.finished}
-          className='mt-4 md:mt-6'
-        />
-
-        {status.finished ? (
-          <div className='mt-4'>
-            <Button onClick={handleViewMetrics}>View Metrics</Button>
-          </div>
-        ) : null}
-
-        <MetricsModal
-          key={`${isMetricsModalOpen}-${data?.cumulative.totalTests ?? 0}`}
-          isOpen={isMetricsModalOpen}
-          onOpenChange={setIsMetricsModalOpen}
-          liveMetrics={liveMetrics}
-          sessionData={data}
-          onRestart={handleRestart}
-          preference='auto'
-        />
+          <MetricsModal
+            key={`${isMetricsModalOpen}-${data?.cumulative.totalTests ?? 0}`}
+            isOpen={isMetricsModalOpen}
+            onOpenChange={setIsMetricsModalOpen}
+            liveMetrics={liveMetrics}
+            sessionData={data}
+            onRestart={handleRestart}
+            preference='auto'
+          />
+        </div>
       </main>
     </div>
   );
