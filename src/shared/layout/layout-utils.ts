@@ -31,7 +31,7 @@ export const layoutClasses = {
 export const textClasses = {
   // Responsive text sizes
   heroTitle:
-    'font-display text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl',
+    'font-display text-4xl xs:text-5xl sm:text-5xl md:text-6xl lg:text-7xl',
   heroSubtitle: 'text-sm sm:text-base md:text-lg lg:text-xl',
   smallResponsive: 'text-xs sm:text-sm',
 
@@ -58,15 +58,15 @@ export const buttonClasses = {
 export const layoutShiftClasses = {
   // Hero section content areas
   heroDescription:
-    'min-h-[2.5rem] sm:min-h-[3rem] md:min-h-[3.5rem] lg:min-h-[4rem]',
-  metricsReserved: 'min-h-[4rem] flex items-end justify-center mb-4',
-  ctaSubtext: 'min-h-[2rem] flex items-center justify-center',
+    'min-h-[2rem] sm:min-h-[2.5rem]',
+  metricsReserved: 'min-h-[3rem] flex items-end justify-center mb-2',
+  ctaSubtext: 'min-h-[1.5rem] flex items-center justify-center',
 
   // Common content containers
   heroContainer:
-    'max-w-4xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 py-12 sm:py-16 md:py-20 lg:py-24 text-center',
+    'max-w-4xl mx-auto w-full px-4 sm:px-6 text-center flex flex-col flex-1 min-h-0',
   heroActions:
-    'flex flex-col items-center justify-center relative gap-3 sm:gap-4 pt-8 sm:pt-10 md:pt-12 z-10',
+    'flex flex-col items-center justify-center relative gap-2 sm:gap-3 pt-4 sm:pt-5 z-10',
 } as const;
 
 /**

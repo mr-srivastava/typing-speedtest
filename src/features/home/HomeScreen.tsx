@@ -48,12 +48,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ className = '' }) => {
   return (
     <div
       className={cn(
-        'min-h-screen w-full bg-background relative flex flex-col antialiased',
+        'h-dvh w-full bg-background relative flex flex-col antialiased overflow-hidden',
         className,
       )}
     >
       <div className='grain-overlay' aria-hidden />
-      <AppHeader />
+      <AppHeader className='shrink-0' />
 
       <HeroSection
         isLoading={isLoading}

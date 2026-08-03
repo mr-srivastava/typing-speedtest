@@ -37,8 +37,15 @@ const HeroSection: React.FC<HeroSectionProps> = ({
   const showLoadingState = !isHydrated || isLoading;
 
   return (
-    <div className={cn('flex-1', layoutClasses.flexCenter, className)}>
+    <div
+      className={cn(
+        'flex-1 min-h-0 flex flex-col',
+        layoutClasses.flexCenter,
+        className,
+      )}
+    >
       <div className={layoutShiftClasses.heroContainer}>
+        <div className='flex flex-1 min-h-0 flex-col justify-center'>
         <h1
           className={cn(
             'relative z-10 font-extrabold leading-[1.1] sm:leading-tight drop-shadow-xs',
@@ -64,7 +71,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
           <>
             <p
               className={cn(
-                'text-muted-foreground max-w-2xl mx-auto mt-6 sm:mt-8 relative z-10 leading-relaxed px-2 sm:px-0',
+                'text-muted-foreground max-w-2xl mx-auto mt-3 sm:mt-4 relative z-10 leading-relaxed px-2 sm:px-0',
                 textClasses.heroSubtitle,
                 layoutShiftClasses.heroDescription,
                 layoutClasses.flexCenter,
@@ -125,7 +132,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
           <>
             <p
               className={cn(
-                'text-muted-foreground max-w-2xl mx-auto mt-6 sm:mt-8 relative z-10 leading-relaxed px-2 sm:px-0 flex items-center justify-center',
+                'text-muted-foreground max-w-2xl mx-auto mt-3 sm:mt-4 relative z-10 leading-relaxed px-2 sm:px-0 flex items-center justify-center',
                 textClasses.heroSubtitle,
                 layoutShiftClasses.heroDescription,
               )}
@@ -160,11 +167,12 @@ const HeroSection: React.FC<HeroSectionProps> = ({
             </div>
           </>
         ) : null}
+        </div>
 
-        {/* Session-aware future features preview */}
+        {/* Session-aware future features preview — pinned to bottom of fold */}
         {showContent ? (
-          <div className='mt-12 sm:mt-16 pt-6 sm:pt-8 border-t border-border/50'>
-            <p className={cn(textClasses.mutedSmall, 'mb-3 sm:mb-4')}>
+          <div className='shrink-0 pt-4 pb-4 sm:pb-6 border-t border-border/50'>
+            <p className={cn(textClasses.mutedSmall, 'mb-2')}>
               {hasSession ? 'More Features Coming Soon' : 'Coming Soon'}
             </p>
             <div className={getFeatureListClasses().container}>
@@ -184,7 +192,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
             {hasSession ? (
               <p
                 className={cn(
-                  'text-xs text-muted-foreground/60 mt-3 sm:mt-4 px-4 sm:px-0',
+                  'text-xs text-muted-foreground/60 mt-2 px-4 sm:px-0',
                 )}
               >
                 Your scores are currently stored locally. Persistent tracking
