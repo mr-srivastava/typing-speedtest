@@ -1,13 +1,24 @@
 {
-  "extends": [
-    "next/core-web-vitals"
-  ],
   "parser": "@typescript-eslint/parser",
-  "plugins": [
-    "@typescript-eslint"
+  "plugins": ["@typescript-eslint", "react", "react-hooks"],
+  "extends": [
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
+    "plugin:@typescript-eslint/recommended"
   ],
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  },
+  "parserOptions": {
+    "ecmaVersion": 2021,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
   "rules": {
-    // TypeScript specific rules
     "@typescript-eslint/no-unused-vars": [
       "warn",
       {
@@ -17,29 +28,60 @@
     ],
     "@typescript-eslint/no-explicit-any": "warn",
     "@typescript-eslint/no-non-null-assertion": "warn",
-    
-    // React Hooks rules (already included in next/core-web-vitals)
+    "react/react-in-jsx-scope": "off",
+    "react/prop-types": "off",
     "react-hooks/exhaustive-deps": "warn",
-    
-    // General JavaScript/TypeScript rules
     "no-console": "warn",
     "no-debugger": "error",
     "no-duplicate-imports": "error",
     "prefer-const": "error",
     "no-var": "error",
     "eqeqeq": ["error", "always"],
-    
-    // Code style rules (fixable)
     "semi": ["error", "always"],
     "quotes": ["error", "single", { "avoidEscape": true }],
     "comma-dangle": ["error", "always-multiline"],
     "object-curly-spacing": ["error", "always"],
-    "array-bracket-spacing": ["error", "never"],
-    
-    // Next.js specific rules
-    "@next/next/no-img-element": "error",
-    "@next/next/no-html-link-for-pages": "error"
+    "array-bracket-spacing": ["error", "never"]
   },
+  "overrides": [
+    {
+      "files": ["src/modules/**/*.{ts,tsx}"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["@/features/*", "@/features/**"],
+                "message": "modules must not import from features"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/shared/**/*.{ts,tsx}"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "@/features/*",
+                  "@/features/**",
+                  "@/modules/*",
+                  "@/modules/**"
+                ],
+                "message": "shared must not import from features or modules"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
   "env": {
     "browser": true,
     "es2021": true,
@@ -51,8 +93,16 @@
     "out/",
     "build/",
     "dist/",
+    "next-env.d.ts",
     "*.config.js",
     "*.config.ts",
-    "src/components/ui/"
+    "src/shared/ui/button.tsx",
+    "src/shared/ui/card.tsx",
+    "src/shared/ui/chart.tsx",
+    "src/shared/ui/dropdown-menu.tsx",
+    "src/shared/ui/textarea.tsx",
+    "src/shared/ui/tooltip.tsx",
+    "src/shared/ui/animated-modal.tsx",
+    "src/shared/ui/background-beams.tsx"
   ]
 }

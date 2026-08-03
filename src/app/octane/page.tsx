@@ -1,5 +1,5 @@
 import React from 'react';
-import TestScreen from '@/screens/TestScreen';
+import TestScreen from '@/features/typing-test/TestScreen';
 
 const defaultTimer = 60;
 

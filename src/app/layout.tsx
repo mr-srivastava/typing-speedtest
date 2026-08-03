@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
 import { Epilogue, Kanit } from 'next/font/google';
-import { ThemeProvider } from '@/components/theme-provider';
-import { SessionProvider } from '@/contexts/SessionContext';
+import { ThemeProvider } from '@/shared/ui/theme-provider';
+import { SessionProvider } from '@/modules/session';
 import './globals.css';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@/shared/lib/cn';
 
 const epilogue = Epilogue({
   subsets: ['latin'],
