@@ -1,13 +1,10 @@
 'use client';
 import React, { useCallback, useState, startTransition } from 'react';
 import dynamic from 'next/dynamic';
-import AppHeader from '@/shared/ui/AppHeader';
 import HeroSection from '@/features/home/HeroSection';
 import { toOverallMetricsData } from '@/features/metrics/metrics-display-utils';
 import { useSession } from '@/modules/session';
-import { AmbientBackground } from '@/shared/layout/AmbientBackground';
-import { layoutClasses } from '@/shared/layout/layout-utils';
-import { cn } from '@/shared/lib/cn';
+import { AppShell } from '@/shared/layout/AppShell';
 
 const MetricsModal = dynamic(
   () => import('@/features/metrics/MetricsModal').then((mod) => mod.default),
@@ -33,10 +30,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ className = '' }) => {
   const overallMetrics = data ? toOverallMetricsData(data.cumulative) : null;
 
   return (
-    <div className={cn(layoutClasses.pageShell, className)}>
-      <AmbientBackground />
-      <AppHeader className='shrink-0' />
-
+    <AppShell className={className}>
       <HeroSection
         isLoading={isLoading}
         isHydrated={isHydrated}
@@ -55,7 +49,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ className = '' }) => {
           locked
         />
       ) : null}
-    </div>
+    </AppShell>
   );
 };
 

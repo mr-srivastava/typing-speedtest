@@ -4,6 +4,7 @@ import LetterAccuracyChart from '@/features/metrics/LetterAccuracyChart';
 import OverallStatsBlock from '@/features/metrics/OverallStatsBlock';
 import { type OverallMetricsData } from '@/features/metrics/metrics-display-utils';
 import { layoutClasses, textClasses } from '@/shared/layout/layout-utils';
+import { width as widthTokens } from '@/shared/lib/tokens';
 import type { MetricsDisplayModel } from '@/modules/metrics';
 import { cn } from '@/shared/lib/cn';
 import { wpmChartConfig, accuracyChartConfig } from '@/shared/lib/chart-config';
@@ -23,7 +24,7 @@ const MetricsDisplay: React.FC<MetricsDisplayProps> = ({
   className = '',
 }) => {
   return (
-    <div className={cn('w-full text-center space-y-5', className)}>
+    <div className={cn('w-full text-center space-y-6', className)}>
       {overallMetrics ? (
         <OverallStatsBlock metrics={overallMetrics} className='mb-2' />
       ) : null}
@@ -33,7 +34,7 @@ const MetricsDisplay: React.FC<MetricsDisplayProps> = ({
       ) : null}
 
       <div className={layoutClasses.responsiveFlex}>
-        <div className='w-full max-w-[280px]'>
+        <div className={cn('w-full', widthTokens.chart)}>
           <RadialChart
             value={model.wpm}
             maxValue={wpmChartConfig.value}
@@ -46,7 +47,7 @@ const MetricsDisplay: React.FC<MetricsDisplayProps> = ({
             compact={compact}
           />
         </div>
-        <div className='w-full max-w-[280px]'>
+        <div className={cn('w-full', widthTokens.chart)}>
           <RadialChart
             value={model.accuracy}
             maxValue={accuracyChartConfig.value}

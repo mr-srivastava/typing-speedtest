@@ -31,6 +31,7 @@
     var(--font-kanit), ui-sans-serif, system-ui, sans-serif,
     'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 
+  /* Semantic colors (bridged from :root primitives) */
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
@@ -61,10 +62,28 @@
   --color-success: hsl(var(--success));
   --color-warning: hsl(var(--warning));
   --color-danger: hsl(var(--danger));
+  --color-on-status: hsl(var(--on-status));
 
+  --color-chart-1: hsl(var(--chart-1));
+  --color-chart-2: hsl(var(--chart-2));
+  --color-chart-3: hsl(var(--chart-3));
+  --color-chart-4: hsl(var(--chart-4));
+  --color-chart-5: hsl(var(--chart-5));
+
+  --color-beam-start: hsl(var(--beam-start));
+  --color-beam-mid: hsl(var(--beam-mid));
+  --color-beam-end: hsl(var(--beam-end));
+
+  /* Radius */
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
+
+  /* Motion */
+  --duration-fast: 150ms;
+  --duration-ui: 200ms;
+  --duration-modal: 250ms;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
@@ -87,21 +106,13 @@
   }
 }
 
-/*
-  The default border color has changed to `currentcolor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
-
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
-*/
 @layer base {
   *,
   ::after,
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: var(--color-gray-200, currentcolor);
+    border-color: var(--color-border, currentcolor);
   }
 }
 
@@ -114,17 +125,20 @@
     --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
-    /* Brand */
-    --primary: 142 70% 35%;
-    --primary-foreground: 0 0% 100%;
-    --ring: 142 70% 35%;
 
-    /* Muted/Accent */
-    --secondary: 210 16% 96%;
+    /* Brand */
+    --brand: 142 70% 35%;
+    --primary: var(--brand);
+    --primary-foreground: 0 0% 100%;
+    --ring: var(--brand);
+
+    /* Subtle surfaces (secondary / muted / accent share one value) */
+    --subtle: 210 16% 96%;
+    --secondary: var(--subtle);
     --secondary-foreground: 222 47% 11%;
-    --muted: 210 16% 96%;
+    --muted: var(--subtle);
     --muted-foreground: 215 16% 45%;
-    --accent: 210 16% 96%;
+    --accent: var(--subtle);
     --accent-foreground: 222 47% 11%;
 
     /* Status */
@@ -133,6 +147,7 @@
     --danger: 0 72% 51%;
     --destructive: var(--danger);
     --destructive-foreground: 0 0% 98%;
+    --on-status: 0 0% 100%;
 
     /* Borders / Inputs */
     --border: 215 16% 85%;
@@ -145,10 +160,10 @@
     --chart-4: 17 88% 61%;
     --chart-5: 210 80% 50%;
 
-    /* Performance feedback */
-    --good: var(--success);
-    --poor: 40 95% 45%;
-    --needs-improvement: var(--danger);
+    /* Ambient beams (derived from chart palette) */
+    --beam-start: var(--chart-2);
+    --beam-mid: var(--chart-3);
+    --beam-end: 280 75% 65%;
 
     /* Radius */
     --radius: 0.75rem;
@@ -156,6 +171,7 @@
     /* Motion */
     --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
     --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+    --duration-fast: 150ms;
     --duration-ui: 200ms;
     --duration-modal: 250ms;
   }
@@ -167,15 +183,18 @@
     --card-foreground: 0 0% 98%;
     --popover: 222 47% 12%;
     --popover-foreground: 0 0% 98%;
-    --primary: 160 90% 40%;
-    --primary-foreground: 0 0% 98%;
-    --ring: 160 90% 40%;
 
-    --secondary: 222 32% 17%;
+    --brand: 160 90% 40%;
+    --primary: var(--brand);
+    --primary-foreground: 0 0% 98%;
+    --ring: var(--brand);
+
+    --subtle: 222 32% 17%;
+    --secondary: var(--subtle);
     --secondary-foreground: 0 0% 98%;
-    --muted: 222 32% 17%;
+    --muted: var(--subtle);
     --muted-foreground: 217 15% 65%;
-    --accent: 222 32% 17%;
+    --accent: var(--subtle);
     --accent-foreground: 0 0% 98%;
 
     --success: 142 70% 40%;
@@ -183,6 +202,7 @@
     --danger: 0 72% 56%;
     --destructive: var(--danger);
     --destructive-foreground: 0 0% 98%;
+    --on-status: 0 0% 98%;
 
     --border: 222 32% 22%;
     --input: 222 32% 22%;
@@ -193,14 +213,15 @@
     --chart-4: 17 88% 63%;
     --chart-5: 210 80% 55%;
 
-    --good: var(--success);
-    --poor: 40 95% 50%;
-    --needs-improvement: var(--danger);
+    --beam-start: var(--chart-2);
+    --beam-mid: var(--chart-3);
+    --beam-end: 280 75% 70%;
 
     --radius: 0.75rem;
 
     --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
     --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+    --duration-fast: 150ms;
     --duration-ui: 200ms;
     --duration-modal: 250ms;
   }
@@ -216,7 +237,6 @@
 }
 
 @layer utilities {
-  /* Subtle grain overlay for depth (apply to main layout) */
   .grain-overlay {
     position: fixed;
     inset: 0;
@@ -240,4 +260,3 @@
     }
   }
 }
-

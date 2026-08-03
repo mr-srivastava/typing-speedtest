@@ -1,3 +1,5 @@
+import { themeColors } from '@/shared/lib/theme';
+
 export const wpmChartConfig = {
   value: 200,
   showPercentage: false,
@@ -8,7 +10,7 @@ export const wpmChartConfig = {
     belowAverage: 'Focus on building up your speed.',
   },
   averageInfo: 'The average typing speed is around 40 WPM.',
-  fillColor: 'hsl(var(--success))',
+  fillColor: themeColors.success,
 };
 
 export const accuracyChartConfig = {
@@ -21,5 +23,5 @@ export const accuracyChartConfig = {
     belowAverage: 'Focus on accuracy. Reduce those errors.',
   },
   averageInfo: 'The average typing accuracy for humans is around 92%.',
-  fillColor: 'hsl(var(--success))',
+  fillColor: themeColors.success,
 };

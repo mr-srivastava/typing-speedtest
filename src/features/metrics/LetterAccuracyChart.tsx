@@ -11,6 +11,7 @@ import {
   getLegendItemClasses,
   getLetterAccuracyColorClass,
 } from '@/shared/layout/theme-display-utils';
+import { motion as motionTokens, size, space } from '@/shared/lib/tokens';
 
 interface LetterAccuracyChartProps {
   letterAccuracyData: Record<string, LetterMetrics>;
@@ -35,7 +36,7 @@ const LetterAccuracyChart: React.FC<LetterAccuracyChartProps> = ({
   const reduceMotion = useReducedMotion();
   const [selectedLetter, setSelectedLetter] = useState<string | null>(null);
   const [hoveredLetter, setHoveredLetter] = useState<string | null>(null);
-  const entranceEase = [0.23, 1, 0.32, 1] as const;
+  const entranceEase = motionTokens.easeOut;
 
   const fadeTransition = (delay = 0) => ({
     duration: reduceMotion ? 0.15 : 0.25,
@@ -98,7 +99,10 @@ const LetterAccuracyChart: React.FC<LetterAccuracyChartProps> = ({
           setHoveredLetter((current) => (current === letter ? null : current))
         }
         className={cn(
-          'w-8 h-8 text-white font-bold cursor-pointer transition-[transform,box-shadow] duration-200 ease-out fine-hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card',
+          size.key,
+          'font-bold cursor-pointer',
+          motionTokens.transitionUi,
+          'fine-hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card',
           radiusClasses.control,
           layoutClasses.flexCenter,
           getAccuracyColor(metrics.correct, metrics.total),
@@ -114,7 +118,7 @@ const LetterAccuracyChart: React.FC<LetterAccuracyChartProps> = ({
   const renderKeyboardRow = (row: string[], rowIndex: number) => (
     <motion.div
       key={rowIndex}
-      className='flex justify-center gap-1 mb-1'
+      className={`flex justify-center ${space.comfortable} mb-3`}
       initial={slideInitial}
       animate={slideAnimate}
       transition={slideTransition(0.04 * rowIndex)}
@@ -156,14 +160,14 @@ const LetterAccuracyChart: React.FC<LetterAccuracyChartProps> = ({
         transition={fadeTransition(0.08)}
       >
         <p className='text-sm font-medium text-foreground'>Key accuracy</p>
-        <p className='text-xs text-muted-foreground mt-0.5'>
+        <p className='text-xs text-muted-foreground mt-1'>
           Weighted average {overallWeightedAccuracy.toFixed(0)}% · Hover or tap
           a key for details
         </p>
       </motion.div>
 
       <motion.div
-        className='mb-3'
+        className='mb-4 px-2 py-1'
         initial={slideInitial}
         animate={slideAnimate}
         transition={slideTransition(0.04)}
@@ -178,7 +182,7 @@ const LetterAccuracyChart: React.FC<LetterAccuracyChartProps> = ({
       */}
       <div
         className={cn(
-          'mb-4 mx-auto flex min-h-[4.5rem] max-w-xs items-center justify-center border px-4 py-3 text-center',
+          `mb-4 mx-auto flex ${size.detailStrip} max-w-xs items-center justify-center border px-4 py-3 text-center`,
           radiusClasses.surface,
           activeLetter
             ? 'border-border bg-muted/40'
@@ -195,7 +199,7 @@ const LetterAccuracyChart: React.FC<LetterAccuracyChartProps> = ({
             <div className='mt-1 text-sm text-foreground'>
               {activeMetrics.correct} / {activeMetrics.total} correct
             </div>
-            <div className='mt-0.5 text-sm text-muted-foreground'>
+            <div className='mt-1 text-sm text-muted-foreground'>
               {activeMetrics.total > 0
                 ? `${((activeMetrics.correct / activeMetrics.total) * 100).toFixed(1)}% accuracy`
                 : 'No presses yet'}
@@ -209,7 +213,7 @@ const LetterAccuracyChart: React.FC<LetterAccuracyChartProps> = ({
       </div>
 
       <motion.div
-        className='flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm'
+        className='flex flex-wrap justify-center gap-x-4 gap-y-2 text-sm'
         initial={slideInitial}
         animate={slideAnimate}
         transition={slideTransition(0.12)}

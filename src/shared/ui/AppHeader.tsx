@@ -3,27 +3,17 @@ import React from 'react';
 import Image from 'next/image';
 import { Button } from '@/shared/ui/button';
 import Link from 'next/link';
-import RestartButton from '@/shared/ui/RestartButton';
 import ThemeToggle from '@/shared/ui/ThemeToggle';
-import TimerDisplay from '@/shared/ui/TimerDisplay';
 import { layoutClasses } from '@/shared/layout/layout-utils';
 import { cn } from '@/shared/lib/cn';
 
 interface AppHeaderProps {
   variant?: 'default' | 'minimal';
-  timer?: number;
-  showRestart?: boolean;
-  onRestart?: () => void;
-  restartDisabled?: boolean;
   className?: string;
 }
 
 const AppHeader: React.FC<AppHeaderProps> = ({
   variant = 'default',
-  timer,
-  showRestart,
-  onRestart,
-  restartDisabled,
   className = '',
 }) => {
   const isMinimal = variant === 'minimal';
@@ -55,15 +45,6 @@ const AppHeader: React.FC<AppHeaderProps> = ({
         </Button>
 
         <div className={cn(layoutClasses.flexStart, layoutClasses.gap2)}>
-          {!isMinimal && typeof timer === 'number' ? (
-            <TimerDisplay timer={timer} />
-          ) : null}
-          {!isMinimal && showRestart && onRestart ? (
-            <RestartButton
-              onRestart={onRestart}
-              disabled={!!restartDisabled}
-            />
-          ) : null}
           {!isMinimal ? (
             <Button
               variant='ghost'

@@ -3,81 +3,67 @@
  */
 
 import { themeColorClasses } from '@/shared/lib/theme';
+import { size } from '@/shared/lib/tokens';
 import { layoutClasses } from '@/shared/layout/layout-utils';
 
-/**
- * Get legend item class names and data
- */
-export const getLegendItemClasses = (size: 'small' | 'medium' = 'small') => ({
+export const getLegendItemClasses = (sizeVariant: 'small' | 'medium' = 'small') => ({
   container: layoutClasses.flexStart,
-  icon: size === 'small' ? 'w-3 h-3' : 'w-4 h-4',
-  spacing: size === 'small' ? 'mr-1' : 'mr-2',
+  icon: sizeVariant === 'small' ? size.iconSm : size.icon,
+  spacing: sizeVariant === 'small' ? 'mr-1' : 'mr-2',
 });
 
-/**
- * Common accuracy legend item data
- */
 export const accuracyLegendData = {
   correct: {
-    colorClass: themeColorClasses.goodBg,
+    colorClass: themeColorClasses.successBg,
     label: 'Correct',
     size: 'small' as const,
   },
   incorrect: {
-    colorClass: themeColorClasses.needsImprovementBg,
+    colorClass: themeColorClasses.dangerBg,
     label: 'Incorrect',
     size: 'small' as const,
   },
   aboveAverage: {
-    colorClass: themeColorClasses.goodBg,
+    colorClass: themeColorClasses.successBg,
     label: 'Above Average',
     size: 'medium' as const,
   },
   nearAverage: {
-    colorClass: themeColorClasses.poorBg,
+    colorClass: themeColorClasses.warningBg,
     label: 'Near Average',
     size: 'medium' as const,
   },
   belowAverage: {
-    colorClass: themeColorClasses.needsImprovementBg,
+    colorClass: themeColorClasses.dangerBg,
     label: 'Below Average',
     size: 'medium' as const,
   },
 };
 
-/**
- * Get theme color class based on accuracy performance (simple boolean)
- */
 export const getAccuracyColorClass = (isCorrect: boolean): string => {
   return isCorrect
-    ? themeColorClasses.goodBg
-    : themeColorClasses.needsImprovementBg;
+    ? themeColorClasses.successBg
+    : themeColorClasses.dangerBg;
 };
 
-/**
- * Get theme color class based on accuracy metrics (for letter accuracy)
- */
 export const getLetterAccuracyColorClass = (
   correct: number,
   total: number,
   overallAccuracy: number,
 ): string => {
-  if (total === 0) return 'bg-muted';
+  if (total === 0) return 'bg-muted text-muted-foreground';
 
   const accuracy = (correct / total) * 100;
 
   if (accuracy > overallAccuracy + 5) {
-    return themeColorClasses.goodBg;
-  } else if (accuracy < overallAccuracy - 5) {
-    return themeColorClasses.needsImprovementBg;
-  } else {
-    return themeColorClasses.poorBg;
+    return themeColorClasses.successBg;
   }
+  if (accuracy < overallAccuracy - 5) {
+    return themeColorClasses.dangerBg;
+  }
+  return themeColorClasses.warningBg;
 };
 
-/**
- * Get timer warning class based on expiry status
- */
 export const getTimerWarningClass = (isNearExpiry: boolean): string => {
   return isNearExpiry ? themeColorClasses.warning : '';
 };

@@ -1,14 +1,21 @@
 'use client';
 
 import * as React from 'react';
-import { MoonIcon, SunIcon } from '@radix-ui/react-icons';
 import { useTheme } from 'next-themes';
 import { Button } from '@/shared/ui/button';
 import { cn } from '@/shared/lib/cn';
 import {
+  DEFAULT_THEME,
+  lightThemeOption,
+  darkThemeOption,
+  THEME_OPTIONS,
+} from '@/shared/lib/theme-config';
+import { size } from '@/shared/lib/tokens';
+import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu';
 
@@ -17,7 +24,7 @@ interface ThemeToggleProps {
 }
 
 const ThemeToggle: React.FC<ThemeToggleProps> = ({ className = '' }) => {
-  const { setTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
 
   React.useEffect(() => {
@@ -33,7 +40,7 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({ className = '' }) => {
         disabled
         aria-label='Toggle theme'
       >
-        <SunIcon className='h-[1.2rem] w-[1.2rem]' />
+        <lightThemeOption.icon className={size.icon} />
       </Button>
     );
   }
@@ -47,24 +54,26 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({ className = '' }) => {
           className={cn('relative', className)}
           aria-label='Toggle theme'
         >
-          <SunIcon
-            className='h-[1.2rem] w-[1.2rem] opacity-100 transition-opacity duration-200 dark:opacity-0'
+          <lightThemeOption.icon
+            className={`${size.icon} opacity-100 transition-opacity duration-ui ease-out dark:opacity-0`}
           />
-          <MoonIcon
-            className='absolute h-[1.2rem] w-[1.2rem] opacity-0 transition-opacity duration-200 dark:opacity-100'
+          <darkThemeOption.icon
+            className={`absolute ${size.icon} opacity-0 transition-opacity duration-ui ease-out dark:opacity-100`}
           />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end'>
-        <DropdownMenuItem onClick={() => setTheme('light')}>
-          Light
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme('dark')}>
-          Dark
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme('system')}>
-          System
-        </DropdownMenuItem>
+        <DropdownMenuRadioGroup
+          value={theme ?? DEFAULT_THEME}
+          onValueChange={setTheme}
+        >
+          {THEME_OPTIONS.map(({ value, label, icon: Icon }) => (
+            <DropdownMenuRadioItem key={value} value={value} className='gap-2'>
+              <Icon className={size.icon} />
+              {label}
+            </DropdownMenuRadioItem>
+          ))}
+        </DropdownMenuRadioGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   );

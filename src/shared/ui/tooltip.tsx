@@ -14,7 +14,7 @@ const tooltipVariants = cva(
       variant: {
         default: cn(
           radiusClasses.control,
-          'bg-primary px-3 py-1.5 text-xs text-primary-foreground',
+          'bg-primary px-3 py-2 text-xs text-primary-foreground',
         ),
         rich: cn(
           radiusClasses.surface,

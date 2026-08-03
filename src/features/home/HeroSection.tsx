@@ -92,7 +92,10 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                 <Button
                   variant={'default'}
                   size={'lg'}
-                  className={buttonClasses.primaryCta}
+                  className={cn(
+                    buttonClasses.heroCta,
+                    buttonClasses.primaryCta,
+                  )}
                   asChild
                 >
                   <Link href={'/octane'} className='whitespace-nowrap'>
@@ -106,7 +109,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                     variant={'outline'}
                     size={'lg'}
                     onClick={onViewStats}
-                    className='whitespace-nowrap'
+                    className={buttonClasses.heroCta}
                   >
                     View All Stats
                   </Button>
@@ -148,7 +151,10 @@ const HeroSection: React.FC<HeroSectionProps> = ({
               <Button
                 variant={'default'}
                 size={'lg'}
-                className={buttonClasses.primaryCta}
+                className={cn(
+                  buttonClasses.heroCta,
+                  buttonClasses.primaryCta,
+                )}
                 asChild
               >
                 <Link href={'/octane'} className='whitespace-nowrap'>

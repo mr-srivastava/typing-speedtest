@@ -39,12 +39,7 @@ export default function RootLayout({
           epilogue.className,
         )}
       >
-        <ThemeProvider
-          attribute='class'
-          defaultTheme='dark'
-          enableSystem
-          disableTransitionOnChange
-        >
+        <ThemeProvider>
           <SessionProvider>{children}</SessionProvider>
         </ThemeProvider>
       </body>

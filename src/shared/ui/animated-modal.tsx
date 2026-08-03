@@ -1,6 +1,7 @@
 'use client';
 import { cn } from '@/shared/lib/cn';
 import { radiusClasses } from '@/shared/layout/layout-utils';
+import { width } from '@/shared/lib/tokens';
 import { useOutsideClick } from '@/shared/hooks/useOutsideClick';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { X } from 'lucide-react';
@@ -99,7 +100,7 @@ export const ModalBody = ({
           <motion.div
             ref={modalRef}
             className={cn(
-              'relative z-50 flex w-full max-w-4xl max-h-[90%] min-h-[50%] flex-col border border-border bg-card text-card-foreground pointer-events-auto',
+              `relative z-50 flex w-full ${width.section} max-h-[90%] min-h-[50%] flex-col border border-border bg-card text-card-foreground pointer-events-auto`,
               radiusClasses.panel,
               className,
             )}
@@ -157,7 +158,7 @@ export const ModalContent = ({
       className={cn(
         // overflow-x must stay visible enough for in-content popovers;
         // overflow-y-auto alone still clips x in most browsers, so pad children instead.
-        'flex min-h-0 flex-1 flex-col overflow-y-auto p-4 sm:p-5',
+        'flex min-h-0 flex-1 flex-col overflow-y-auto p-4 sm:p-6',
         className,
       )}
     >

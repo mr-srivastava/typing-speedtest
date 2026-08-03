@@ -10,6 +10,7 @@ import {
 } from '@/features/typing-test/typing-surface-utils';
 import { getAccuracyColorClass } from '@/shared/layout/theme-display-utils';
 import { cn } from '@/shared/lib/cn';
+import { motion as motionTokens, size } from '@/shared/lib/tokens';
 
 interface TypingSurfaceProps {
   referenceText: string;
@@ -29,9 +30,9 @@ function getCharClassName(
 
   switch (status) {
     case 'correct':
-      return cn(getAccuracyColorClass(true), 'opacity-90 dark:text-black');
+      return cn(getAccuracyColorClass(true), 'opacity-90');
     case 'incorrect':
-      return cn(getAccuracyColorClass(false), 'opacity-90 dark:text-black');
+      return cn(getAccuracyColorClass(false), 'opacity-90');
     case 'cursor':
       return 'bg-primary/25 rounded-sm';
     case 'pending':
@@ -76,7 +77,7 @@ const TypingSurface: React.FC<TypingSurfaceProps> = ({
   return (
     <div
       className={cn(
-        'relative min-h-[12rem] max-h-[40vh] overflow-y-auto',
+        `relative ${size.typingMin} max-h-[40vh] overflow-y-auto`,
         className,
       )}
     >
@@ -106,7 +107,7 @@ const TypingSurface: React.FC<TypingSurfaceProps> = ({
                   <span
                     key={globalIndex}
                     className={cn(
-                      'transition-colors duration-150',
+                      motionTokens.transitionColors,
                       getCharClassName(referenceText, input, globalIndex),
                     )}
                   >

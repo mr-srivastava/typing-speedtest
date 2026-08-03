@@ -30,7 +30,7 @@ export function toOverallMetricsData(
  * Get class names for overall metrics display pattern
  */
 export const getOverallMetricsClasses = () => ({
-  container: `${layoutClasses.flexCenterCol} gap-1.5 sm:gap-2`,
+  container: `${layoutClasses.flexCenterCol} gap-2 sm:gap-3`,
   statsRow: `${layoutClasses.responsiveFlexCol} ${textClasses.smallResponsive}`,
   detailsRow: `${layoutClasses.responsiveFlexCol} ${textClasses.mutedSubtle}`,
 });
@@ -62,5 +62,5 @@ export const getFormattedMetricsData = (metrics: OverallMetricsData) => ({
 export const getFeatureListClasses = () => ({
   container: `flex flex-wrap justify-center gap-3 sm:gap-4 ${textClasses.smallResponsive} px-4 sm:px-0`,
   item: 'flex items-center gap-2 text-muted-foreground/70',
-  bullet: 'w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-muted-foreground/30',
+  bullet: 'w-2 h-2 rounded-full bg-muted-foreground/30',
 });

@@ -1,9 +1,8 @@
 'use client';
 import React, { useCallback, useMemo, useState, startTransition } from 'react';
 import dynamic from 'next/dynamic';
-import AppHeader from '@/shared/ui/AppHeader';
 import TestPanel from '@/features/typing-test/TestPanel';
-import { AmbientBackground } from '@/shared/layout/AmbientBackground';
+import { AppShell } from '@/shared/layout/AppShell';
 import {
   useTypingTest,
   type TypingTestFinishedSnapshot,
@@ -89,10 +88,7 @@ const TestScreen: React.FC<TestScreenProps> = ({
   );
 
   return (
-    <div className={cn(layoutClasses.pageShell, className)}>
-      <AmbientBackground />
-      <AppHeader variant='minimal' className='shrink-0' />
-
+    <AppShell headerVariant='minimal' className={className}>
       <main
         className={cn(
           layoutClasses.containerPadding,
@@ -127,7 +123,7 @@ const TestScreen: React.FC<TestScreenProps> = ({
           />
         </div>
       </main>
-    </div>
+    </AppShell>
   );
 };
 

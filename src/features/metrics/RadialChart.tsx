@@ -17,6 +17,7 @@ import { ChartConfig, ChartContainer } from '@/shared/ui/chart';
 import { cn } from '@/shared/lib/cn';
 import { themeColors } from '@/shared/lib/theme';
 import { layoutClasses } from '@/shared/layout/layout-utils';
+import { size } from '@/shared/lib/tokens';
 
 interface RadialChartProps {
   title?: string;
@@ -42,7 +43,7 @@ const RadialChart: React.FC<RadialChartProps> = ({
   maxValue = 100,
   chartConfig = {
     value: { label: 'value' },
-    safari: { label: 'Safari', color: 'hsl(var(--chart-2))' },
+    safari: { label: 'Safari', color: themeColors.chart2 },
   },
   feedbackThresholds = { excellent: 92, average: 90 },
   feedbackMessages = {
@@ -52,7 +53,7 @@ const RadialChart: React.FC<RadialChartProps> = ({
   },
   averageInfo = 'The average typing accuracy for humans is around 92%.',
   dataKey = 'value',
-  fillColor = themeColors.good,
+  fillColor = themeColors.success,
   showPercentage = false,
   compact = false,
   className = '',
@@ -90,7 +91,7 @@ const RadialChart: React.FC<RadialChartProps> = ({
           config={chartConfig}
           className={cn(
             'mx-auto aspect-square',
-            compact ? 'max-h-[130px]' : 'max-h-[150px]',
+            compact ? size.chartCompact : size.chartDefault,
           )}
         >
           <RadialBarChart
@@ -146,7 +147,7 @@ const RadialChart: React.FC<RadialChartProps> = ({
         <div
           className={cn(
             layoutClasses.flexStart,
-            layoutClasses.gap2,
+            'gap-2',
             'font-medium text-center justify-center',
           )}
         >
