@@ -46,7 +46,7 @@ export const textClasses = {
 export const buttonClasses = {
   // Primary CTA button
   primaryCta:
-    'hover:scale-105 hover:shadow-lg hover:shadow-primary/25 transition-all duration-300 min-h-[48px] px-6 sm:px-8 text-base sm:text-lg font-semibold min-w-[240px]',
+    'fine-hover:scale-[1.02] hover:shadow-lg hover:shadow-primary/25 transition-[transform,box-shadow] duration-200 ease-out min-h-[48px] px-6 sm:px-8 text-base sm:text-lg font-semibold min-w-[240px]',
 
   // Action button with icon
   actionWithIcon: 'flex items-center gap-2',
@@ -77,8 +77,8 @@ export const animationClasses = {
   spinner: 'animate-spin rounded-full h-4 w-4 border-b-2 border-current',
 
   // Common transitions
-  smoothTransition: 'transition-all duration-300',
-  quickTransition: 'transition duration-200',
+  smoothTransition: 'transition-[transform,opacity,box-shadow] duration-200 ease-out',
+  quickTransition: 'transition-[transform,opacity] duration-200 ease-out',
 
   // Hover effects
   hoverScale: 'hover:scale-105',

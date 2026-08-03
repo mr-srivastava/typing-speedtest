@@ -7,11 +7,11 @@ import {
   TooltipTrigger,
   TooltipProvider,
 } from '@/components/ui/tooltip';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { PieChart, Pie, Cell } from 'recharts';
 import { LetterMetrics } from '@/types/metrics';
 import { calculateOverallWeightedAccuracy } from '@/lib/metrics-utils';
-import { pieChartColors } from '@/lib/utils';
+import { pieChartColors, cn } from '@/lib/utils';
 import { layoutClasses } from '@/lib/layout-utils';
 import {
   accuracyLegendData,
@@ -34,6 +34,29 @@ const LetterAccuracyChart: React.FC<LetterAccuracyChartProps> = ({
   letterAccuracyData,
   className = '',
 }) => {
+  const reduceMotion = useReducedMotion();
+  const entranceEase = [0.23, 1, 0.32, 1] as const;
+
+  const fadeTransition = (delay = 0) => ({
+    duration: reduceMotion ? 0.15 : 0.25,
+    delay: reduceMotion ? 0 : delay,
+    ease: entranceEase,
+  });
+
+  const slideTransition = (delay = 0) => ({
+    duration: reduceMotion ? 0.15 : 0.25,
+    delay: reduceMotion ? 0 : delay,
+    ease: entranceEase,
+  });
+
+  const slideInitial = reduceMotion
+    ? { opacity: 0 }
+    : { opacity: 0, transform: 'translateY(20px)' };
+
+  const slideAnimate = reduceMotion
+    ? { opacity: 1 }
+    : { opacity: 1, transform: 'translateY(0px)' };
+
   const { sortedLetters: _sortedLetters, overallWeightedAccuracy } =
     useMemo(() => {
       const sorted = Object.entries(letterAccuracyData).sort((a, b) =>
@@ -62,12 +85,11 @@ const LetterAccuracyChart: React.FC<LetterAccuracyChartProps> = ({
         <Tooltip>
           <TooltipTrigger asChild>
             <div
-              className={`w-8 h-8 rounded-md ${
-                layoutClasses.flexCenter
-              } text-white font-bold cursor-pointer transition-transform hover:scale-110 active:scale-95 ${getAccuracyColor(
-                metrics.correct,
-                metrics.total,
-              )}`}
+              className={cn(
+                'w-8 h-8 rounded-md text-white font-bold cursor-pointer transition-transform duration-200 ease-out fine-hover:scale-110 active:scale-95',
+                layoutClasses.flexCenter,
+                getAccuracyColor(metrics.correct, metrics.total),
+              )}
             >
               {letter.toUpperCase()}
             </div>
@@ -113,15 +135,16 @@ const LetterAccuracyChart: React.FC<LetterAccuracyChartProps> = ({
               ) : (
                 <div className='text-gray-400 mb-4'>No data available</div>
               )}
-              <div className={`${layoutClasses.flexCenter} mt-2 text-xs`}>
+              <div className={cn(layoutClasses.flexCenter, 'mt-2 text-xs')}>
                 <div className='mr-4'>
                   <div className={getLegendItemClasses('small').container}>
                     <div
-                      className={`${
-                        getLegendItemClasses('small').icon
-                      } rounded-full ${accuracyLegendData.correct.colorClass} ${
-                        getLegendItemClasses('small').spacing
-                      }`}
+                      className={cn(
+                        getLegendItemClasses('small').icon,
+                        'rounded-full',
+                        accuracyLegendData.correct.colorClass,
+                        getLegendItemClasses('small').spacing,
+                      )}
                     ></div>
                     <span>{accuracyLegendData.correct.label}</span>
                   </div>
@@ -129,11 +152,12 @@ const LetterAccuracyChart: React.FC<LetterAccuracyChartProps> = ({
                 <div>
                   <div className={getLegendItemClasses('small').container}>
                     <div
-                      className={`${
-                        getLegendItemClasses('small').icon
-                      } rounded-full ${
-                        accuracyLegendData.incorrect.colorClass
-                      } ${getLegendItemClasses('small').spacing}`}
+                      className={cn(
+                        getLegendItemClasses('small').icon,
+                        'rounded-full',
+                        accuracyLegendData.incorrect.colorClass,
+                        getLegendItemClasses('small').spacing,
+                      )}
                     />
                     <span>{accuracyLegendData.incorrect.label}</span>
                   </div>
@@ -150,9 +174,9 @@ const LetterAccuracyChart: React.FC<LetterAccuracyChartProps> = ({
     <motion.div
       key={rowIndex}
       className='flex justify-center space-x-1 mb-1'
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.1 * rowIndex }}
+      initial={slideInitial}
+      animate={slideAnimate}
+      transition={slideTransition(0.04 * rowIndex)}
     >
       {row.map(renderKey)}
     </motion.div>
@@ -172,12 +196,12 @@ const LetterAccuracyChart: React.FC<LetterAccuracyChartProps> = ({
   // Show message if no data available
   if (!hasActualData) {
     return (
-      <div className={`mt-5 text-center ${className}`}>
+      <div className={cn('mt-5 text-center', className)}>
         <motion.div
           className='text-muted-foreground'
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
+          transition={fadeTransition()}
         >
           No letter-level accuracy data available for this view.
         </motion.div>
@@ -186,50 +210,59 @@ const LetterAccuracyChart: React.FC<LetterAccuracyChartProps> = ({
   }
 
   return (
-    <div className={`mt-5 ${className}`}>
+    <div className={cn('mt-5', className)}>
       <motion.div
         className='text-center mb-2 text-xl'
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.4 }}
+        transition={fadeTransition(0.12)}
       >
         Overall Weighted Accuracy: {overallWeightedAccuracy.toFixed(1)}%
       </motion.div>
       <motion.div
         className='mb-6'
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
+        initial={slideInitial}
+        animate={slideAnimate}
+        transition={slideTransition(0.06)}
       >
         {keyboardLayout.map(renderKeyboardRow)}
       </motion.div>
       <motion.div
         className='flex justify-center space-x-6 text-sm'
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.6 }}
+        initial={slideInitial}
+        animate={slideAnimate}
+        transition={slideTransition(0.18)}
       >
         <div className={getLegendItemClasses('medium').container}>
           <div
-            className={`${getLegendItemClasses('medium').icon} rounded-full ${
-              accuracyLegendData.aboveAverage.colorClass
-            } ${getLegendItemClasses('medium').spacing}`}
+            className={cn(
+              getLegendItemClasses('medium').icon,
+              'rounded-full',
+              accuracyLegendData.aboveAverage.colorClass,
+              getLegendItemClasses('medium').spacing,
+            )}
           ></div>
           <span>{accuracyLegendData.aboveAverage.label}</span>
         </div>
         <div className={getLegendItemClasses('medium').container}>
           <div
-            className={`${getLegendItemClasses('medium').icon} rounded-full ${
-              accuracyLegendData.nearAverage.colorClass
-            } ${getLegendItemClasses('medium').spacing}`}
+            className={cn(
+              getLegendItemClasses('medium').icon,
+              'rounded-full',
+              accuracyLegendData.nearAverage.colorClass,
+              getLegendItemClasses('medium').spacing,
+            )}
           ></div>
           <span>{accuracyLegendData.nearAverage.label}</span>
         </div>
         <div className={getLegendItemClasses('medium').container}>
           <div
-            className={`${getLegendItemClasses('medium').icon} rounded-full ${
-              accuracyLegendData.belowAverage.colorClass
-            } ${getLegendItemClasses('medium').spacing}`}
+            className={cn(
+              getLegendItemClasses('medium').icon,
+              'rounded-full',
+              accuracyLegendData.belowAverage.colorClass,
+              getLegendItemClasses('medium').spacing,
+            )}
           ></div>
           <span>{accuracyLegendData.belowAverage.label}</span>
         </div>

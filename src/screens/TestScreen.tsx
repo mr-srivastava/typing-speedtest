@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { LiveTestMetrics, MetricsView } from '@/types/metrics';
 import { useSession } from '@/contexts/SessionContext';
 import { buildTestSession } from '@/lib/metrics-utils';
+import { cn } from '@/lib/utils';
 
 const MetricsModal = dynamic(
   () => import('@/components/organisms/MetricsModal').then((mod) => mod.default),
@@ -82,7 +83,7 @@ const TestScreen: React.FC<TestScreenProps> = ({
   }, [data]);
 
   return (
-    <div className={`min-h-screen bg-background relative ${className}`}>
+    <div className={cn('min-h-screen bg-background relative', className)}>
       <div className='grain-overlay' aria-hidden />
       <AppHeader />
 

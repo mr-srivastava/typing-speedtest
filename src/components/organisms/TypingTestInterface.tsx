@@ -3,6 +3,7 @@ import TextPreview from '@/components/atoms/TextPreview';
 import TypingInput from '@/components/atoms/TypingInput';
 import ActionButton from '@/components/atoms/ActionButton';
 import { ResetIcon } from '@radix-ui/react-icons';
+import { cn } from '@/lib/utils';
 
 export interface TypingAreaProps {
   text: string;
@@ -28,7 +29,7 @@ const TypingTestInterface: React.FC<TypingAreaProps> = ({
   className = '',
 }) => {
   return (
-    <div className={`w-full space-y-4 ${className}`}>
+    <div className={cn('w-full space-y-4', className)}>
       <div className='w-full rounded-lg bg-secondary/60 border border-border p-4 text-base md:text-lg font-mono leading-relaxed'>
         <TextPreview text={text} userInput={userInput} />
       </div>

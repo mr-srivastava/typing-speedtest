@@ -13,7 +13,7 @@ import {
   layoutShiftClasses,
   gradientClasses,
 } from '@/lib/layout-utils';
-import { themeColorClasses } from '@/lib/utils';
+import { themeColorClasses, cn } from '@/lib/utils';
 
 interface HeroSectionProps {
   isLoading?: boolean;
@@ -36,19 +36,23 @@ const HeroSection: React.FC<HeroSectionProps> = ({
   const showLoadingState = !isHydrated || isLoading;
 
   return (
-    <div className={`flex-1 ${layoutClasses.flexCenter} ${className}`}>
+    <div className={cn('flex-1', layoutClasses.flexCenter, className)}>
       <div className={layoutShiftClasses.heroContainer}>
         <h1
-          className={`relative z-10 ${textClasses.heroTitle} font-extrabold leading-[1.1] sm:leading-tight drop-shadow-sm`}
+          className={cn(
+            'relative z-10 font-extrabold leading-[1.1] sm:leading-tight drop-shadow-xs',
+            textClasses.heroTitle,
+          )}
         >
-          <span
-            className={`${gradientClasses.heroTextGradient} block sm:inline`}
-          >
+          <span className={cn(gradientClasses.heroTextGradient, 'block sm:inline')}>
             Unleash Your
           </span>
           <br className='hidden sm:block' />
           <span
-            className={`${themeColorClasses.primary} drop-shadow-sm block sm:inline mt-1 sm:mt-0`}
+            className={cn(
+              themeColorClasses.primary,
+              'drop-shadow-xs block sm:inline mt-1 sm:mt-0',
+            )}
           >
             Typing Fury!
           </span>
@@ -58,7 +62,12 @@ const HeroSection: React.FC<HeroSectionProps> = ({
         {showContent ? (
           <>
             <p
-              className={`text-muted-foreground max-w-2xl mx-auto mt-6 sm:mt-8 ${textClasses.heroSubtitle} relative z-10 leading-relaxed px-2 sm:px-0 ${layoutShiftClasses.heroDescription} ${layoutClasses.flexCenter}`}
+              className={cn(
+                'text-muted-foreground max-w-2xl mx-auto mt-6 sm:mt-8 relative z-10 leading-relaxed px-2 sm:px-0',
+                textClasses.heroSubtitle,
+                layoutShiftClasses.heroDescription,
+                layoutClasses.flexCenter,
+              )}
             >
               {overallMetrics
                 ? `Welcome back! Ready to improve your ${overallMetrics.wpm} WPM average?`
@@ -96,7 +105,11 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                 ) : null}
               </div>
               <p
-                className={`${textClasses.mutedSmall} px-4 sm:px-0 text-center ${layoutShiftClasses.ctaSubtext}`}
+                className={cn(
+                  textClasses.mutedSmall,
+                  'px-4 sm:px-0 text-center',
+                  layoutShiftClasses.ctaSubtext,
+                )}
               >
                 {overallMetrics
                   ? 'Challenge yourself to improve your overall performance'
@@ -110,7 +123,11 @@ const HeroSection: React.FC<HeroSectionProps> = ({
         {showLoadingState ? (
           <>
             <p
-              className={`text-muted-foreground max-w-2xl mx-auto mt-6 sm:mt-8 ${textClasses.heroSubtitle} relative z-10 leading-relaxed px-2 sm:px-0 ${layoutShiftClasses.heroDescription} flex items-center justify-center`}
+              className={cn(
+                'text-muted-foreground max-w-2xl mx-auto mt-6 sm:mt-8 relative z-10 leading-relaxed px-2 sm:px-0 flex items-center justify-center',
+                textClasses.heroSubtitle,
+                layoutShiftClasses.heroDescription,
+              )}
             >
               Ready to dominate the keyboard? Our fun typing speed test will put
               your skills to the test.
@@ -131,7 +148,11 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                 </Link>
               </Button>
               <p
-                className={`${textClasses.mutedSmall} px-4 sm:px-0 text-center ${layoutShiftClasses.ctaSubtext}`}
+                className={cn(
+                  textClasses.mutedSmall,
+                  'px-4 sm:px-0 text-center',
+                  layoutShiftClasses.ctaSubtext,
+                )}
               >
                 Test your typing skills instantly — no login needed!
               </p>
@@ -142,7 +163,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
         {/* Session-aware future features preview */}
         {showContent ? (
           <div className='mt-12 sm:mt-16 pt-6 sm:pt-8 border-t border-border/50'>
-            <p className={`${textClasses.mutedSmall} mb-3 sm:mb-4`}>
+            <p className={cn(textClasses.mutedSmall, 'mb-3 sm:mb-4')}>
               {hasSession ? 'More Features Coming Soon' : 'Coming Soon'}
             </p>
             <div className={getFeatureListClasses().container}>
@@ -161,7 +182,9 @@ const HeroSection: React.FC<HeroSectionProps> = ({
             </div>
             {hasSession ? (
               <p
-                className={`${textClasses.mutedSubtle}/60 mt-3 sm:mt-4 px-4 sm:px-0`}
+                className={cn(
+                  'text-xs text-muted-foreground/60 mt-3 sm:mt-4 px-4 sm:px-0',
+                )}
               >
                 Your scores are currently stored locally. Persistent tracking
                 coming soon!

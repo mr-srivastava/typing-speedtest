@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 import AppHeader from '@/components/organisms/AppHeader';
 import HeroSection from '@/sections/HeroSection';
 import { useSession } from '@/contexts/SessionContext';
-import { gradients } from '@/lib/utils';
+import { gradients, cn } from '@/lib/utils';
 import type { OverallMetricsData } from '@/lib/metrics-display-utils';
 
 const BackgroundBeams = dynamic(
@@ -46,7 +46,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ className = '' }) => {
 
   return (
     <div
-      className={`min-h-screen w-full bg-background relative flex flex-col antialiased ${className}`}
+      className={cn(
+        'min-h-screen w-full bg-background relative flex flex-col antialiased',
+        className,
+      )}
     >
       <div className='grain-overlay' aria-hidden />
       <AppHeader />
@@ -70,7 +73,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ className = '' }) => {
       ) : null}
 
       <div
-        className={`pointer-events-none absolute inset-0 z-[1] ${gradients.primaryRadial}`}
+        className={cn(
+          'pointer-events-none absolute inset-0 z-[1]',
+          gradients.primaryRadial,
+        )}
       />
       <BackgroundBeams />
     </div>

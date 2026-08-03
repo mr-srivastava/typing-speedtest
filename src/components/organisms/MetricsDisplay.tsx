@@ -17,7 +17,7 @@ import {
   getLetterAccuracyData,
   generateStatsTitle,
 } from '@/lib/metrics-utils';
-import { wpmChartConfig, accuracyChartConfig } from '@/lib/utils';
+import { wpmChartConfig, accuracyChartConfig, cn } from '@/lib/utils';
 
 const EMPTY_LIVE_METRICS: LiveTestMetrics = {
   correctWordCount: 0,
@@ -124,9 +124,9 @@ const MetricsDisplay: React.FC<MetricsDisplayProps> = ({
   }, [showOverallStats, sessionData]);
 
   return (
-    <div className={`w-full text-center space-y-4 ${className}`}>
+    <div className={cn('w-full text-center space-y-4', className)}>
       {overallMetrics ? (
-        <div className={`${getOverallMetricsClasses().container} mb-6`}>
+        <div className={cn(getOverallMetricsClasses().container, 'mb-6')}>
           <div className={getOverallMetricsClasses().statsRow}>
             <span className='text-muted-foreground'>Overall stats:</span>
             <MetricGroup

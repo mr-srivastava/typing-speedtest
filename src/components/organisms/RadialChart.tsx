@@ -14,7 +14,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { ChartConfig, ChartContainer } from '@/components/ui/chart';
-import { themeColors } from '@/lib/utils';
+import { themeColors, cn } from '@/lib/utils';
 import { layoutClasses } from '@/lib/layout-utils';
 
 interface RadialChartProps {
@@ -69,7 +69,7 @@ const RadialChart: React.FC<RadialChartProps> = ({
   }
 
   return (
-    <Card className={`flex flex-col shadow-md shadow-gray-500/20 ${className}`}>
+    <Card className={cn('flex flex-col shadow-md shadow-gray-500/20', className)}>
       <CardHeader className='items-center pb-0'>
         {title && <CardTitle>{title.toUpperCase()}</CardTitle>}
         {description && <CardDescription>{description}</CardDescription>}
@@ -124,7 +124,11 @@ const RadialChart: React.FC<RadialChartProps> = ({
       </CardContent>
       <CardFooter className='flex-col gap-2 text-xs'>
         <div
-          className={`${layoutClasses.flexStart} ${layoutClasses.gap2} font-medium`}
+          className={cn(
+            layoutClasses.flexStart,
+            layoutClasses.gap2,
+            'font-medium',
+          )}
         >
           {getFeedbackMessage(value)}
         </div>

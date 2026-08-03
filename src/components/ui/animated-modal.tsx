@@ -1,13 +1,12 @@
 'use client';
 import { cn } from '@/lib/utils';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import React, {
   ReactNode,
   createContext,
   useContext,
   useEffect,
   useRef,
-  useState,
 } from 'react';
 
 interface ModalContextType {
@@ -51,6 +50,7 @@ export const ModalBody = ({
   title?: string;
 }) => {
   const { open } = useModal();
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
     if (open) {
@@ -67,23 +67,26 @@ export const ModalBody = ({
   const { setOpen } = useModal();
   useOutsideClick(modalRef, () => setOpen(false));
 
+  const panelTransition = reduceMotion
+    ? { duration: 0.2 }
+    : { type: 'spring' as const, duration: 0.4, bounce: 0.15 };
+
+  const panelInitial = reduceMotion
+    ? { opacity: 0 }
+    : { opacity: 0, transform: 'translateY(8px) scale(0.95)' };
+
+  const panelAnimate = reduceMotion
+    ? { opacity: 1 }
+    : { opacity: 1, transform: 'translateY(0px) scale(1)' };
+
+  const panelExit = reduceMotion
+    ? { opacity: 0 }
+    : { opacity: 0, transform: 'translateY(4px) scale(0.97)' };
+
   return (
     <AnimatePresence>
       {open ? (
-        <motion.div
-          initial={{
-            opacity: 0,
-          }}
-          animate={{
-            opacity: 1,
-            backdropFilter: 'blur(10px)',
-          }}
-          exit={{
-            opacity: 0,
-            backdropFilter: 'blur(0px)',
-          }}
-          className='fixed [perspective:800px] [transform-style:preserve-3d] inset-0 h-full w-full flex items-center justify-center z-50'
-        >
+        <div className='fixed inset-0 h-full w-full flex items-center justify-center z-50'>
           <Overlay />
 
           <motion.div
@@ -92,28 +95,10 @@ export const ModalBody = ({
               'min-h-[50%] max-h-[90%] md:max-w-[40%] bg-white dark:bg-neutral-950 border border-transparent dark:border-neutral-800 md:rounded-2xl relative z-50 flex flex-col flex-1 pointer-events-auto',
               className
             )}
-            initial={{
-              opacity: 0,
-              scale: 0.5,
-              rotateX: 40,
-              y: 40,
-            }}
-            animate={{
-              opacity: 1,
-              scale: 1,
-              rotateX: 0,
-              y: 0,
-            }}
-            exit={{
-              opacity: 0,
-              scale: 0.8,
-              rotateX: 10,
-            }}
-            transition={{
-              type: 'spring',
-              stiffness: 260,
-              damping: 15,
-            }}
+            initial={panelInitial}
+            animate={panelAnimate}
+            exit={panelExit}
+            transition={panelTransition}
           >
             <div className='flex justify-between items-center p-4'>
               <h2 className='text-2xl font-bold'>{title}</h2>
@@ -121,7 +106,7 @@ export const ModalBody = ({
             </div>
             {children}
           </motion.div>
-        </motion.div>
+        </div>
       ) : null}
     </AnimatePresence>
   );
@@ -168,19 +153,15 @@ export const ModalFooter = ({
 const Overlay = ({ className }: { className?: string }) => {
   return (
     <motion.div
-      initial={{
-        opacity: 0,
-      }}
-      animate={{
-        opacity: 1,
-        backdropFilter: 'blur(10px)',
-      }}
-      exit={{
-        opacity: 0,
-        backdropFilter: 'blur(0px)',
-      }}
-      className={`fixed inset-0 h-full w-full bg-black bg-opacity-50 z-50 pointer-events-none ${className}`}
-    ></motion.div>
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
+      className={cn(
+        'fixed inset-0 h-full w-full bg-black/50 backdrop-blur-md z-50 pointer-events-none',
+        className
+      )}
+    />
   );
 };
 
@@ -201,7 +182,7 @@ const CloseIcon = () => {
         strokeWidth='2'
         strokeLinecap='round'
         strokeLinejoin='round'
-        className='text-black dark:text-white h-4 w-4 group-hover:scale-125 group-hover:rotate-3 transition duration-200'
+        className='text-black dark:text-white h-4 w-4 transition-transform duration-200 ease-out fine-hover:scale-110 fine-hover:rotate-3'
       >
         <path stroke='none' d='M0 0h24v24H0z' fill='none' />
         <path d='M18 6l-12 12' />

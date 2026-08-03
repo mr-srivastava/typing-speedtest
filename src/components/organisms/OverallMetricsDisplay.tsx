@@ -6,6 +6,7 @@ import {
   getFormattedMetricsData,
   OverallMetricsData,
 } from '@/lib/metrics-display-utils';
+import { cn } from '@/lib/utils';
 
 interface OverallMetricsDisplayProps {
   metrics: OverallMetricsData;
@@ -20,7 +21,7 @@ const OverallMetricsDisplay: React.FC<OverallMetricsDisplayProps> = ({
   const data = getFormattedMetricsData(metrics);
 
   return (
-    <div className={`${classes.container} ${className}`}>
+    <div className={cn(classes.container, className)}>
       <div className={classes.statsRow}>
         <span className='text-muted-foreground'>Overall stats:</span>
         <MetricGroup metrics={data.primaryMetrics} />

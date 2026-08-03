@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ResetIcon } from '@radix-ui/react-icons';
+import { cn } from '@/lib/utils';
 
 interface RestartButtonProps {
   onRestart: () => void;
@@ -14,7 +15,7 @@ const RestartButton: React.FC<RestartButtonProps> = ({
   className = '',
 }) => {
   return (
-    <div className={`flex w-full justify-end mt-5 ${className}`}>
+    <div className={cn('flex w-full justify-end mt-5', className)}>
       <Button
         variant='outline'
         className='rounded-lg'

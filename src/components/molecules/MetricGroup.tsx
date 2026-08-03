@@ -1,6 +1,7 @@
 import React from 'react';
 import MetricBadge from '@/components/atoms/MetricBadge';
 import { layoutClasses } from '@/lib/layout-utils';
+import { cn } from '@/lib/utils';
 
 interface MetricItem {
   value: string | number;
@@ -23,7 +24,7 @@ const MetricGroup: React.FC<MetricGroupProps> = ({
 }) => {
   return (
     <div
-      className={`${layoutClasses.flexStart} ${layoutClasses.gap2} ${className}`}
+      className={cn(layoutClasses.flexStart, layoutClasses.gap2, className)}
     >
       {metrics.map((metric, index) => (
         <React.Fragment key={index}>

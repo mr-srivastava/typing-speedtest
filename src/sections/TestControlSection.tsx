@@ -2,6 +2,7 @@ import React from 'react';
 import TimerDisplay from '@/components/molecules/TimerDisplay';
 import RestartButton from '@/components/atoms/RestartButton';
 import { layoutClasses } from '@/lib/layout-utils';
+import { cn } from '@/lib/utils';
 
 interface TestControlSectionProps {
   timer: number;
@@ -25,10 +26,10 @@ const TestControlSection: React.FC<TestControlSectionProps> = ({
   className = '',
 }) => {
   return (
-    <section className={`w-full ${className}`}>
+    <section className={cn('w-full', className)}>
       {/* Controls row: restart and timer */}
       <div className={layoutClasses.flexBetween}>
-        <div className={`${layoutClasses.flexStart} ${layoutClasses.gap2}`}>
+        <div className={cn(layoutClasses.flexStart, layoutClasses.gap2)}>
           {showRestart ? (
             <RestartButton
               onRestart={onRestart}

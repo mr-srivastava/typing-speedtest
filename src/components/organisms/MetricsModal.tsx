@@ -13,6 +13,7 @@ import {
   MetricsView,
 } from '@/types/metrics';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 interface ViewToggleProps {
   showCumulative: boolean;
@@ -91,7 +92,7 @@ const MetricsModal: React.FC<MetricsModalProps> = ({
     <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
       <ModalBody
         title='Metrics'
-        className={`w-full max-w-4xl mx-auto ${className}`}
+        className={cn('w-full max-w-4xl mx-auto', className)}
       >
         <ModalContent>
           {showToggle ? (

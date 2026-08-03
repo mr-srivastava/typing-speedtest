@@ -38,12 +38,11 @@ const TimerDisplay: React.FC<TimerDisplayProps> = ({
   }
 
   return (
-    <div className={`px-2 py-1.5 text-right cursor-default ${className}`}>
+    <div className={cn('px-2 py-1.5 text-right cursor-default', className)}>
       <span
         className={cn(
-          `inline-flex items-center rounded-full border border-border bg-secondary/60 backdrop-blur px-3 py-1 text-2xl md:text-3xl ${getTimerWarningClass(
-            isNearExpiry,
-          )}`,
+          'inline-flex items-center rounded-full border border-border bg-secondary/60 backdrop-blur px-3 py-1 text-2xl md:text-3xl',
+          getTimerWarningClass(isNearExpiry),
           orbitron.className,
         )}
       >

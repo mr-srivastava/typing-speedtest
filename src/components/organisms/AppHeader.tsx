@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import RestartButton from '@/components/atoms/RestartButton';
 import { layoutClasses } from '@/lib/layout-utils';
+import { cn } from '@/lib/utils';
 
 interface AppHeaderProps {
   timer?: number;
@@ -22,12 +23,18 @@ const AppHeader: React.FC<AppHeaderProps> = ({
   className = '',
 }) => {
   return (
-    <header className={`w-full ${className}`}>
+    <header className={cn('w-full', className)}>
       <div
-        className={`mx-auto max-w-6xl px-6 md:px-8 ${layoutClasses.flexBetween} h-16 md:h-20`}
+        className={cn(
+          'mx-auto max-w-6xl px-6 md:px-8 h-16 md:h-20',
+          layoutClasses.flexBetween,
+        )}
       >
         <Button
-          className={`${layoutClasses.flexStart} space-x-2 px-2 md:px-3 py-2 hover:bg-transparent`}
+          className={cn(
+            layoutClasses.flexStart,
+            'space-x-2 px-2 md:px-3 py-2 hover:bg-transparent',
+          )}
           variant={'ghost'}
           asChild
         >
@@ -38,7 +45,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
             </span>
           </Link>
         </Button>
-        <div className={`${layoutClasses.flexStart} ${layoutClasses.gap2}`}>
+        <div className={cn(layoutClasses.flexStart, layoutClasses.gap2)}>
           {typeof timer === 'number' ? <TimerDisplay timer={timer} /> : null}
           {showRestart && onRestart ? (
             <RestartButton onRestart={onRestart} disabled={!!restartDisabled} />
