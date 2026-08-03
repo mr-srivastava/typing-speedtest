@@ -1,7 +1,7 @@
 'use client';
 import React, { createContext, useContext } from 'react';
 import { EnhancedStoredData, TestSession } from '@/types/metrics';
-import { useSession as useSessionHook } from '@/hooks/complex/useSession';
+import { useSessionStorage } from '@/hooks/complex/useSession';
 
 interface SessionContextType {
   data: EnhancedStoredData | null;
@@ -15,7 +15,7 @@ interface SessionContextType {
 const SessionContext = createContext<SessionContextType | undefined>(undefined);
 
 export function SessionProvider({ children }: { children: React.ReactNode }) {
-  const sessionData = useSessionHook();
+  const sessionData = useSessionStorage();
 
   return (
     <SessionContext.Provider value={sessionData}>

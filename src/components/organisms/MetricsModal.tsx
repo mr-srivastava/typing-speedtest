@@ -7,7 +7,11 @@ import {
   ModalFooter,
 } from '@/components/ui/animated-modal';
 import MetricsDisplay from '@/components/organisms/MetricsDisplay';
-import { LetterMetrics, EnhancedStoredData } from '@/types/metrics';
+import {
+  LiveTestMetrics,
+  EnhancedStoredData,
+  MetricsView,
+} from '@/types/metrics';
 import { Button } from '@/components/ui/button';
 
 interface ViewToggleProps {
@@ -41,48 +45,47 @@ function ViewToggle({ showCumulative, onToggle, totalTests }: ViewToggleProps) {
   );
 }
 
+function initialShowCumulative(view: MetricsView): boolean {
+  if (view.scope === 'cumulative') return true;
+  if (view.scope === 'toggle') return view.initial === 'cumulative';
+  return false;
+}
+
 interface MetricsModalProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  correctWordCount: number;
-  totalWordCount: number;
-  timer: number;
-  timerDuration?: number;
-  letterAccuracyData: Record<string, LetterMetrics>;
+  liveMetrics?: LiveTestMetrics;
   sessionData?: EnhancedStoredData | null;
   onRestart: () => void;
-  mode?: 'this-test' | 'all-tests' | 'both';
+  view?: MetricsView;
   className?: string;
 }
 
 const MetricsModal: React.FC<MetricsModalProps> = ({
   isOpen,
   onOpenChange,
-  correctWordCount,
-  totalWordCount,
-  timer,
-  timerDuration = 60,
-  letterAccuracyData,
+  liveMetrics,
   sessionData,
   onRestart,
-  mode = 'both',
+  view = { scope: 'toggle', initial: 'live' },
   className = '',
 }) => {
-  // Initial view from mode; parent passes key so state resets when mode/isOpen changes
-  const getInitialView = () => {
-    if (mode === 'all-tests') return true;
-    if (mode === 'this-test') return false;
-    return false;
-  };
-
-  const [showCumulative, setShowCumulative] = useState(getInitialView);
+  const [showCumulative, setShowCumulative] = useState(() =>
+    initialShowCumulative(view),
+  );
 
   const hasCumulativeData = Boolean(
     sessionData && sessionData.cumulative.totalTests > 1,
   );
 
-  // Determine if toggle should be shown
-  const showToggle = mode === 'both' && hasCumulativeData;
+  const showToggle = view.scope === 'toggle' && hasCumulativeData;
+
+  const effectiveShowCumulative =
+    view.scope === 'cumulative'
+      ? true
+      : view.scope === 'live'
+        ? false
+        : showCumulative && hasCumulativeData;
 
   return (
     <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
@@ -100,15 +103,9 @@ const MetricsModal: React.FC<MetricsModalProps> = ({
           ) : null}
 
           <MetricsDisplay
-            correctWordCount={correctWordCount}
-            totalWordCount={totalWordCount}
-            timer={timer}
-            timerDuration={timerDuration}
-            letterAccuracyData={letterAccuracyData}
-            data={sessionData}
-            showCumulative={
-              mode === 'all-tests' ? true : showCumulative && hasCumulativeData
-            }
+            liveMetrics={liveMetrics}
+            sessionData={sessionData}
+            showCumulative={effectiveShowCumulative}
           />
         </ModalContent>
         <ModalFooter className='gap-4 justify-end'>
@@ -116,7 +113,7 @@ const MetricsModal: React.FC<MetricsModalProps> = ({
             onClick={onRestart}
             className='bg-black text-white dark:bg-white dark:text-black text-sm px-4 py-2 rounded-md border border-black w-28'
           >
-            {mode === 'all-tests' ? 'Close' : 'Restart'}
+            {view.scope === 'cumulative' ? 'Close' : 'Restart'}
           </button>
         </ModalFooter>
       </ModalBody>

@@ -3,13 +3,15 @@ import getText from '@/lib/text';
 import { LetterMetrics } from '@/types/metrics';
 import { useTimer } from '@/hooks/atomic/useTimer';
 import { useToggle } from '@/hooks/atomic/useToggle';
+import {
+  evaluateInput,
+  buildFinishedSnapshot,
+  type TypingTestFinishedSnapshot,
+} from '@/lib/typing-engine';
 
-export interface TypingTestFinishedSnapshot {
-  correctWordCount: number;
-  totalWordCount: number;
-  timer: number;
-  letterAccuracy: Record<string, LetterMetrics>;
-}
+export type { TypingTestFinishedSnapshot };
+
+export type TypingTestPhase = 'idle' | 'active' | 'finished';
 
 export interface UseTypingTestOptions {
   onFinished?: (snapshot: TypingTestFinishedSnapshot) => void;
@@ -17,7 +19,7 @@ export interface UseTypingTestOptions {
 
 export function useTypingTest(
   defaultTimer: number,
-  options: UseTypingTestOptions = {}
+  options: UseTypingTestOptions = {},
 ) {
   const { onFinished } = options;
   const [text, setText] = useState<string>(getText());
@@ -45,30 +47,25 @@ export function useTypingTest(
   });
 
   const finishTest = useCallback(
-    (override?: Partial<TypingTestFinishedSnapshot>) => {
+    (snapshot: TypingTestFinishedSnapshot) => {
       setFinished();
-      const snapshot = override
-        ? { ...snapshotRef.current, ...override }
-        : snapshotRef.current;
       onFinishedRef.current?.(snapshot);
     },
-    [setFinished]
+    [setFinished],
   );
 
-  // Use atomic hooks for timer
   const {
     timer,
-    setTimer,
     start: startTimer,
     stop: stopTimer,
     reset: resetTimer,
     isRunning: timerStarted,
   } = useTimer({
     duration: defaultTimer,
-    onExpiry: () => finishTest(),
+    onExpiry: () => finishTest(snapshotRef.current),
   });
 
-  // Keep snapshot ref in sync with current state so onExpiry gets fresh data
+  // Keep snapshot ref in sync so onExpiry gets fresh data
   snapshotRef.current = {
     correctWordCount,
     totalWordCount,
@@ -76,8 +73,12 @@ export function useTypingTest(
     letterAccuracy,
   };
 
-  // Derived state for started - using timer's isRunning
   const started = timerStarted;
+  const phase: TypingTestPhase = finished
+    ? 'finished'
+    : started
+      ? 'active'
+      : 'idle';
 
   const onRestart = useCallback(() => {
     setText(getText());
@@ -89,105 +90,36 @@ export function useTypingTest(
     setLetterAccuracy({});
   }, [clearFinished, resetTimer]);
 
-  const checkIfFinished = useCallback(
-    (
-      input: string,
-      finalLetterAccuracy?: Record<string, LetterMetrics>
-    ) => {
-      if (input.length === text.length) {
-        const typedWords = input
-          .trim()
-          .split(/\s+/)
-          .filter((word) => word.length > 0);
-        const textWords = text
-          .trim()
-          .split(/\s+/)
-          .filter((word) => word.length > 0);
-        let correctWords = 0;
-        for (let i = 0; i < typedWords.length; i++) {
-          if (i < textWords.length && typedWords[i] === textWords[i]) {
-            correctWords++;
-          }
-        }
-        stopTimer();
-        finishTest({
-          correctWordCount: correctWords,
-          totalWordCount: typedWords.length,
-          timer,
-          letterAccuracy: finalLetterAccuracy ?? letterAccuracy,
-        });
-      }
-    },
-    [text, timer, letterAccuracy, finishTest, stopTimer],
-  );
+  const setInput = useCallback(
+    (value: string) => {
+      const result = evaluateInput(text, value, letterAccuracy);
 
-  const updateWordCounts = useCallback(
-    (input: string) => {
-      // Count words by splitting on spaces and filtering out empty strings
-      const typedWords = input
-        .trim()
-        .split(/\s+/)
-        .filter((word) => word.length > 0);
-      const textWords = text
-        .trim()
-        .split(/\s+/)
-        .filter((word) => word.length > 0);
-
-      let correctWords = 0;
-
-      // Count correct words by comparing each typed word with the corresponding text word
-      for (let i = 0; i < typedWords.length; i++) {
-        if (i < textWords.length && typedWords[i] === textWords[i]) {
-          correctWords++;
-        }
-      }
-
-      setTotalWordCount(typedWords.length);
-      setCorrectWordCount(correctWords);
-    },
-    [text],
-  );
-
-  const onInputChange = useCallback(
-    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      const v = e.target.value;
-      const lastChar = v[v.length - 1];
-      const isCorrect = lastChar === text[v.length - 1];
-
-      updateWordCounts(v);
+      setCorrectWordCount(result.correctWordCount);
+      setTotalWordCount(result.totalWordCount);
+      setUserInput(value);
+      setLetterAccuracy(result.letterAccuracy);
       startTimer();
-      setUserInput(v);
 
-      // Compute accuracy including this keystroke so checkIfFinished gets final state
-      const newAccuracy = { ...letterAccuracy };
-      if (lastChar && lastChar.match(/[a-z]/i)) {
-        const lowerChar = lastChar.toLowerCase();
-        if (newAccuracy[lowerChar]) {
-          newAccuracy[lowerChar] = { ...newAccuracy[lowerChar] };
-        } else {
-          newAccuracy[lowerChar] = { correct: 0, total: 0 };
-        }
-        newAccuracy[lowerChar].total++;
-        if (isCorrect) {
-          newAccuracy[lowerChar].correct++;
-        }
+      if (result.isComplete) {
+        stopTimer();
+        finishTest(
+          buildFinishedSnapshot(
+            text,
+            value,
+            timer,
+            result.letterAccuracy,
+          ),
+        );
       }
-      setLetterAccuracy(newAccuracy);
-      checkIfFinished(v, newAccuracy);
     },
-    [text, letterAccuracy, updateWordCounts, startTimer, checkIfFinished],
+    [text, letterAccuracy, timer, startTimer, stopTimer, finishTest],
   );
 
   return {
-    text,
-    timer,
-    userInput,
-    started,
-    finished,
-    correctWordCount,
-    totalWordCount,
-    letterAccuracy,
-    onRestart,
-    onInputChange,
+    content: { text, input: userInput },
+    status: { phase, started, finished },
+    timer: { remaining: timer, duration: defaultTimer },
+    metrics: { correctWordCount, totalWordCount, letterAccuracy },
+    actions: { restart: onRestart, setInput },
   };
 }

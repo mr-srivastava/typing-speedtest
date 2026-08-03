@@ -4,10 +4,10 @@ import TypingInput from '@/components/atoms/TypingInput';
 import ActionButton from '@/components/atoms/ActionButton';
 import { ResetIcon } from '@radix-ui/react-icons';
 
-interface TypingTestInterfaceProps {
+export interface TypingAreaProps {
   text: string;
   userInput: string;
-  onInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  onInputChange: (value: string) => void;
   readOnly: boolean;
   disablePaste?: boolean;
   showRestart?: boolean;
@@ -16,7 +16,7 @@ interface TypingTestInterfaceProps {
   className?: string;
 }
 
-const TypingTestInterface: React.FC<TypingTestInterfaceProps> = ({
+const TypingTestInterface: React.FC<TypingAreaProps> = ({
   text,
   userInput,
   onInputChange,
@@ -29,12 +29,10 @@ const TypingTestInterface: React.FC<TypingTestInterfaceProps> = ({
 }) => {
   return (
     <div className={`w-full space-y-4 ${className}`}>
-      {/* Text Preview */}
       <div className='w-full rounded-lg bg-secondary/60 border border-border p-4 text-base md:text-lg font-mono leading-relaxed'>
         <TextPreview text={text} userInput={userInput} />
       </div>
 
-      {/* Typing Input */}
       <div className='relative'>
         <TypingInput
           value={userInput}
@@ -43,7 +41,6 @@ const TypingTestInterface: React.FC<TypingTestInterfaceProps> = ({
           disablePaste={disablePaste}
         />
 
-        {/* Restart Button positioned at bottom right of input */}
         {showRestart && onRestart ? (
           <div className='flex w-full justify-end mt-3'>
             <ActionButton

@@ -2,7 +2,12 @@
  * Metrics calculation utilities
  */
 
-import { LetterMetrics, EnhancedStoredData } from '@/types/metrics';
+import {
+  LetterMetrics,
+  EnhancedStoredData,
+  TestSession,
+} from '@/types/metrics';
+import type { TypingTestFinishedSnapshot } from '@/lib/typing-engine';
 
 /**
  * Calculate current WPM based on correct words and test duration
@@ -24,6 +29,28 @@ export function calculateCurrentAccuracy(
 ): number {
   if (totalWordCount === 0) return 0;
   return Math.round((correctWordCount / totalWordCount) * 100) || 0;
+}
+
+/**
+ * Build a TestSession from a finished typing snapshot and configured duration.
+ */
+export function buildTestSession(
+  snapshot: TypingTestFinishedSnapshot,
+  timerDuration: number,
+): TestSession {
+  const testDuration = timerDuration - snapshot.timer;
+  return {
+    wpm: calculateCurrentWpm(snapshot.correctWordCount, testDuration),
+    accuracy: calculateCurrentAccuracy(
+      snapshot.correctWordCount,
+      snapshot.totalWordCount,
+    ),
+    testDate: new Date().toISOString(),
+    testDuration,
+    wordsTyped: Math.round(snapshot.totalWordCount),
+    correctWords: Math.round(snapshot.correctWordCount),
+    letterAccuracy: snapshot.letterAccuracy,
+  };
 }
 
 /**

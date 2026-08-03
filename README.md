@@ -2,28 +2,33 @@
 
 ## Overview
 
-Octane Type is a Next.js application that provides a typing speed test experience. The app features a modern UI with dark mode support, animated components, and real-time typing statistics.
+Octane Type is a Next.js application that provides a typing speed test experience. The app features a modern UI with dark mode support, animated components, and real-time typing statistics with local session persistence.
 
 ## Key Components
 
 ### Pages
 
-- `Home` (`src/app/page.tsx`): The landing page with an animated background and a call-to-action button to start the typing test.
-- `Octane` (`src/app/octane/page.tsx`): The main typing test page where users can take the test and view their results.
+- `Home` ([`src/app/page.tsx`](src/app/page.tsx)): Landing page with hero CTA and overall stats when a prior session exists.
+- `Octane` ([`src/app/octane/page.tsx`](src/app/octane/page.tsx)): Main typing test page.
 
-### UI Components
+### Screens & sections
 
-- `Header` (`src/components/header.tsx`): Displays the app logo and a timer.
-- `Preview` (`src/components/preview.tsx`): Shows the text to be typed with real-time highlighting.
-- `TypingStats` (`src/components/stats.tsx`): Displays typing statistics after the test is completed.
-- `Clock` (`src/components/clock.tsx`): A countdown timer component.
-- `BackgroundBeams` (`src/components/ui/background-beams.tsx`): Creates an animated background effect.
-- `Button` (`src/components/ui/moving-border.tsx`): A custom button component with animated borders.
+- `HomeScreen` ([`src/screens/HomeScreen.tsx`](src/screens/HomeScreen.tsx)): Home layout, session-aware hero, cumulative metrics modal.
+- `TestScreen` ([`src/screens/TestScreen.tsx`](src/screens/TestScreen.tsx)): Orchestrates the typing test, timer, and results modal.
+- `HeroSection`, `TypingSection`, `TestControlSection` under [`src/sections/`](src/sections/).
 
-### Utilities
+### Domain & hooks
 
-- `getText` (`src/lib/text.ts`): Provides random text passages for the typing test.
-- `utils` (`src/lib/utils.ts`): Contains utility functions for styling and class name management.
+- `typing-engine` ([`src/lib/typing-engine.ts`](src/lib/typing-engine.ts)): Pure word/letter accuracy and finish snapshot logic.
+- `metrics-utils` ([`src/lib/metrics-utils.ts`](src/lib/metrics-utils.ts)): WPM/accuracy helpers and session building.
+- `useTypingTest` ([`src/hooks/complex/useTypingTest.ts`](src/hooks/complex/useTypingTest.ts)): Test state orchestration.
+- `useSessionStorage` / `SessionProvider` ([`src/hooks/complex/useSession.ts`](src/hooks/complex/useSession.ts), [`src/contexts/SessionContext.tsx`](src/contexts/SessionContext.tsx)): Persist last session and cumulative stats in localStorage.
+
+### UI highlights
+
+- `TypingTestInterface` / `TextPreview` / `TypingInput`: live feedback while typing.
+- `MetricsModal` / `MetricsDisplay`: WPM, accuracy, and letter-level charts.
+- `ThemeProvider` + `ThemeToggle`: dark mode via `next-themes`.
 
 ## Features
 
@@ -32,25 +37,35 @@ Octane Type is a Next.js application that provides a typing speed test experienc
 3. Real-time typing feedback with character highlighting
 4. Countdown timer
 5. Calculation of typing speed (WPM) and accuracy
-6. Responsive design for various screen sizes
+6. Letter-level accuracy keyboard visualization
+7. Local cumulative stats across tests
+8. Responsive design for various screen sizes
 
 ## Setup and Configuration
 
-The project uses Next.js 14 with TypeScript and Tailwind CSS for styling. It also incorporates various UI libraries and animation frameworks:
+The project uses Next.js with TypeScript and Tailwind CSS. UI libraries include:
 
 - `@radix-ui` for UI primitives
 - `class-variance-authority` for managing component variants
 - `framer-motion` for animations
 - `next-themes` for theme management
+- `recharts` for radial and pie charts
+
+```bash
+pnpm install
+pnpm dev
+```
 
 ## How It Works
 
-1. Users start on the home page and click the "Think You're Fast? Prove It!" button.
-2. They are taken to the Octane page where a random text is displayed.
-3. As the user types, their input is compared to the original text in real-time.
-4. A 60-second countdown begins when the user starts typing.
-5. After completion or when the timer runs out, typing statistics are displayed.
+1. Users start on the home page and click the CTA to begin.
+2. They are taken to `/octane` where a random passage is displayed.
+3. As the user types, input is compared to the reference text in real time.
+4. A countdown (default 60s) begins on the first keystroke.
+5. When the timer expires or the passage is completed, metrics are shown and saved locally.
 
 ## Customization
 
-The app can be easily customized by modifying the text passages in `getText`, adjusting the styling in the Tailwind configuration, or changing the timer duration in the `Octane` component.
+- Passages: [`src/lib/text.ts`](src/lib/text.ts)
+- Timer duration: `defaultTimer` in [`src/app/octane/page.tsx`](src/app/octane/page.tsx) or `TestScreen`
+- Styling: Tailwind config and theme utilities under `src/lib/`

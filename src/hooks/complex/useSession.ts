@@ -108,7 +108,7 @@ function validateStoredData(value: unknown): value is EnhancedStoredData {
   return true;
 }
 
-export function useSession() {
+export function useSessionStorage() {
   const {
     value: data,
     setValue: setStoredData,

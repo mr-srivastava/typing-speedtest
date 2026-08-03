@@ -1,21 +1,13 @@
 import React from 'react';
-import TypingTestInterface from '@/components/organisms/TypingTestInterface';
+import TypingTestInterface, {
+  type TypingAreaProps,
+} from '@/components/organisms/TypingTestInterface';
 import { Card, CardContent } from '@/components/ui/card';
 import { gradients } from '@/lib/utils';
 
-interface TypingSectionProps {
-  text: string;
-  userInput: string;
-  onInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-  readOnly: boolean;
-  disablePaste?: boolean;
-  showRestart?: boolean;
-  onRestart?: () => void;
-  restartDisabled?: boolean;
-  className?: string;
-}
+export type { TypingAreaProps };
 
-const TypingSection: React.FC<TypingSectionProps> = ({
+const TypingSection: React.FC<TypingAreaProps> = ({
   text,
   userInput,
   onInputChange,
@@ -29,7 +21,6 @@ const TypingSection: React.FC<TypingSectionProps> = ({
   return (
     <section className={`w-full ${className}`}>
       <Card className='relative overflow-hidden'>
-        {/* Top gradient accent */}
         <div
           className={`pointer-events-none absolute inset-x-0 top-0 h-[2px] ${gradients.primaryLinear}`}
         />

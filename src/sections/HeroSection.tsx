@@ -2,7 +2,10 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import OverallMetricsDisplay from '@/components/organisms/OverallMetricsDisplay';
 import Link from 'next/link';
-import { getFeatureListClasses } from '@/lib/metrics-display-utils';
+import {
+  getFeatureListClasses,
+  type OverallMetricsData,
+} from '@/lib/metrics-display-utils';
 import {
   layoutClasses,
   textClasses,
@@ -16,13 +19,7 @@ interface HeroSectionProps {
   isLoading?: boolean;
   isHydrated?: boolean;
   hasSession?: boolean;
-  overallMetrics?: {
-    wpm: number;
-    accuracy: number;
-    totalTests: number;
-    totalTimeSpent: number;
-    firstTestDate: string;
-  } | null;
+  overallMetrics?: OverallMetricsData | null;
   onViewStats?: () => void;
   className?: string;
 }

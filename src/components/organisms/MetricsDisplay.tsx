@@ -1,7 +1,10 @@
 import React, { useMemo, useCallback } from 'react';
 import RadialChart from '@/components/organisms/RadialChart';
 import LetterAccuracyChart from '@/components/organisms/LetterAccuracyChart';
-import { LetterMetrics, EnhancedStoredData } from '@/types/metrics';
+import {
+  LiveTestMetrics,
+  EnhancedStoredData,
+} from '@/types/metrics';
 import {
   getOverallMetricsClasses,
   getFormattedMetricsData,
@@ -16,44 +19,69 @@ import {
 } from '@/lib/metrics-utils';
 import { wpmChartConfig, accuracyChartConfig } from '@/lib/utils';
 
+const EMPTY_LIVE_METRICS: LiveTestMetrics = {
+  correctWordCount: 0,
+  totalWordCount: 0,
+  timerRemaining: 0,
+  timerDuration: 60,
+  letterAccuracy: {},
+};
+
 interface MetricsDisplayProps {
-  correctWordCount: number;
-  totalWordCount: number;
-  timer: number;
-  timerDuration?: number;
-  letterAccuracyData: Record<string, LetterMetrics>;
-  data?: EnhancedStoredData | null;
+  liveMetrics?: LiveTestMetrics;
+  sessionData?: EnhancedStoredData | null;
   showCumulative?: boolean;
   showOverallStats?: boolean;
   className?: string;
 }
 
 const MetricsDisplay: React.FC<MetricsDisplayProps> = ({
-  correctWordCount,
-  totalWordCount,
-  timer,
-  timerDuration = 60,
-  letterAccuracyData,
-  data,
+  liveMetrics = EMPTY_LIVE_METRICS,
+  sessionData,
   showCumulative = false,
   showOverallStats = false,
   className = '',
 }) => {
+  const {
+    correctWordCount,
+    totalWordCount,
+    timerRemaining,
+    timerDuration,
+    letterAccuracy,
+  } = liveMetrics;
+
   const wpm = useMemo(
     () =>
-      getWpmValue(correctWordCount, timer, data, showCumulative, timerDuration),
-    [correctWordCount, timer, data, showCumulative, timerDuration],
+      getWpmValue(
+        correctWordCount,
+        timerRemaining,
+        sessionData,
+        showCumulative,
+        timerDuration,
+      ),
+    [
+      correctWordCount,
+      timerRemaining,
+      sessionData,
+      showCumulative,
+      timerDuration,
+    ],
   );
 
   const accuracy = useMemo(
     () =>
-      getAccuracyValue(correctWordCount, totalWordCount, data, showCumulative),
-    [correctWordCount, totalWordCount, data, showCumulative],
+      getAccuracyValue(
+        correctWordCount,
+        totalWordCount,
+        sessionData,
+        showCumulative,
+      ),
+    [correctWordCount, totalWordCount, sessionData, showCumulative],
   );
 
   const displayLetterAccuracy = useMemo(
-    () => getLetterAccuracyData(letterAccuracyData, data, showCumulative),
-    [letterAccuracyData, data, showCumulative],
+    () => getLetterAccuracyData(letterAccuracy, sessionData, showCumulative),
+    [letterAccuracy, sessionData, showCumulative],
   );
 
   const renderRadialChart = useCallback(
@@ -79,26 +107,24 @@ const MetricsDisplay: React.FC<MetricsDisplayProps> = ({
   );
 
   const statsTitle = useMemo(
-    () => generateStatsTitle(data, showCumulative),
-    [data, showCumulative],
+    () => generateStatsTitle(sessionData, showCumulative),
+    [sessionData, showCumulative],
   );
 
-  // Overall stats metrics for display
   const overallMetrics = useMemo(() => {
-    if (!showOverallStats || !data) return null;
+    if (!showOverallStats || !sessionData) return null;
 
     return {
-      wpm: data.cumulative.weightedWPM,
-      accuracy: data.cumulative.weightedAccuracy,
-      totalTests: data.cumulative.totalTests,
-      totalTimeSpent: data.cumulative.totalTimeSpent,
-      firstTestDate: data.cumulative.firstTestDate,
+      wpm: sessionData.cumulative.weightedWPM,
+      accuracy: sessionData.cumulative.weightedAccuracy,
+      totalTests: sessionData.cumulative.totalTests,
+      totalTimeSpent: sessionData.cumulative.totalTimeSpent,
+      firstTestDate: sessionData.cumulative.firstTestDate,
     };
-  }, [showOverallStats, data]);
+  }, [showOverallStats, sessionData]);
 
   return (
     <div className={`w-full text-center space-y-4 ${className}`}>
-      {/* Overall Stats Header */}
       {overallMetrics ? (
         <div className={`${getOverallMetricsClasses().container} mb-6`}>
           <div className={getOverallMetricsClasses().statsRow}>
@@ -116,18 +142,15 @@ const MetricsDisplay: React.FC<MetricsDisplayProps> = ({
         </div>
       ) : null}
 
-      {/* Session Stats Title */}
       {statsTitle ? (
         <div className='text-sm text-muted-foreground mb-4'>{statsTitle}</div>
       ) : null}
 
-      {/* Main Metrics Charts */}
       <div className={layoutClasses.responsiveFlex}>
         {renderRadialChart(wpm, 'Words per minute', wpmChartConfig)}
         {renderRadialChart(accuracy, 'Accuracy', accuracyChartConfig)}
       </div>
 
-      {/* Letter Accuracy Details */}
       <div className='mt-6'>
         <LetterAccuracyChart letterAccuracyData={displayLetterAccuracy} />
       </div>

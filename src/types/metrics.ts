@@ -29,3 +29,16 @@ export interface EnhancedStoredData {
   lastSession: TestSession;
   cumulative: CumulativeStats;
 }
+
+export interface LiveTestMetrics {
+  correctWordCount: number;
+  totalWordCount: number;
+  timerRemaining: number;
+  timerDuration: number;
+  letterAccuracy: Record<string, LetterMetrics>;
+}
+
+export type MetricsView =
+  | { scope: 'live' }
+  | { scope: 'cumulative' }
+  | { scope: 'toggle'; initial: 'live' | 'cumulative' };
