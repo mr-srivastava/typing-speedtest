@@ -1,5 +1,5 @@
 import React from 'react';
-import HomeScreen from '@/screens/HomeScreen';
+import HomeScreen from '@/features/home/HomeScreen';
 
 export default function Home() {
   return <HomeScreen />;

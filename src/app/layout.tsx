@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
 import { Epilogue, Kanit } from 'next/font/google';
-import { ThemeProvider } from '@/components/theme-provider';
-import { SessionProvider } from '@/contexts/SessionContext';
+import { ThemeProvider } from '@/shared/ui/theme-provider';
+import { SessionProvider } from '@/modules/session';
 import './globals.css';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@/shared/lib/cn';
 
 const epilogue = Epilogue({
   subsets: ['latin'],
@@ -30,7 +30,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang='en' suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <body
         className={cn(
           'min-h-screen bg-background antialiased',
@@ -39,12 +39,7 @@ export default function RootLayout({
           epilogue.className,
         )}
       >
-        <ThemeProvider
-          attribute='class'
-          defaultTheme='dark'
-          enableSystem
-          disableTransitionOnChange
-        >
+        <ThemeProvider>
           <SessionProvider>{children}</SessionProvider>
         </ThemeProvider>
       </body>
