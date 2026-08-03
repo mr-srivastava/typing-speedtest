@@ -28,8 +28,7 @@ interface HeroSectionProps {
 const DEFAULT_DESCRIPTION =
   'Ready to dominate the keyboard? Our fun typing speed test will put your skills to the test.';
 const DEFAULT_CTA = 'Start Your Speed Test!';
-const DEFAULT_SUBTEXT =
-  'Test your typing skills instantly — no login needed!';
+const DEFAULT_SUBTEXT = 'Test your typing skills instantly — no login needed!';
 
 const HeroSection: React.FC<HeroSectionProps> = ({
   isLoading = false,
@@ -51,27 +50,19 @@ const HeroSection: React.FC<HeroSectionProps> = ({
     : DEFAULT_SUBTEXT;
 
   return (
-    <div
-      className={cn(
-        'flex-1 min-h-0 flex flex-col',
-        layoutClasses.flexCenter,
-        className,
-      )}
-    >
+    <div className={cn('flex-1 min-h-0 flex flex-col', layoutClasses.flexCenter, className)}>
       <div className={layoutShiftClasses.heroContainer}>
-        <div className='flex flex-1 min-h-0 flex-col justify-center'>
+        <div className="flex flex-1 min-h-0 flex-col justify-center">
           <h1
             className={cn(
               'relative z-10 font-extrabold leading-[1.1] sm:leading-tight drop-shadow-xs',
               textClasses.heroTitle,
             )}
           >
-            <span
-              className={cn(gradientClasses.heroTextGradient, 'block sm:inline')}
-            >
+            <span className={cn(gradientClasses.heroTextGradient, 'block sm:inline')}>
               Unleash Your
             </span>
-            <br className='hidden sm:block' />
+            <br className="hidden sm:block" />
             <span
               className={cn(
                 themeColorClasses.primary,
@@ -95,26 +86,24 @@ const HeroSection: React.FC<HeroSectionProps> = ({
 
           <div className={layoutShiftClasses.heroActions}>
             <div className={layoutShiftClasses.metricsReserved}>
-              {hasMetrics ? (
-                <OverallStatsBlock metrics={overallMetrics} />
-              ) : null}
+              {hasMetrics ? <OverallStatsBlock metrics={overallMetrics} /> : null}
             </div>
 
-            <div className='flex flex-col sm:flex-row gap-3 items-center justify-center'>
+            <div className="flex flex-col sm:flex-row gap-3 items-center justify-center">
               <Button
-                variant='default'
-                size='lg'
+                variant="default"
+                size="lg"
                 className={cn(buttonClasses.heroCta, buttonClasses.primaryCta)}
                 asChild
               >
-                <Link href='/octane' className='whitespace-nowrap'>
+                <Link href="/octane" className="whitespace-nowrap">
                   {ctaLabel}
                 </Link>
               </Button>
               {hasMetrics && onViewStats ? (
                 <Button
-                  variant='outline'
-                  size='lg'
+                  variant="outline"
+                  size="lg"
                   onClick={onViewStats}
                   className={buttonClasses.heroCta}
                 >
@@ -136,16 +125,14 @@ const HeroSection: React.FC<HeroSectionProps> = ({
         </div>
 
         {showContent ? (
-          <div className='shrink-0 pt-4 pb-4 sm:pb-6 border-t border-border/50'>
+          <div className="shrink-0 pt-4 pb-4 sm:pb-6 border-t border-border/50">
             <p className={cn(textClasses.mutedSmall, 'mb-2')}>
               {hasSession ? 'More Features Coming Soon' : 'Coming Soon'}
             </p>
             <div className={getFeatureListClasses().container}>
               {[
                 'Global Leaderboards',
-                hasSession
-                  ? 'Persistent Progress Tracking'
-                  : 'Progress Tracking',
+                hasSession ? 'Persistent Progress Tracking' : 'Progress Tracking',
                 'Custom Challenges',
               ].map((feature) => (
                 <div key={feature} className={getFeatureListClasses().item}>
@@ -155,13 +142,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({
               ))}
             </div>
             {hasSession ? (
-              <p
-                className={cn(
-                  'text-xs text-muted-foreground/60 mt-2 px-4 sm:px-0',
-                )}
-              >
-                Your scores are currently stored locally. Persistent tracking
-                coming soon!
+              <p className={cn('text-xs text-muted-foreground/60 mt-2 px-4 sm:px-0')}>
+                Your scores are currently stored locally. Persistent tracking coming soon!
               </p>
             ) : null}
           </div>

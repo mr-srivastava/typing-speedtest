@@ -2,16 +2,7 @@
  * Layout recipes composed from design tokens.
  */
 
-import {
-  elevation,
-  motion,
-  pad,
-  radius,
-  size,
-  space,
-  type,
-  width,
-} from '@/shared/lib/tokens';
+import { elevation, motion, pad, radius, size, space, type, width } from '@/shared/lib/tokens';
 import { gradients } from '@/shared/lib/theme';
 
 export const layoutClasses = {
@@ -21,14 +12,14 @@ export const layoutClasses = {
   flexStart: 'flex items-center',
   flexCol: 'flex flex-col',
 
-  responsiveFlex: 'flex flex-col w-full justify-evenly items-center space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4',
+  responsiveFlex:
+    'flex flex-col w-full justify-evenly items-center space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4',
   responsiveFlexCol: `flex flex-col xs:flex-row items-center ${space.tight} xs:gap-2`,
 
   containerPadding: pad.page,
   sectionSpacing: 'py-12 sm:py-16 md:py-20 lg:py-24',
 
-  pageShell:
-    'h-dvh w-full bg-background relative flex flex-col antialiased overflow-hidden',
+  pageShell: 'h-dvh w-full bg-background relative flex flex-col antialiased overflow-hidden',
   contentShell: `mx-auto w-full ${width.content}`,
 
   /** @deprecated Use spaceClasses.inline */

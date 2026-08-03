@@ -21,11 +21,7 @@ interface TypingSurfaceProps {
   className?: string;
 }
 
-function getCharClassName(
-  referenceText: string,
-  input: string,
-  index: number,
-): string {
+function getCharClassName(referenceText: string, input: string, index: number): string {
   const status = getCharStatus(referenceText, input, index);
 
   switch (status) {
@@ -51,10 +47,7 @@ const TypingSurface: React.FC<TypingSurfaceProps> = ({
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const spanRefs = useRef<(HTMLSpanElement | null)[]>([]);
 
-  const spans = useMemo(
-    () => parseReferenceSpans(referenceText),
-    [referenceText],
-  );
+  const spans = useMemo(() => parseReferenceSpans(referenceText), [referenceText]);
 
   const cursorIndex = input.length;
   const currentSpanIndex = getCurrentWordSpanIndex(spans, cursorIndex);
@@ -75,12 +68,7 @@ const TypingSurface: React.FC<TypingSurfaceProps> = ({
   };
 
   return (
-    <div
-      className={cn(
-        `relative ${size.typingMin} max-h-[40vh] overflow-y-auto`,
-        className,
-      )}
-    >
+    <div className={cn(`relative ${size.typingMin} max-h-[40vh] overflow-y-auto`, className)}>
       <div
         className={cn(
           'pointer-events-none select-none whitespace-pre-wrap break-words',
@@ -90,8 +78,7 @@ const TypingSurface: React.FC<TypingSurfaceProps> = ({
         aria-hidden
       >
         {spans.map((span, spanIndex) => {
-          const isCurrentWord =
-            !span.isWhitespace && spanIndex === currentSpanIndex;
+          const isCurrentWord = !span.isWhitespace && spanIndex === currentSpanIndex;
 
           return (
             <span
@@ -127,10 +114,10 @@ const TypingSurface: React.FC<TypingSurfaceProps> = ({
         readOnly={readOnly}
         onPaste={handlePaste}
         spellCheck={false}
-        autoComplete='off'
-        autoCorrect='off'
-        autoCapitalize='off'
-        aria-label='Typing area'
+        autoComplete="off"
+        autoCorrect="off"
+        autoCapitalize="off"
+        aria-label="Typing area"
         className={cn(
           'absolute inset-0 h-full w-full resize-none overflow-hidden border-0 bg-transparent',
           'text-transparent caret-primary',

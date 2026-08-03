@@ -69,13 +69,13 @@ pnpm dev
 
 ## Scripts
 
-| Command | Description |
-|---------|-------------|
-| `pnpm dev` | Start dev server |
-| `pnpm build` | Production build |
-| `pnpm test` | Run Vitest unit tests |
-| `pnpm typecheck` | TypeScript check |
-| `pnpm lint` | ESLint |
+| Command          | Description           |
+| ---------------- | --------------------- |
+| `pnpm dev`       | Start dev server      |
+| `pnpm build`     | Production build      |
+| `pnpm test`      | Run Vitest unit tests |
+| `pnpm typecheck` | TypeScript check      |
+| `pnpm lint`      | ESLint                |
 
 ## How It Works
 

@@ -12,15 +12,11 @@ interface AppShellProps {
   className?: string;
 }
 
-export function AppShell({
-  children,
-  headerVariant = 'default',
-  className,
-}: AppShellProps) {
+export function AppShell({ children, headerVariant = 'default', className }: AppShellProps) {
   return (
     <div className={cn(layoutClasses.pageShell, className)}>
       <AmbientBackground />
-      <AppHeader variant={headerVariant} className='shrink-0' />
+      <AppHeader variant={headerVariant} className="shrink-0" />
       {children}
     </div>
   );

@@ -1,10 +1,7 @@
 function getCalendarDayDiff(from: Date, to: Date): number {
   const start = new Date(from.getFullYear(), from.getMonth(), from.getDate());
   const end = new Date(to.getFullYear(), to.getMonth(), to.getDate());
-  return Math.max(
-    0,
-    Math.round((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)),
-  );
+  return Math.max(0, Math.round((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)));
 }
 
 export function formatTimeSpent(seconds: number): string {
@@ -14,9 +11,7 @@ export function formatTimeSpent(seconds: number): string {
 
   const hours = Math.floor(seconds / 3600);
   const minutes =
-    hours > 0
-      ? Math.floor((seconds % 3600) / 60)
-      : Math.max(1, Math.ceil(seconds / 60));
+    hours > 0 ? Math.floor((seconds % 3600) / 60) : Math.max(1, Math.ceil(seconds / 60));
 
   if (hours > 0) {
     return `${hours}h ${minutes}m`;

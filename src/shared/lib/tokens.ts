@@ -52,8 +52,7 @@ export const type = {
   body: 'text-base',
   bodyLg: 'text-lg',
   heading: 'text-xl sm:text-2xl',
-  display:
-    'font-display text-4xl xs:text-5xl sm:text-5xl md:text-6xl',
+  display: 'font-display text-4xl xs:text-5xl sm:text-5xl md:text-6xl',
   muted: 'text-xs sm:text-sm text-muted-foreground',
   mutedCaption: 'text-xs text-muted-foreground',
 } as const;
@@ -81,7 +80,6 @@ export const motion = {
   durationUi: 0.2,
   durationModal: 0.25,
   transitionFast: 'transition-[transform,opacity] duration-fast ease-out',
-  transitionUi:
-    'transition-[transform,opacity,box-shadow] duration-ui ease-out',
+  transitionUi: 'transition-[transform,opacity,box-shadow] duration-ui ease-out',
   transitionColors: 'transition-colors duration-fast',
 } as const;

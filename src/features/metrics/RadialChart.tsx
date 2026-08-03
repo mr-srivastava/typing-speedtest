@@ -1,10 +1,4 @@
-import {
-  Label,
-  PolarGrid,
-  PolarRadiusAxis,
-  RadialBar,
-  RadialBarChart,
-} from 'recharts';
+import { Label, PolarGrid, PolarRadiusAxis, RadialBar, RadialBarChart } from 'recharts';
 import {
   Card,
   CardContent,
@@ -43,14 +37,8 @@ const RadialChart: React.FC<RadialChartProps> = ({
   compact = false,
   className = '',
 }) => {
-  const {
-    maxValue,
-    showPercentage,
-    feedbackThresholds,
-    feedbackMessages,
-    averageInfo,
-    fillColor,
-  } = metricConfig;
+  const { maxValue, showPercentage, feedbackThresholds, feedbackMessages, averageInfo, fillColor } =
+    metricConfig;
   const chartData = [{ value, fill: fillColor }];
 
   function getFeedbackMessage(current: number) {
@@ -73,19 +61,14 @@ const RadialChart: React.FC<RadialChartProps> = ({
     >
       <CardHeader className={cn('items-center', compact ? 'pb-0 pt-3' : 'pb-0')}>
         {title ? (
-          <CardTitle className={cn(compact && 'text-sm font-medium')}>
-            {title}
-          </CardTitle>
+          <CardTitle className={cn(compact && 'text-sm font-medium')}>{title}</CardTitle>
         ) : null}
         {description ? <CardDescription>{description}</CardDescription> : null}
       </CardHeader>
-      <CardContent className='flex-1 pb-0'>
+      <CardContent className="flex-1 pb-0">
         <ChartContainer
           config={rechartsConfig}
-          className={cn(
-            'mx-auto aspect-square',
-            compact ? size.chartCompact : size.chartDefault,
-          )}
+          className={cn('mx-auto aspect-square', compact ? size.chartCompact : size.chartDefault)}
         >
           <RadialBarChart
             data={chartData}
@@ -95,13 +78,13 @@ const RadialChart: React.FC<RadialChartProps> = ({
             outerRadius={55}
           >
             <PolarGrid
-              gridType='circle'
+              gridType="circle"
               radialLines={false}
-              stroke='none'
-              className='first:fill-muted last:fill-background'
+              stroke="none"
+              className="first:fill-muted last:fill-background"
               polarRadius={[43, 37]}
             />
-            <RadialBar dataKey='value' background cornerRadius={5} />
+            <RadialBar dataKey="value" background cornerRadius={5} />
             <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
               <Label
                 content={({ viewBox }) => {
@@ -110,13 +93,13 @@ const RadialChart: React.FC<RadialChartProps> = ({
                       <text
                         x={viewBox.cx}
                         y={viewBox.cy}
-                        textAnchor='middle'
-                        dominantBaseline='middle'
+                        textAnchor="middle"
+                        dominantBaseline="middle"
                       >
                         <tspan
                           x={viewBox.cx}
                           y={viewBox.cy}
-                          className='fill-foreground text-2xl font-bold'
+                          className="fill-foreground text-2xl font-bold"
                         >
                           {value.toLocaleString()}
                           {showPercentage ? '%' : ''}
@@ -131,23 +114,14 @@ const RadialChart: React.FC<RadialChartProps> = ({
           </RadialBarChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter
-        className={cn(
-          'flex-col text-xs',
-          compact ? 'gap-1 pt-1 pb-3' : 'gap-2',
-        )}
-      >
+      <CardFooter className={cn('flex-col text-xs', compact ? 'gap-1 pt-1 pb-3' : 'gap-2')}>
         <div
-          className={cn(
-            layoutClasses.flexStart,
-            'gap-2',
-            'font-medium text-center justify-center',
-          )}
+          className={cn(layoutClasses.flexStart, 'gap-2', 'font-medium text-center justify-center')}
         >
           {getFeedbackMessage(value)}
         </div>
         {!compact && averageInfo ? (
-          <div className='text-muted-foreground text-center'>{averageInfo}</div>
+          <div className="text-muted-foreground text-center">{averageInfo}</div>
         ) : null}
       </CardFooter>
     </Card>

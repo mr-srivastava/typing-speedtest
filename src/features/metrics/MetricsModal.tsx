@@ -1,12 +1,6 @@
 'use client';
 import React, { useMemo, useState } from 'react';
-import {
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  useModal,
-} from '@/shared/ui/animated-modal';
+import { Modal, ModalBody, ModalContent, ModalFooter, useModal } from '@/shared/ui/animated-modal';
 import MetricsDisplay from '@/features/metrics/MetricsDisplay';
 import {
   getMetricsModalActionLabel,
@@ -33,14 +27,14 @@ function ViewToggle({ showCumulative, onToggle, totalTests }: ViewToggleProps) {
     <div className={cn('flex bg-muted p-1', radiusClasses.surface)}>
       <Button
         variant={!showCumulative ? 'default' : 'ghost'}
-        size='sm'
+        size="sm"
         onClick={() => onToggle(false)}
       >
         This Test
       </Button>
       <Button
         variant={showCumulative ? 'default' : 'ghost'}
-        size='sm'
+        size="sm"
         onClick={() => onToggle(true)}
       >
         All Tests ({totalTests})
@@ -60,16 +54,13 @@ function MetricsModalFooter({
   const isRestart = actionLabel === 'Restart';
 
   return (
-    <ModalFooter className='gap-3'>
+    <ModalFooter className="gap-3">
       {isRestart ? (
-        <Button variant='ghost' onClick={() => setOpen(false)}>
+        <Button variant="ghost" onClick={() => setOpen(false)}>
           Close
         </Button>
       ) : null}
-      <Button
-        onClick={isRestart ? onRestart : () => setOpen(false)}
-        className='min-w-28'
-      >
+      <Button onClick={isRestart ? onRestart : () => setOpen(false)} className="min-w-28">
         {actionLabel}
       </Button>
     </ModalFooter>
@@ -98,8 +89,7 @@ const MetricsModal: React.FC<MetricsModalProps> = ({
   locked = false,
   className = '',
 }) => {
-  const [preference, setPreference] =
-    useState<MetricsPreference>(initialPreference);
+  const [preference, setPreference] = useState<MetricsPreference>(initialPreference);
 
   const model = useMemo(
     () =>
@@ -121,7 +111,7 @@ const MetricsModal: React.FC<MetricsModalProps> = ({
   const subtitle =
     modalTitle === 'Test Complete'
       ? `${model.wpm} WPM · ${model.accuracy}% accuracy`
-      : model.statsTitle ?? undefined;
+      : (model.statsTitle ?? undefined);
 
   return (
     <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
@@ -133,9 +123,7 @@ const MetricsModal: React.FC<MetricsModalProps> = ({
           model.canToggle ? (
             <ViewToggle
               showCumulative={model.showingCumulative}
-              onToggle={(showCumulative) =>
-                setPreference(showCumulative ? 'cumulative' : 'live')
-              }
+              onToggle={(showCumulative) => setPreference(showCumulative ? 'cumulative' : 'live')}
               totalTests={model.totalTests}
             />
           ) : null

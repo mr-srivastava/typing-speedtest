@@ -34,10 +34,7 @@ export function splitWords(text: string): string[] {
     .filter((word) => word.length > 0);
 }
 
-export function countWordAccuracy(
-  referenceText: string,
-  input: string,
-): WordAccuracy {
+export function countWordAccuracy(referenceText: string, input: string): WordAccuracy {
   const typedWords = splitWords(input);
   const textWords = splitWords(referenceText);
 
@@ -74,9 +71,7 @@ export function recordLetterAccuracy(
 
   const lowerChar = typedChar.toLowerCase();
   const next = { ...prev };
-  next[lowerChar] = next[lowerChar]
-    ? { ...next[lowerChar] }
-    : { correct: 0, total: 0 };
+  next[lowerChar] = next[lowerChar] ? { ...next[lowerChar] } : { correct: 0, total: 0 };
   next[lowerChar].total++;
   if (typedChar === expectedChar) {
     next[lowerChar].correct++;
@@ -96,11 +91,7 @@ export function evaluateInput(
   const { correct, total } = countWordAccuracy(referenceText, input);
   const lastChar = input[input.length - 1] ?? '';
   const expectedChar = referenceText[input.length - 1] ?? '';
-  const letterAccuracy = recordLetterAccuracy(
-    prevLetterAccuracy,
-    lastChar,
-    expectedChar,
-  );
+  const letterAccuracy = recordLetterAccuracy(prevLetterAccuracy, lastChar, expectedChar);
 
   return {
     correctWordCount: correct,

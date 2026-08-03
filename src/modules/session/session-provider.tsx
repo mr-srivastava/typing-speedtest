@@ -18,17 +18,10 @@ interface SessionContextType {
 const SessionContext = createContext<SessionContextType | undefined>(undefined);
 
 export function SessionProvider({ children }: { children: React.ReactNode }) {
-  const store = useMemo<SessionStore>(
-    () => createLocalStorageSessionStore(),
-    [],
-  );
+  const store = useMemo<SessionStore>(() => createLocalStorageSessionStore(), []);
   const sessionData = useSessionWithStore(store);
 
-  return (
-    <SessionContext.Provider value={sessionData}>
-      {children}
-    </SessionContext.Provider>
-  );
+  return <SessionContext.Provider value={sessionData}>{children}</SessionContext.Provider>;
 }
 
 export function useSession() {

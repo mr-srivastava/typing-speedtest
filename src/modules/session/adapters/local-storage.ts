@@ -56,9 +56,7 @@ function removeFromStorage(key: string): void {
   }
 }
 
-export function createLocalStorageSessionStore(
-  key: string = SESSION_STORAGE_KEY,
-): SessionStore {
+export function createLocalStorageSessionStore(key: string = SESSION_STORAGE_KEY): SessionStore {
   let cache: EnhancedStoredData | null | undefined;
 
   return {

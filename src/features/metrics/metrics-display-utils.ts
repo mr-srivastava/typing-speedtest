@@ -14,9 +14,7 @@ export interface OverallMetricsData {
   firstTestDate: string;
 }
 
-export function toOverallMetricsData(
-  cumulative: CumulativeStats,
-): OverallMetricsData {
+export function toOverallMetricsData(cumulative: CumulativeStats): OverallMetricsData {
   return {
     wpm: cumulative.weightedWPM,
     accuracy: cumulative.weightedAccuracy,

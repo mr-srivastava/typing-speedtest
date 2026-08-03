@@ -1,9 +1,4 @@
-export type {
-  LiveTestMetrics,
-  MetricsView,
-  MetricsPreference,
-  MetricsDisplayModel,
-} from './types';
+export type { LiveTestMetrics, MetricsView, MetricsPreference, MetricsDisplayModel } from './types';
 export {
   calculateCurrentWpm,
   calculateLiveWpm,

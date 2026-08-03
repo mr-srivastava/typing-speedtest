@@ -31,10 +31,7 @@ export interface TypingTest {
   dispatch(event: TypingTestEvent): TypingTestState;
 }
 
-export function createTypingTest(config: {
-  duration: number;
-  getText: () => string;
-}): TypingTest {
+export function createTypingTest(config: { duration: number; getText: () => string }): TypingTest {
   const { duration, getText } = config;
 
   function createInitialState(): TypingTestState {
@@ -99,11 +96,7 @@ export function createTypingTest(config: {
     }
 
     // input
-    const result = evaluateInput(
-      state.referenceText,
-      event.value,
-      state.letterAccuracy,
-    );
+    const result = evaluateInput(state.referenceText, event.value, state.letterAccuracy);
 
     state = {
       ...state,

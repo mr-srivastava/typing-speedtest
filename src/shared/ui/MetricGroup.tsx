@@ -23,9 +23,7 @@ const MetricGroup: React.FC<MetricGroupProps> = ({
   itemClassName = '',
 }) => {
   return (
-    <div
-      className={cn(layoutClasses.flexStart, layoutClasses.gap2, className)}
-    >
+    <div className={cn(layoutClasses.flexStart, layoutClasses.gap2, className)}>
       {metrics.map((metric, index) => (
         <React.Fragment key={index}>
           <MetricBadge
@@ -34,9 +32,7 @@ const MetricGroup: React.FC<MetricGroupProps> = ({
             variant={metric.variant}
             className={itemClassName}
           />
-          {index < metrics.length - 1 && (
-            <span className='text-muted-foreground'>{separator}</span>
-          )}
+          {index < metrics.length - 1 && <span className="text-muted-foreground">{separator}</span>}
         </React.Fragment>
       ))}
     </div>

@@ -12,24 +12,18 @@ interface OverallStatsBlockProps {
   className?: string;
 }
 
-const OverallStatsBlock: React.FC<OverallStatsBlockProps> = ({
-  metrics,
-  className = '',
-}) => {
+const OverallStatsBlock: React.FC<OverallStatsBlockProps> = ({ metrics, className = '' }) => {
   const classes = getOverallMetricsClasses();
   const data = getFormattedMetricsData(metrics);
 
   return (
     <div className={cn(classes.container, className)}>
       <div className={classes.statsRow}>
-        <span className='text-muted-foreground'>Overall stats:</span>
+        <span className="text-muted-foreground">Overall stats:</span>
         <MetricGroup metrics={data.primaryMetrics} />
       </div>
       <div className={classes.detailsRow}>
-        <MetricGroup
-          metrics={data.detailMetrics}
-          className='flex-wrap justify-center'
-        />
+        <MetricGroup metrics={data.detailMetrics} className="flex-wrap justify-center" />
       </div>
     </div>
   );

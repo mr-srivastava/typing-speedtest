@@ -8,7 +8,7 @@ import { DEFAULT_THEME } from '@/shared/lib/theme-config';
 export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   return (
     <NextThemesProvider
-      attribute='class'
+      attribute="class"
       defaultTheme={DEFAULT_THEME}
       enableSystem
       disableTransitionOnChange

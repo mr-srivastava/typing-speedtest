@@ -1,0 +1,83 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "react", "import", "unicorn", "oxc"],
+  "categories": {
+    "correctness": "error"
+  },
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true
+  },
+  "ignorePatterns": [
+    "node_modules/",
+    ".next/",
+    "out/",
+    "build/",
+    "dist/",
+    "next-env.d.ts",
+    "*.config.js",
+    "*.config.ts",
+    "src/shared/ui/button.tsx",
+    "src/shared/ui/card.tsx",
+    "src/shared/ui/chart.tsx",
+    "src/shared/ui/dropdown-menu.tsx",
+    "src/shared/ui/textarea.tsx",
+    "src/shared/ui/tooltip.tsx",
+    "src/shared/ui/animated-modal.tsx",
+    "src/shared/ui/background-beams.tsx"
+  ],
+  "rules": {
+    "no-unused-vars": [
+      "warn",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_"
+      }
+    ],
+    "typescript/no-explicit-any": "warn",
+    "typescript/no-non-null-assertion": "warn",
+    "react/react-in-jsx-scope": "off",
+    "react/exhaustive-deps": "warn",
+    "no-console": "warn",
+    "no-debugger": "error",
+    "no-duplicate-imports": "error",
+    "prefer-const": "error",
+    "no-var": "error",
+    "eqeqeq": ["error", "always"]
+  },
+  "overrides": [
+    {
+      "files": ["src/modules/**/*.{ts,tsx}"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["@/features/*", "@/features/**"],
+                "message": "modules must not import from features"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/shared/**/*.{ts,tsx}"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["@/features/*", "@/features/**", "@/modules/*", "@/modules/**"],
+                "message": "shared must not import from features or modules"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

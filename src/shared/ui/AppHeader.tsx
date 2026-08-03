@@ -12,10 +12,7 @@ interface AppHeaderProps {
   className?: string;
 }
 
-const AppHeader: React.FC<AppHeaderProps> = ({
-  variant = 'default',
-  className = '',
-}) => {
+const AppHeader: React.FC<AppHeaderProps> = ({ variant = 'default', className = '' }) => {
   const isMinimal = variant === 'minimal';
 
   return (
@@ -33,12 +30,12 @@ const AppHeader: React.FC<AppHeaderProps> = ({
             layoutClasses.flexStart,
             'space-x-2 px-2 md:px-3 py-2 hover:bg-transparent',
           )}
-          variant='ghost'
+          variant="ghost"
           asChild
         >
-          <Link href='/'>
-            <Image src='/logo.svg' alt='Logo' width={36} height={36} />
-            <span className='w-max font-bold whitespace-nowrap text-base md:text-lg'>
+          <Link href="/">
+            <Image src="/logo.svg" alt="Logo" width={36} height={36} />
+            <span className="w-max font-bold whitespace-nowrap text-base md:text-lg">
               Octane Type
             </span>
           </Link>
@@ -46,13 +43,9 @@ const AppHeader: React.FC<AppHeaderProps> = ({
 
         <div className={cn(layoutClasses.flexStart, layoutClasses.gap2)}>
           {!isMinimal ? (
-            <Button
-              variant='ghost'
-              disabled
-              className='text-muted-foreground hidden sm:flex'
-            >
+            <Button variant="ghost" disabled className="text-muted-foreground hidden sm:flex">
               Leaderboard
-              <span className='ml-1 text-xs'>(Soon)</span>
+              <span className="ml-1 text-xs">(Soon)</span>
             </Button>
           ) : null}
           <ThemeToggle />

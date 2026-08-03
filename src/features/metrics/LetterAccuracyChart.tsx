@@ -54,9 +54,7 @@ const LetterAccuracyChart: React.FC<LetterAccuracyChartProps> = ({
     ? { opacity: 0 }
     : { opacity: 0, transform: 'translateY(12px)' };
 
-  const slideAnimate = reduceMotion
-    ? { opacity: 1 }
-    : { opacity: 1, transform: 'translateY(0px)' };
+  const slideAnimate = reduceMotion ? { opacity: 1 } : { opacity: 1, transform: 'translateY(0px)' };
 
   const overallWeightedAccuracy = useMemo(
     () => calculateOverallWeightedAccuracy(letterAccuracyData),
@@ -86,18 +84,14 @@ const LetterAccuracyChart: React.FC<LetterAccuracyChartProps> = ({
     return (
       <button
         key={letter}
-        type='button'
+        type="button"
         aria-pressed={selectedLetter === letter}
         aria-label={`${letter.toUpperCase()}: ${metrics.correct} of ${metrics.total} correct, ${accuracyLabel}`}
         onClick={() => handleSelectLetter(letter)}
         onMouseEnter={() => setHoveredLetter(letter)}
-        onMouseLeave={() =>
-          setHoveredLetter((current) => (current === letter ? null : current))
-        }
+        onMouseLeave={() => setHoveredLetter((current) => (current === letter ? null : current))}
         onFocus={() => setHoveredLetter(letter)}
-        onBlur={() =>
-          setHoveredLetter((current) => (current === letter ? null : current))
-        }
+        onBlur={() => setHoveredLetter((current) => (current === letter ? null : current))}
         className={cn(
           size.key,
           'font-bold cursor-pointer',
@@ -106,8 +100,7 @@ const LetterAccuracyChart: React.FC<LetterAccuracyChartProps> = ({
           radiusClasses.control,
           layoutClasses.flexCenter,
           getAccuracyColor(metrics.correct, metrics.total),
-          isActive &&
-            'ring-2 ring-foreground/80 ring-offset-2 ring-offset-card',
+          isActive && 'ring-2 ring-foreground/80 ring-offset-2 ring-offset-card',
         )}
       >
         {letter.toUpperCase()}
@@ -131,16 +124,14 @@ const LetterAccuracyChart: React.FC<LetterAccuracyChartProps> = ({
     if (!letterAccuracyData || Object.keys(letterAccuracyData).length === 0) {
       return false;
     }
-    return Object.values(letterAccuracyData).some(
-      (metrics) => metrics.total > 0,
-    );
+    return Object.values(letterAccuracyData).some((metrics) => metrics.total > 0);
   }, [letterAccuracyData]);
 
   if (!hasActualData) {
     return (
       <div className={cn('mt-4 text-center', className)}>
         <motion.div
-          className='text-muted-foreground text-sm'
+          className="text-muted-foreground text-sm"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={fadeTransition()}
@@ -154,20 +145,19 @@ const LetterAccuracyChart: React.FC<LetterAccuracyChartProps> = ({
   return (
     <div className={cn('mt-4', className)}>
       <motion.div
-        className='text-center mb-3'
+        className="text-center mb-3"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={fadeTransition(0.08)}
       >
-        <p className='text-sm font-medium text-foreground'>Key accuracy</p>
-        <p className='text-xs text-muted-foreground mt-1'>
-          Weighted average {overallWeightedAccuracy}% · Hover or tap
-          a key for details
+        <p className="text-sm font-medium text-foreground">Key accuracy</p>
+        <p className="text-xs text-muted-foreground mt-1">
+          Weighted average {overallWeightedAccuracy}% · Hover or tap a key for details
         </p>
       </motion.div>
 
       <motion.div
-        className='mb-4 px-2 py-1'
+        className="mb-4 px-2 py-1"
         initial={slideInitial}
         animate={slideAnimate}
         transition={slideTransition(0.04)}
@@ -188,32 +178,28 @@ const LetterAccuracyChart: React.FC<LetterAccuracyChartProps> = ({
             ? 'border-border bg-muted/40'
             : 'border-dashed border-border/60 bg-transparent',
         )}
-        role='status'
-        aria-live='polite'
+        role="status"
+        aria-live="polite"
       >
         {activeLetter && activeMetrics ? (
           <div key={activeLetter}>
-            <div className='text-lg font-semibold tracking-wide'>
-              {activeLetter.toUpperCase()}
-            </div>
-            <div className='mt-1 text-sm text-foreground'>
+            <div className="text-lg font-semibold tracking-wide">{activeLetter.toUpperCase()}</div>
+            <div className="mt-1 text-sm text-foreground">
               {activeMetrics.correct} / {activeMetrics.total} correct
             </div>
-            <div className='mt-1 text-sm text-muted-foreground'>
+            <div className="mt-1 text-sm text-muted-foreground">
               {activeMetrics.total > 0
                 ? `${((activeMetrics.correct / activeMetrics.total) * 100).toFixed(1)}% accuracy`
                 : 'No presses yet'}
             </div>
           </div>
         ) : (
-          <p className='text-sm text-muted-foreground'>
-            Select a key to inspect accuracy
-          </p>
+          <p className="text-sm text-muted-foreground">Select a key to inspect accuracy</p>
         )}
       </div>
 
       <motion.div
-        className='flex flex-wrap justify-center gap-x-4 gap-y-2 text-sm'
+        className="flex flex-wrap justify-center gap-x-4 gap-y-2 text-sm"
         initial={slideInitial}
         animate={slideAnimate}
         transition={slideTransition(0.12)}

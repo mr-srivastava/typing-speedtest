@@ -25,9 +25,7 @@ const MetricsDisplay: React.FC<MetricsDisplayProps> = ({
 }) => {
   return (
     <div className={cn('w-full text-center space-y-6', className)}>
-      {overallMetrics ? (
-        <OverallStatsBlock metrics={overallMetrics} className='mb-2' />
-      ) : null}
+      {overallMetrics ? <OverallStatsBlock metrics={overallMetrics} className="mb-2" /> : null}
 
       {model.statsTitle && !compact ? (
         <div className={cn(textClasses.mutedSmall)}>{model.statsTitle}</div>
@@ -37,7 +35,7 @@ const MetricsDisplay: React.FC<MetricsDisplayProps> = ({
         <div className={cn('w-full', widthTokens.chart)}>
           <RadialChart
             value={model.wpm}
-            title='Words per minute'
+            title="Words per minute"
             metricConfig={wpmChartConfig}
             compact={compact}
           />
@@ -45,18 +43,15 @@ const MetricsDisplay: React.FC<MetricsDisplayProps> = ({
         <div className={cn('w-full', widthTokens.chart)}>
           <RadialChart
             value={model.accuracy}
-            title='Accuracy'
+            title="Accuracy"
             metricConfig={accuracyChartConfig}
             compact={compact}
           />
         </div>
       </div>
 
-      <div className='border-t border-border/60 pt-4'>
-        <LetterAccuracyChart
-          key={model.view.scope}
-          letterAccuracyData={model.letterAccuracy}
-        />
+      <div className="border-t border-border/60 pt-4">
+        <LetterAccuracyChart key={model.view.scope} letterAccuracyData={model.letterAccuracy} />
       </div>
     </div>
   );

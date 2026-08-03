@@ -3,10 +3,7 @@ import React, { useCallback, useMemo, useState, startTransition } from 'react';
 import dynamic from 'next/dynamic';
 import TestPanel from '@/features/typing-test/TestPanel';
 import { AppShell } from '@/shared/layout/AppShell';
-import {
-  useTypingTest,
-  type TypingTestFinishedSnapshot,
-} from '@/modules/typing-test';
+import { useTypingTest, type TypingTestFinishedSnapshot } from '@/modules/typing-test';
 import { useSession } from '@/modules/session';
 import {
   buildTestSession,
@@ -27,10 +24,7 @@ interface TestScreenProps {
   className?: string;
 }
 
-const TestScreen: React.FC<TestScreenProps> = ({
-  defaultTimer = 60,
-  className = '',
-}) => {
+const TestScreen: React.FC<TestScreenProps> = ({ defaultTimer = 60, className = '' }) => {
   const { recordTest, data } = useSession();
   const [isMetricsModalOpen, setIsMetricsModalOpen] = useState(false);
 
@@ -42,10 +36,9 @@ const TestScreen: React.FC<TestScreenProps> = ({
     [defaultTimer, recordTest],
   );
 
-  const { content, status, timer, metrics, actions } = useTypingTest(
-    defaultTimer,
-    { onFinished: handleFinished },
-  );
+  const { content, status, timer, metrics, actions } = useTypingTest(defaultTimer, {
+    onFinished: handleFinished,
+  });
 
   const handleRestart = useCallback(() => {
     actions.restart();
@@ -70,32 +63,23 @@ const TestScreen: React.FC<TestScreenProps> = ({
   );
 
   const liveWpm = useMemo(
-    () =>
-      calculateLiveWpm(
-        metrics.correctWordCount,
-        timer.duration,
-        timer.remaining,
-      ),
+    () => calculateLiveWpm(metrics.correctWordCount, timer.duration, timer.remaining),
     [metrics.correctWordCount, timer.duration, timer.remaining],
   );
   const liveAccuracy = useMemo(
-    () =>
-      calculateCurrentAccuracy(
-        metrics.correctWordCount,
-        metrics.totalWordCount,
-      ),
+    () => calculateCurrentAccuracy(metrics.correctWordCount, metrics.totalWordCount),
     [metrics.correctWordCount, metrics.totalWordCount],
   );
 
   return (
-    <AppShell headerVariant='minimal' className={className}>
+    <AppShell headerVariant="minimal" className={className}>
       <main
         className={cn(
           layoutClasses.containerPadding,
           'flex flex-1 min-h-0 items-center justify-center py-6',
         )}
       >
-        <div className='w-full max-w-3xl'>
+        <div className="w-full max-w-3xl">
           <TestPanel
             referenceText={content.text}
             input={content.input}
@@ -119,7 +103,7 @@ const TestScreen: React.FC<TestScreenProps> = ({
             liveMetrics={liveMetrics}
             sessionData={data}
             onRestart={handleRestart}
-            preference='auto'
+            preference="auto"
           />
         </div>
       </main>

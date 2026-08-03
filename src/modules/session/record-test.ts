@@ -1,7 +1,4 @@
-import {
-  createInitialCumulativeStats,
-  updateCumulativeStats,
-} from './aggregate';
+import { createInitialCumulativeStats, updateCumulativeStats } from './aggregate';
 import type { EnhancedStoredData, TestSession } from './types';
 
 export function mergeTestRecord(

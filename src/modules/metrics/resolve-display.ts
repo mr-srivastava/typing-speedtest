@@ -1,14 +1,6 @@
 import type { EnhancedStoredData, LetterMetrics } from '@/modules/session/types';
-import {
-  calculateCurrentAccuracy,
-  calculateLiveWpm,
-} from './calculate';
-import type {
-  LiveTestMetrics,
-  MetricsDisplayModel,
-  MetricsPreference,
-  MetricsView,
-} from './types';
+import { calculateCurrentAccuracy, calculateLiveWpm } from './calculate';
+import type { LiveTestMetrics, MetricsDisplayModel, MetricsPreference, MetricsView } from './types';
 
 const EMPTY_LIVE: LiveTestMetrics = {
   correctWordCount: 0,
@@ -98,20 +90,12 @@ export function resolveMetricsDisplay(input: {
   const session = input.session;
   const canToggle = Boolean(session && session.cumulative.totalTests >= 2);
   const view = resolveView(session, preference, locked);
-  const showingCumulative = resolveShowingCumulative(
-    view,
-    preference,
-    canToggle,
-  );
+  const showingCumulative = resolveShowingCumulative(view, preference, canToggle);
 
   const wpm =
     showingCumulative && session
       ? session.cumulative.weightedWPM
-      : calculateLiveWpm(
-          live.correctWordCount,
-          live.timerDuration,
-          live.timerRemaining,
-        );
+      : calculateLiveWpm(live.correctWordCount, live.timerDuration, live.timerRemaining);
 
   const accuracy =
     showingCumulative && session

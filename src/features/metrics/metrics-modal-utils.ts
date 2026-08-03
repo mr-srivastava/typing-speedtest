@@ -8,20 +8,14 @@ export function getMetricsModalTitle(
     return 'Your Stats';
   }
 
-  if (
-    model.view.scope === 'live' ||
-    (!model.showingCumulative && options.hasLiveMetrics)
-  ) {
+  if (model.view.scope === 'live' || (!model.showingCumulative && options.hasLiveMetrics)) {
     return 'Test Complete';
   }
 
   return 'Metrics';
 }
 
-export function getMetricsModalActionLabel(
-  model: MetricsDisplayModel,
-  locked: boolean,
-): string {
+export function getMetricsModalActionLabel(model: MetricsDisplayModel, locked: boolean): string {
   if ((locked && model.view.scope === 'cumulative') || model.showingCumulative) {
     return 'Close';
   }

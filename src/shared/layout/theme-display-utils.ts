@@ -41,9 +41,7 @@ export const accuracyLegendData = {
 };
 
 export const getAccuracyColorClass = (isCorrect: boolean): string => {
-  return isCorrect
-    ? themeColorClasses.successBg
-    : themeColorClasses.dangerBg;
+  return isCorrect ? themeColorClasses.successBg : themeColorClasses.dangerBg;
 };
 
 export const getLetterAccuracyColorClass = (

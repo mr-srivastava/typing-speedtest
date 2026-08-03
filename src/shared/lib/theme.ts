@@ -19,10 +19,7 @@ export const themeColorClasses = {
 };
 
 export const gradients = {
-  primaryRadial:
-    'bg-gradient-radial from-primary/20 via-transparent to-transparent',
-  primaryLinear:
-    'bg-gradient-to-r from-primary/50 via-primary/30 to-primary/50',
-  heroText:
-    'bg-clip-text text-transparent bg-gradient-to-b from-foreground/70 to-muted-foreground',
+  primaryRadial: 'bg-gradient-radial from-primary/20 via-transparent to-transparent',
+  primaryLinear: 'bg-gradient-to-r from-primary/50 via-primary/30 to-primary/50',
+  heroText: 'bg-clip-text text-transparent bg-gradient-to-b from-foreground/70 to-muted-foreground',
 };

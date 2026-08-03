@@ -34,10 +34,7 @@ function toHookReturn(state: TypingTestState) {
   };
 }
 
-export function useTypingTest(
-  defaultTimer: number,
-  options: UseTypingTestOptions = {},
-) {
+export function useTypingTest(defaultTimer: number, options: UseTypingTestOptions = {}) {
   const { onFinished, getText: getTextOption } = options;
   const onFinishedRef = useRef(onFinished);
 

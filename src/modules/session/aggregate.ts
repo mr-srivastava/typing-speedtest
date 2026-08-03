@@ -1,8 +1,6 @@
 import type { CumulativeStats, TestSession } from './types';
 
-export function createInitialCumulativeStats(
-  newTest: TestSession,
-): CumulativeStats {
+export function createInitialCumulativeStats(newTest: TestSession): CumulativeStats {
   return {
     totalTests: 1,
     totalWordsTyped: newTest.wordsTyped,
@@ -27,8 +25,7 @@ export function updateCumulativeStats(
 
   const weightedWPM =
     newTotalTimeSpent > 0
-      ? (current.weightedWPM * current.totalTimeSpent +
-          newTest.wpm * newTest.testDuration) /
+      ? (current.weightedWPM * current.totalTimeSpent + newTest.wpm * newTest.testDuration) /
         newTotalTimeSpent
       : newTest.wpm;
 

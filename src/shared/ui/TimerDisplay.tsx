@@ -47,8 +47,8 @@ const TimerDisplay: React.FC<TimerDisplayProps> = ({
           getTimerWarningClass(isNearExpiry),
           orbitron.className,
         )}
-        aria-live='polite'
-        aria-label='Time remaining'
+        aria-live="polite"
+        aria-label="Time remaining"
       >
         {getTime()}
       </span>

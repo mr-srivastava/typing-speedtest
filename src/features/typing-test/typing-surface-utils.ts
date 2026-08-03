@@ -21,10 +21,7 @@ export function parseReferenceSpans(referenceText: string): TextSpan[] {
   return spans;
 }
 
-export function getCurrentWordSpanIndex(
-  spans: TextSpan[],
-  cursorIndex: number,
-): number {
+export function getCurrentWordSpanIndex(spans: TextSpan[], cursorIndex: number): number {
   let lastWordIndex = 0;
 
   for (let i = 0; i < spans.length; i++) {
@@ -45,11 +42,7 @@ export function getCurrentWordSpanIndex(
 
 export type CharStatus = 'pending' | 'correct' | 'incorrect' | 'cursor';
 
-export function getCharStatus(
-  referenceText: string,
-  input: string,
-  index: number,
-): CharStatus {
+export function getCharStatus(referenceText: string, input: string, index: number): CharStatus {
   if (index < input.length) {
     return input[index] === referenceText[index] ? 'correct' : 'incorrect';
   }

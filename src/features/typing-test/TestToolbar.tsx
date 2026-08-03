@@ -38,49 +38,46 @@ const TestToolbar: React.FC<TestToolbarProps> = ({
       )}
     >
       <Button
-        variant='outline'
-        size='sm'
+        variant="outline"
+        size="sm"
         onClick={onRestart}
         disabled={restartDisabled}
-        className='gap-2 shrink-0'
-        aria-label='Restart test'
+        className="gap-2 shrink-0"
+        aria-label="Restart test"
       >
-        <ResetIcon className='h-4 w-4' />
-        <span className='hidden sm:inline'>Restart</span>
+        <ResetIcon className="h-4 w-4" />
+        <span className="hidden sm:inline">Restart</span>
       </Button>
 
       <div
-        className={cn(
-          layoutClasses.flexCenter,
-          'min-w-0 flex-1 gap-3 sm:gap-6 text-xs sm:text-sm',
-        )}
-        aria-live='polite'
+        className={cn(layoutClasses.flexCenter, 'min-w-0 flex-1 gap-3 sm:gap-6 text-xs sm:text-sm')}
+        aria-live="polite"
       >
         {started ? (
           <>
-            <span className='tabular-nums'>
-              <span className='font-semibold text-success'>{wpm}</span>
-              <span className='text-muted-foreground ml-1'>WPM</span>
+            <span className="tabular-nums">
+              <span className="font-semibold text-success">{wpm}</span>
+              <span className="text-muted-foreground ml-1">WPM</span>
             </span>
-            <span className='text-muted-foreground hidden sm:inline'>•</span>
-            <span className='tabular-nums'>
-              <span className='font-semibold'>{accuracy}%</span>
-              <span className='text-muted-foreground ml-1'>accuracy</span>
+            <span className="text-muted-foreground hidden sm:inline">•</span>
+            <span className="tabular-nums">
+              <span className="font-semibold">{accuracy}%</span>
+              <span className="text-muted-foreground ml-1">accuracy</span>
             </span>
-            <span className='text-muted-foreground hidden sm:inline'>•</span>
-            <span className='tabular-nums'>
-              <span className='font-semibold'>{correctWords}</span>
-              <span className='text-muted-foreground ml-1'>words</span>
+            <span className="text-muted-foreground hidden sm:inline">•</span>
+            <span className="tabular-nums">
+              <span className="font-semibold">{correctWords}</span>
+              <span className="text-muted-foreground ml-1">words</span>
             </span>
           </>
         ) : (
-          <span className='text-muted-foreground text-center truncate'>
+          <span className="text-muted-foreground text-center truncate">
             Start typing — timer begins on your first keystroke
           </span>
         )}
       </div>
 
-      <TimerDisplay timer={timer} timerDuration={timerDuration} className='shrink-0' />
+      <TimerDisplay timer={timer} timerDuration={timerDuration} className="shrink-0" />
     </div>
   );
 };

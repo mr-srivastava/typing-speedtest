@@ -16,15 +16,19 @@ function isLetterMetricsRecord(
   return true;
 }
 
-export function validateStoredData(
-  value: unknown,
-): value is EnhancedStoredData {
+export function validateStoredData(value: unknown): value is EnhancedStoredData {
   if (typeof value !== 'object' || value === null) return false;
   const o = value as Record<string, unknown>;
   const lastSession = o.lastSession as Record<string, unknown> | undefined;
   const cumulative = o.cumulative as Record<string, unknown> | undefined;
 
-  if (lastSession === null || lastSession === undefined || cumulative === null || cumulative === undefined) return false;
+  if (
+    lastSession === null ||
+    lastSession === undefined ||
+    cumulative === null ||
+    cumulative === undefined
+  )
+    return false;
 
   if (
     typeof lastSession.wpm !== 'number' ||

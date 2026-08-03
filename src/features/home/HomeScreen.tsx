@@ -45,7 +45,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ className = '' }) => {
           onOpenChange={setIsMetricsModalOpen}
           sessionData={data}
           onRestart={handleCloseMetrics}
-          preference='cumulative'
+          preference="cumulative"
           locked
         />
       ) : null}
