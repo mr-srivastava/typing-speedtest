@@ -37,12 +37,12 @@ src/
 
 Imports flow downward only. oxlint enforces these rules:
 
-| Layer     | Can import from              | Cannot import from   |
-| --------- | ---------------------------- | -------------------- |
-| `app/`    | `features`, `shared`         | —                    |
-| `features`| `modules`, `shared`          | other `features`     |
-| `modules` | `shared` (lib only)          | `features`           |
-| `shared`  | external packages            | `features`, `modules`|
+| Layer      | Can import from      | Cannot import from    |
+| ---------- | -------------------- | --------------------- |
+| `app/`     | `features`, `shared` | —                     |
+| `features` | `modules`, `shared`  | other `features`      |
+| `modules`  | `shared` (lib only)  | `features`            |
+| `shared`   | external packages    | `features`, `modules` |
 
 ## Key components
 
@@ -115,18 +115,18 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Scripts
 
-| Command            | Description                        |
-| ------------------ | ---------------------------------- |
-| `pnpm dev`         | Start dev server                   |
-| `pnpm build`       | Production build                   |
-| `pnpm start`       | Serve production build             |
-| `pnpm test`        | Run Vitest unit tests              |
-| `pnpm test:watch`  | Run Vitest in watch mode           |
-| `pnpm typecheck`   | TypeScript check                   |
-| `pnpm lint`        | Lint with oxlint                   |
-| `pnpm lint:fix`    | Lint and auto-fix with oxlint      |
-| `pnpm fmt`         | Format code with oxfmt             |
-| `pnpm fmt:check`   | Check formatting without writing   |
+| Command           | Description                      |
+| ----------------- | -------------------------------- |
+| `pnpm dev`        | Start dev server                 |
+| `pnpm build`      | Production build                 |
+| `pnpm start`      | Serve production build           |
+| `pnpm test`       | Run Vitest unit tests            |
+| `pnpm test:watch` | Run Vitest in watch mode         |
+| `pnpm typecheck`  | TypeScript check                 |
+| `pnpm lint`       | Lint with oxlint                 |
+| `pnpm lint:fix`   | Lint and auto-fix with oxlint    |
+| `pnpm fmt`        | Format code with oxfmt           |
+| `pnpm fmt:check`  | Check formatting without writing |
 
 Lint and format config live in [`.oxlintrc.json`](.oxlintrc.json) and
 [`.oxfmtrc.json`](.oxfmtrc.json).

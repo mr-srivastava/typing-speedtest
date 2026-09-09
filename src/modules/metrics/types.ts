@@ -3,6 +3,8 @@ import type { LetterMetrics } from '@/modules/session/types';
 export interface LiveTestMetrics {
   correctWordCount: number;
   totalWordCount: number;
+  correctChars: number;
+  typedChars: number;
   timerRemaining: number;
   timerDuration: number;
   letterAccuracy: Record<string, LetterMetrics>;
@@ -17,6 +19,7 @@ export type MetricsPreference = 'live' | 'cumulative' | 'auto';
 
 export interface MetricsDisplayModel {
   wpm: number;
+  rawWpm: number;
   accuracy: number;
   letterAccuracy: Record<string, LetterMetrics>;
   statsTitle: string | null;

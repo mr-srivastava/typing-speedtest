@@ -49,6 +49,8 @@ const TestScreen: React.FC<TestScreenProps> = ({ defaultTimer = 60, className = 
     () => ({
       correctWordCount: metrics.correctWordCount,
       totalWordCount: metrics.totalWordCount,
+      correctChars: metrics.correctChars,
+      typedChars: metrics.typedChars,
       timerRemaining: timer.remaining,
       timerDuration: timer.duration,
       letterAccuracy: metrics.letterAccuracy,
@@ -56,6 +58,8 @@ const TestScreen: React.FC<TestScreenProps> = ({ defaultTimer = 60, className = 
     [
       metrics.correctWordCount,
       metrics.totalWordCount,
+      metrics.correctChars,
+      metrics.typedChars,
       metrics.letterAccuracy,
       timer.remaining,
       timer.duration,
@@ -63,8 +67,8 @@ const TestScreen: React.FC<TestScreenProps> = ({ defaultTimer = 60, className = 
   );
 
   const liveWpm = useMemo(
-    () => calculateLiveWpm(metrics.correctWordCount, timer.duration, timer.remaining),
-    [metrics.correctWordCount, timer.duration, timer.remaining],
+    () => calculateLiveWpm(metrics.correctChars, timer.duration, timer.remaining),
+    [metrics.correctChars, timer.duration, timer.remaining],
   );
   const liveAccuracy = useMemo(
     () => calculateCurrentAccuracy(metrics.correctWordCount, metrics.totalWordCount),

@@ -22,6 +22,8 @@ export interface TypingTestState {
   duration: number;
   correctWordCount: number;
   totalWordCount: number;
+  correctChars: number;
+  typedChars: number;
   letterAccuracy: Record<string, LetterMetrics>;
   snapshot: TypingTestFinishedSnapshot | null;
 }
@@ -43,6 +45,8 @@ export function createTypingTest(config: { duration: number; getText: () => stri
       duration,
       correctWordCount: 0,
       totalWordCount: 0,
+      correctChars: 0,
+      typedChars: 0,
       letterAccuracy: {},
       snapshot: null,
     };
@@ -86,6 +90,8 @@ export function createTypingTest(config: { duration: number; getText: () => stri
           timerRemaining: 0,
           correctWordCount: snapshot.correctWordCount,
           totalWordCount: snapshot.totalWordCount,
+          correctChars: snapshot.correctChars,
+          typedChars: snapshot.typedChars,
         };
         finish(snapshot);
         return state;
@@ -104,6 +110,8 @@ export function createTypingTest(config: { duration: number; getText: () => stri
       input: event.value,
       correctWordCount: result.correctWordCount,
       totalWordCount: result.totalWordCount,
+      correctChars: result.correctChars,
+      typedChars: result.typedChars,
       letterAccuracy: result.letterAccuracy,
     };
 

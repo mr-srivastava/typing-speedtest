@@ -1,7 +1,8 @@
 export type { LiveTestMetrics, MetricsView, MetricsPreference, MetricsDisplayModel } from './types';
 export {
-  calculateCurrentWpm,
+  calculateWpm,
   calculateLiveWpm,
+  calculateRawWpm,
   calculateCurrentAccuracy,
   calculateOverallWeightedAccuracy,
   getElapsedSecondsForWpm,

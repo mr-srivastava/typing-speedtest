@@ -14,20 +14,31 @@ export function getElapsedSecondsForWpm(timerDuration: number, timerRemaining: n
   return elapsed > 0 ? elapsed : 1;
 }
 
-export function calculateCurrentWpm(correctWordCount: number, elapsedSeconds: number): number {
+/**
+ * Standard typing-test WPM: 5 characters = 1 "word", regardless of whether
+ * typed word boundaries line up with the reference text.
+ */
+export function calculateWpm(charCount: number, elapsedSeconds: number): number {
   if (elapsedSeconds <= 0) return 0;
-  return Math.round((correctWordCount * 60) / elapsedSeconds);
+  return Math.round(charCount / 5 / (elapsedSeconds / 60));
 }
 
+/** Correct WPM: only characters that matched the reference text. */
 export function calculateLiveWpm(
-  correctWordCount: number,
+  correctChars: number,
   timerDuration: number,
   timerRemaining: number,
 ): number {
-  return calculateCurrentWpm(
-    correctWordCount,
-    getElapsedSecondsForWpm(timerDuration, timerRemaining),
-  );
+  return calculateWpm(correctChars, getElapsedSecondsForWpm(timerDuration, timerRemaining));
+}
+
+/** Raw WPM: every character typed, correct or not. */
+export function calculateRawWpm(
+  typedChars: number,
+  timerDuration: number,
+  timerRemaining: number,
+): number {
+  return calculateWpm(typedChars, getElapsedSecondsForWpm(timerDuration, timerRemaining));
 }
 
 export function calculateCurrentAccuracy(correctWordCount: number, totalWordCount: number): number {

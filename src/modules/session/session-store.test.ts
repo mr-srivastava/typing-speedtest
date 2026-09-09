@@ -6,6 +6,7 @@ import type { TestSession } from './types';
 function makeTest(overrides: Partial<TestSession> = {}): TestSession {
   return {
     wpm: 60,
+    rawWpm: 65,
     accuracy: 95,
     testDate: '2026-01-01T00:00:00.000Z',
     testDuration: 60,
@@ -30,6 +31,7 @@ describe('SessionStore (in-memory)', () => {
       totalTimeSpent: 60,
       totalCorrectWords: 57,
       weightedWPM: 60,
+      weightedRawWPM: 65,
       weightedAccuracy: 95,
       letterStats: { a: { correct: 10, total: 10 } },
       firstTestDate: test.testDate,
@@ -43,6 +45,7 @@ describe('SessionStore (in-memory)', () => {
     store.recordTest(
       makeTest({
         wpm: 60,
+        rawWpm: 65,
         accuracy: 90,
         testDuration: 60,
         wordsTyped: 60,
@@ -52,6 +55,7 @@ describe('SessionStore (in-memory)', () => {
 
     const second = makeTest({
       wpm: 80,
+      rawWpm: 85,
       accuracy: 100,
       testDate: '2026-01-02T00:00:00.000Z',
       testDuration: 60,
@@ -70,6 +74,8 @@ describe('SessionStore (in-memory)', () => {
     expect(data.cumulative.totalTimeSpent).toBe(120);
     // (60*60 + 80*60) / 120 = 70
     expect(data.cumulative.weightedWPM).toBe(70);
+    // (65*60 + 85*60) / 120 = 75
+    expect(data.cumulative.weightedRawWPM).toBe(75);
     // (90*60 + 100*40) / 100 = 94
     expect(data.cumulative.weightedAccuracy).toBe(94);
     expect(data.cumulative.letterStats).toEqual({

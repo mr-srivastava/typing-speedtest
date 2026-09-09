@@ -13,16 +13,25 @@ export interface WordAccuracy {
   total: number;
 }
 
-export interface TypingTestFinishedSnapshot {
+/** Character counts for the industry-standard "chars / 5 = words" WPM formula. */
+export interface CharAccuracy {
+  correctChars: number;
+  typedChars: number;
+}
+
+interface AccuracyCounts {
   correctWordCount: number;
   totalWordCount: number;
+  correctChars: number;
+  typedChars: number;
+}
+
+export interface TypingTestFinishedSnapshot extends AccuracyCounts {
   timer: number;
   letterAccuracy: Record<string, LetterMetrics>;
 }
 
-export interface EvaluateInputResult {
-  correctWordCount: number;
-  totalWordCount: number;
+export interface EvaluateInputResult extends AccuracyCounts {
   letterAccuracy: Record<string, LetterMetrics>;
   isComplete: boolean;
 }
@@ -50,6 +59,28 @@ export function countWordAccuracy(referenceText: string, input: string): WordAcc
 
 export function isTestComplete(referenceText: string, input: string): boolean {
   return input.length === referenceText.length;
+}
+
+/**
+ * Per-character correctness against the reference text, position by position.
+ * `typedChars` is every character typed so far (raw); `correctChars` is the
+ * subset that matches the reference at that position (correct).
+ */
+export function countCharAccuracy(referenceText: string, input: string): CharAccuracy {
+  let correctChars = 0;
+  for (let i = 0; i < input.length; i++) {
+    if (input[i] === referenceText[i]) {
+      correctChars++;
+    }
+  }
+  return { correctChars, typedChars: input.length };
+}
+
+/** Word + character accuracy counts, computed together since every caller needs both. */
+function countAccuracy(referenceText: string, input: string): AccuracyCounts {
+  const { correct, total } = countWordAccuracy(referenceText, input);
+  const { correctChars, typedChars } = countCharAccuracy(referenceText, input);
+  return { correctWordCount: correct, totalWordCount: total, correctChars, typedChars };
 }
 
 export function isLetterKey(char: string): boolean {
@@ -88,14 +119,12 @@ export function evaluateInput(
   input: string,
   prevLetterAccuracy: Record<string, LetterMetrics>,
 ): EvaluateInputResult {
-  const { correct, total } = countWordAccuracy(referenceText, input);
   const lastChar = input[input.length - 1] ?? '';
   const expectedChar = referenceText[input.length - 1] ?? '';
   const letterAccuracy = recordLetterAccuracy(prevLetterAccuracy, lastChar, expectedChar);
 
   return {
-    correctWordCount: correct,
-    totalWordCount: total,
+    ...countAccuracy(referenceText, input),
     letterAccuracy,
     isComplete: isTestComplete(referenceText, input),
   };
@@ -107,10 +136,8 @@ export function buildFinishedSnapshot(
   timerRemaining: number,
   letterAccuracy: Record<string, LetterMetrics>,
 ): TypingTestFinishedSnapshot {
-  const { correct, total } = countWordAccuracy(referenceText, input);
   return {
-    correctWordCount: correct,
-    totalWordCount: total,
+    ...countAccuracy(referenceText, input),
     timer: timerRemaining,
     letterAccuracy,
   };

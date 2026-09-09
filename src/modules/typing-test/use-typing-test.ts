@@ -29,6 +29,8 @@ function toHookReturn(state: TypingTestState) {
     metrics: {
       correctWordCount: state.correctWordCount,
       totalWordCount: state.totalWordCount,
+      correctChars: state.correctChars,
+      typedChars: state.typedChars,
       letterAccuracy: state.letterAccuracy,
     },
   };

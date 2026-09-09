@@ -32,6 +32,8 @@ describe('createTypingTest', () => {
     expect(state.snapshot).toEqual({
       correctWordCount: 2,
       totalWordCount: 2,
+      correctChars: SAMPLE.length,
+      typedChars: SAMPLE.length,
       timer: 60,
       letterAccuracy: state.letterAccuracy,
     });
@@ -49,6 +51,8 @@ describe('createTypingTest', () => {
     expect(state.timerRemaining).toBe(60);
     expect(state.correctWordCount).toBe(0);
     expect(state.totalWordCount).toBe(0);
+    expect(state.correctChars).toBe(0);
+    expect(state.typedChars).toBe(0);
     expect(state.letterAccuracy).toEqual({});
     expect(state.snapshot).toBeNull();
   });

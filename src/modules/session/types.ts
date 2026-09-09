@@ -9,6 +9,7 @@ export interface CumulativeStats {
   totalTimeSpent: number; // in seconds
   totalCorrectWords: number; // for weighted accuracy calculation
   weightedWPM: number;
+  weightedRawWPM?: number; // optional: absent in data recorded before raw WPM tracking
   weightedAccuracy: number;
   letterStats: Record<string, LetterMetrics>; // aggregated across all tests
   firstTestDate: string;
@@ -17,6 +18,7 @@ export interface CumulativeStats {
 
 export interface TestSession {
   wpm: number;
+  rawWpm: number;
   accuracy: number;
   testDate: string;
   testDuration: number;

@@ -6,6 +6,9 @@ import type { LiveTestMetrics } from './types';
 const live: LiveTestMetrics = {
   correctWordCount: 30,
   totalWordCount: 32,
+  // elapsed = 60-20 = 40s; 150 correct chars / 5 / (40/60) = 45 WPM; 160 typed chars = 48 raw WPM
+  correctChars: 150,
+  typedChars: 160,
   timerRemaining: 20,
   timerDuration: 60,
   letterAccuracy: { a: { correct: 5, total: 6 } },
@@ -15,6 +18,7 @@ function makeSession(totalTests: number): EnhancedStoredData {
   return {
     lastSession: {
       wpm: 45,
+      rawWpm: 48,
       accuracy: 90,
       testDate: '2026-01-01T00:00:00.000Z',
       testDuration: 60,
@@ -28,6 +32,7 @@ function makeSession(totalTests: number): EnhancedStoredData {
       totalTimeSpent: 120,
       totalCorrectWords: 90,
       weightedWPM: 55,
+      weightedRawWPM: 60,
       weightedAccuracy: 92,
       letterStats: { a: { correct: 20, total: 22 }, b: { correct: 5, total: 5 } },
       firstTestDate: '2026-01-01T00:00:00.000Z',
@@ -43,8 +48,10 @@ describe('resolveMetricsDisplay', () => {
     expect(model.view).toEqual({ scope: 'live' });
     expect(model.canToggle).toBe(false);
     expect(model.showingCumulative).toBe(false);
-    // 30 words in 40 seconds → 45 WPM
+    // 150 correct chars in 40 seconds → 45 WPM
     expect(model.wpm).toBe(45);
+    // 160 typed chars in 40 seconds → 48 raw WPM
+    expect(model.rawWpm).toBe(48);
     expect(model.accuracy).toBe(94);
     expect(model.letterAccuracy).toEqual(live.letterAccuracy);
     expect(model.statsTitle).toBeNull();
@@ -87,6 +94,7 @@ describe('resolveMetricsDisplay', () => {
     expect(model.canToggle).toBe(true);
     expect(model.showingCumulative).toBe(true);
     expect(model.wpm).toBe(55);
+    expect(model.rawWpm).toBe(60);
     expect(model.accuracy).toBe(92);
     expect(model.letterAccuracy).toEqual({
       a: { correct: 20, total: 22 },

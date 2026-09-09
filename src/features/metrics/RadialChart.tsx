@@ -22,6 +22,8 @@ const rechartsConfig: ChartConfig = {
 interface RadialChartProps {
   title?: string;
   description?: string;
+  /** Small secondary stat shown in the footer, e.g. "Raw 82" */
+  caption?: string;
   value?: number;
   metricConfig: RadialMetricConfig;
   /** Tighter layout for modals — one feedback line, no average blurb, lighter chrome */
@@ -32,6 +34,7 @@ interface RadialChartProps {
 const RadialChart: React.FC<RadialChartProps> = ({
   title,
   description,
+  caption,
   value = 0,
   metricConfig,
   compact = false,
@@ -120,6 +123,7 @@ const RadialChart: React.FC<RadialChartProps> = ({
         >
           {getFeedbackMessage(value)}
         </div>
+        {caption ? <div className="text-muted-foreground text-center">{caption}</div> : null}
         {!compact && averageInfo ? (
           <div className="text-muted-foreground text-center">{averageInfo}</div>
         ) : null}

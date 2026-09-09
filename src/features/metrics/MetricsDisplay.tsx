@@ -36,6 +36,7 @@ const MetricsDisplay: React.FC<MetricsDisplayProps> = ({
           <RadialChart
             value={model.wpm}
             title="Words per minute"
+            caption={`Raw ${model.rawWpm}`}
             metricConfig={wpmChartConfig}
             compact={compact}
           />
