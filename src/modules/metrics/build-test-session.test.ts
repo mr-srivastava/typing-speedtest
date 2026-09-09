@@ -1,9 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { buildTestSession } from './build-test-session';
-import type { TestTiming } from '@/modules/typing-test/config';
-import type { TypingTestFinishedSnapshot } from '@/modules/typing-test/create-typing-test';
-import { buildTypingTestResult, type TypingTestResultInput } from '@/modules/typing-test/result';
-import type { TypingEventLog } from '@/modules/typing-test/event-log';
+import {
+  buildTypingTestResult,
+  type TestTiming,
+  type TypingEventLog,
+  type TypingTestFinishedSnapshot,
+  type TypingTestResultInput,
+} from '@/modules/typing-test';
 
 type AccuracyOverrides = Partial<
   Omit<

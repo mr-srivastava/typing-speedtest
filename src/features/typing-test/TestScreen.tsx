@@ -3,8 +3,11 @@ import React, { startTransition, useCallback, useState } from 'react';
 import dynamic from 'next/dynamic';
 import TestPanel from '@/features/typing-test/TestPanel';
 import { AppShell } from '@/shared/layout/AppShell';
-import { DEFAULT_TEST_CONFIG, type TestConfig } from '@/modules/typing-test/config';
-import type { TypingTestFinishedSnapshot } from '@/modules/typing-test/create-typing-test';
+import {
+  DEFAULT_TEST_CONFIG,
+  type TestConfig,
+  type TypingTestFinishedSnapshot,
+} from '@/modules/typing-test';
 import { useSession } from '@/modules/session/session-provider';
 import { buildTestSession } from '@/modules/metrics/build-test-session';
 import { layoutClasses } from '@/shared/layout/layout-utils';

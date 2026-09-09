@@ -1,10 +1,4 @@
-import type { LetterMetrics } from '@/modules/typing-test/types';
-export {
-  calculateCurrentAccuracy,
-  calculateWpm,
-  getElapsedSecondsForWpm,
-  resolveTestElapsedSeconds as resolveLiveElapsedSeconds,
-} from '@/modules/typing-test/scoring';
+import type { LetterMetrics } from '@/modules/typing-test';
 
 export function calculateOverallWeightedAccuracy(
   letterAccuracyData: Record<string, LetterMetrics>,

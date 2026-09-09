@@ -9,12 +9,12 @@ import {
 } from '@/shared/ui/dropdown-menu';
 import { Button } from '@/shared/ui/button';
 import {
+  LANGUAGES,
   TIME_PRESETS,
   WORD_COUNT_PRESETS,
   type TestConfig,
   type TestMode,
-} from '@/modules/typing-test/config';
-import { LANGUAGES } from '@/modules/typing-test/word-lists';
+} from '@/modules/typing-test';
 import { cn } from '@/shared/lib/cn';
 
 interface TestSettingsBarProps {

@@ -1,5 +1,5 @@
 import type { EnhancedStoredData } from '@/modules/session/types';
-import type { LetterMetrics } from '@/modules/typing-test/types';
+import type { LetterMetrics } from '@/modules/typing-test';
 import type { LiveTestMetrics, MetricsDisplayModel, MetricsPreference, MetricsView } from './types';
 
 const EMPTY_LIVE: LiveTestMetrics = {

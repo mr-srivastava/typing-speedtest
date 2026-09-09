@@ -2,7 +2,7 @@ import React from 'react';
 import { ResetIcon } from '@radix-ui/react-icons';
 import TimerDisplay from '@/shared/ui/TimerDisplay';
 import { Button } from '@/shared/ui/button';
-import type { TestMode } from '@/modules/typing-test/config';
+import type { TestMode } from '@/modules/typing-test';
 import { layoutClasses } from '@/shared/layout/layout-utils';
 import { cn } from '@/shared/lib/cn';
 

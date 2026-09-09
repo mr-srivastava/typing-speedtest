@@ -1,10 +1,4 @@
 export type { LiveTestMetrics, MetricsView, MetricsPreference, MetricsDisplayModel } from './types';
-export {
-  calculateWpm,
-  resolveLiveElapsedSeconds,
-  calculateCurrentAccuracy,
-  calculateOverallWeightedAccuracy,
-  getElapsedSecondsForWpm,
-} from './calculate';
+export { calculateOverallWeightedAccuracy } from './calculate';
 export { buildTestSession } from './build-test-session';
 export { resolveMetricsDisplay } from './resolve-display';

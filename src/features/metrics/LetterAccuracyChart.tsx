@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import type { LetterMetrics } from '@/modules/typing-test/types';
+import type { LetterMetrics } from '@/modules/typing-test';
 import { calculateOverallWeightedAccuracy } from '@/modules/metrics/calculate';
 import { cn } from '@/shared/lib/cn';
 import { layoutClasses, radiusClasses } from '@/shared/layout/layout-utils';

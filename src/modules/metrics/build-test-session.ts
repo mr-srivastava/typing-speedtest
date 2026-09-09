@@ -1,5 +1,5 @@
 import type { TestSession } from '@/modules/session/types';
-import type { TypingTestFinishedSnapshot } from '@/modules/typing-test/create-typing-test';
+import type { TypingTestFinishedSnapshot } from '@/modules/typing-test';
 
 export function buildTestSession(snapshot: TypingTestFinishedSnapshot): TestSession {
   return {

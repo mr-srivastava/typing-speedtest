@@ -10,18 +10,16 @@ import React, {
   useState,
   useSyncExternalStore,
 } from 'react';
-import type { TestConfig } from '@/modules/typing-test/config';
 import {
   createTypingTest,
+  deriveLiveTypingAnalytics,
+  getReferenceText,
+  type LiveTypingAnalytics,
+  type TestConfig,
   type TypingTest,
   type TypingTestFinishedSnapshot,
   type TypingTestState,
-} from '@/modules/typing-test/create-typing-test';
-import {
-  deriveLiveTypingAnalytics,
-  type LiveTypingAnalytics,
-} from '@/modules/typing-test/analytics';
-import getReferenceText from '@/modules/typing-test/text-provider';
+} from '@/modules/typing-test';
 
 const TypingTestContext = createContext<TypingTest | null>(null);
 

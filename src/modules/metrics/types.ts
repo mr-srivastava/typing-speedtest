@@ -1,6 +1,4 @@
-import type { LetterMetrics } from '@/modules/typing-test/types';
-import type { TestTiming } from '@/modules/typing-test/config';
-import type { WpmSeriesPoint } from '@/modules/typing-test/replay';
+import type { LetterMetrics, TestTiming, WpmSeriesPoint } from '@/modules/typing-test';
 
 export type LiveTestMetrics = TestTiming & {
   correctWordCount: number;
