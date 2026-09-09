@@ -1,6 +1,6 @@
 import type { MetricsDisplayModel } from '@/modules/metrics/types';
 
-export function getMetricsModalTitle(
+export function getMetricsSheetTitle(
   model: MetricsDisplayModel,
   options: { hasLiveMetrics: boolean },
 ): string {
@@ -11,7 +11,7 @@ export function getMetricsModalTitle(
   return 'Metrics';
 }
 
-export function getMetricsModalActionLabel(model: MetricsDisplayModel): string {
+export function getMetricsSheetActionLabel(model: MetricsDisplayModel): string {
   if (model.showingCumulative) {
     return 'Close';
   }

@@ -4,9 +4,8 @@ import dynamic from 'next/dynamic';
 import { ChartNoAxesColumn } from 'lucide-react';
 import TestPanel from '@/features/typing-test/TestPanel';
 import TestIntro from '@/features/home/TestIntro';
-import ComingSoonStrip from '@/features/home/ComingSoonStrip';
 import MobileDesktopNotice from '@/features/home/MobileDesktopNotice';
-import StatsPanel from '@/features/metrics/StatsPanel';
+import MetricsSheet from '@/features/metrics/MetricsSheet';
 import { AppShell } from '@/shared/layout/AppShell';
 import { Button } from '@/shared/ui/button';
 import {
@@ -25,8 +24,8 @@ import {
   useTypingTestAnalytics,
 } from './typing-test-react';
 
-const MetricsModal = dynamic(
-  () => import('@/features/metrics/MetricsModal').then((mod) => mod.default),
+const DynamicMetricsSheet = dynamic(
+  () => import('@/features/metrics/MetricsSheet').then((mod) => mod.default),
   { ssr: false },
 );
 
@@ -52,21 +51,21 @@ function useDesktopViewport() {
   return useSyncExternalStore(subscribeToDesktopViewport, getDesktopViewportSnapshot, () => false);
 }
 
-interface CompletionModalProps {
+interface CompletionSheetProps {
   isOpen: boolean;
   data: ReturnType<typeof useSession>['data'];
   onOpenChange: (isOpen: boolean) => void;
   onRestart: () => void;
 }
 
-/** Scoped so live analytics are only subscribed to while the completion modal can show them. */
-function CompletionModal({ data, isOpen, onOpenChange, onRestart }: CompletionModalProps) {
+/** Scoped so live analytics are only subscribed to while the completion sheet can show them. */
+function CompletionSheet({ data, isOpen, onOpenChange, onRestart }: CompletionSheetProps) {
   const analytics = useTypingTestAnalytics();
 
   return (
-    <MetricsModal
-      isOpen={isOpen}
-      onOpenChange={onOpenChange}
+    <DynamicMetricsSheet
+      open={isOpen}
+      onClose={() => onOpenChange(false)}
       liveMetrics={analytics}
       sessionData={data}
       onRestart={onRestart}
@@ -78,16 +77,16 @@ interface TestScreenContentProps {
   config: TestConfig;
   onConfigChange: (config: TestConfig) => void;
   className: string;
-  isMetricsModalOpen: boolean;
-  onMetricsModalOpenChange: (isOpen: boolean) => void;
+  isCompletionSheetOpen: boolean;
+  onCompletionSheetOpenChange: (isOpen: boolean) => void;
 }
 
 function DesktopTestScreen({
   config,
   onConfigChange,
   className,
-  isMetricsModalOpen,
-  onMetricsModalOpenChange,
+  isCompletionSheetOpen,
+  onCompletionSheetOpenChange,
 }: TestScreenContentProps) {
   const { data, isLoading, isHydrated, hasSession } = useSession();
   const { restart } = useTypingTestActions();
@@ -95,8 +94,8 @@ function DesktopTestScreen({
 
   const handleRestart = useCallback(() => {
     restart();
-    onMetricsModalOpenChange(false);
-  }, [onMetricsModalOpenChange, restart]);
+    onCompletionSheetOpenChange(false);
+  }, [onCompletionSheetOpenChange, restart]);
 
   const showStatsTrigger = isHydrated && !isLoading && hasSession;
 
@@ -121,7 +120,7 @@ function DesktopTestScreen({
       <div
         className={cn(
           layoutClasses.containerPadding,
-          'flex flex-col items-center gap-8 py-10 md:py-16',
+          'flex flex-col items-center gap-6 pt-12 pb-16 sm:pt-16 md:pt-20',
         )}
       >
         <TestIntro />
@@ -132,16 +131,14 @@ function DesktopTestScreen({
           onRestart={handleRestart}
           className="w-full max-w-screen-2xl"
         />
-
-        <ComingSoonStrip hasSession={hasSession} />
       </div>
 
-      <StatsPanel open={isStatsOpen} sessionData={data} onClose={() => setIsStatsOpen(false)} />
+      <MetricsSheet open={isStatsOpen} sessionData={data} onClose={() => setIsStatsOpen(false)} />
 
-      <CompletionModal
+      <CompletionSheet
         data={data}
-        isOpen={isMetricsModalOpen}
-        onOpenChange={onMetricsModalOpenChange}
+        isOpen={isCompletionSheetOpen}
+        onOpenChange={onCompletionSheetOpenChange}
         onRestart={handleRestart}
       />
     </AppShell>
@@ -154,7 +151,7 @@ function DesktopTypingTest({ defaultTimer = 60, className = '' }: TestScreenProp
     ...DEFAULT_TEST_CONFIG,
     timeSeconds: defaultTimer,
   }));
-  const [isMetricsModalOpen, setIsMetricsModalOpen] = useState(false);
+  const [isCompletionSheetOpen, setIsMetricsModalOpen] = useState(false);
 
   const handleFinished = useCallback(
     (snapshot: TypingTestFinishedSnapshot) => {
@@ -170,8 +167,8 @@ function DesktopTypingTest({ defaultTimer = 60, className = '' }: TestScreenProp
         config={config}
         onConfigChange={setConfig}
         className={className}
-        isMetricsModalOpen={isMetricsModalOpen}
-        onMetricsModalOpenChange={setIsMetricsModalOpen}
+        isCompletionSheetOpen={isCompletionSheetOpen}
+        onCompletionSheetOpenChange={setIsMetricsModalOpen}
       />
     </TypingTestProvider>
   );

@@ -28,6 +28,8 @@ interface RadialChartProps {
   metricConfig: RadialMetricConfig;
   /** Tighter layout for modals — one feedback line, no average blurb, lighter chrome */
   compact?: boolean;
+  /** Larger ring + value text for spacious, full-screen layouts */
+  large?: boolean;
   className?: string;
 }
 
@@ -38,6 +40,7 @@ const RadialChart: React.FC<RadialChartProps> = ({
   value = 0,
   metricConfig,
   compact = false,
+  large = false,
   className = '',
 }) => {
   const { maxValue, showPercentage, feedbackThresholds, feedbackMessages, averageInfo, fillColor } =
@@ -67,14 +70,17 @@ const RadialChart: React.FC<RadialChartProps> = ({
       <CardContent className="flex-1 pb-0">
         <ChartContainer
           config={rechartsConfig}
-          className={cn('mx-auto aspect-square', compact ? size.chartCompact : size.chartDefault)}
+          className={cn(
+            'mx-auto aspect-square',
+            compact ? size.chartCompact : large ? size.chartLarge : size.chartDefault,
+          )}
         >
           <RadialBarChart
             data={chartData}
             startAngle={0}
             endAngle={(value / maxValue) * 360}
-            innerRadius={40}
-            outerRadius={55}
+            innerRadius={large ? 44 : 40}
+            outerRadius={large ? 62 : 55}
           >
             <PolarGrid
               gridType="circle"
@@ -83,7 +89,13 @@ const RadialChart: React.FC<RadialChartProps> = ({
               className="first:fill-muted last:fill-background"
               polarRadius={[43, 37]}
             />
-            <RadialBar dataKey="value" background cornerRadius={5} />
+            <RadialBar
+              dataKey="value"
+              background
+              cornerRadius={5}
+              animationDuration={600}
+              animationEasing="ease-out"
+            />
             <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
               <Label
                 content={({ viewBox }) => {
@@ -98,7 +110,10 @@ const RadialChart: React.FC<RadialChartProps> = ({
                         <tspan
                           x={viewBox.cx}
                           y={viewBox.cy}
-                          className="typing-face fill-foreground text-2xl font-semibold"
+                          className={cn(
+                            'typing-face fill-foreground font-semibold',
+                            large ? 'text-3xl' : 'text-2xl',
+                          )}
                         >
                           {value.toLocaleString()}
                           {showPercentage ? '%' : ''}

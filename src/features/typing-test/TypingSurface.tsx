@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
   getCurrentWordSpanIndex,
   parseReferenceSpans,
+  TYPING_SURFACE_VISIBLE_LINES,
   type TextSpan,
   typingSurfacePadding,
   typingSurfaceTypography,
@@ -67,6 +68,13 @@ const ReferenceSpan = React.memo(function ReferenceSpan({
   );
 });
 
+interface LineScrollState {
+  offsetPx: number;
+  lineHeightPx: number;
+}
+
+const initialLineScrollState: LineScrollState = { offsetPx: 0, lineHeightPx: 0 };
+
 const TypingSurface: React.FC<TypingSurfaceProps> = ({
   referenceText,
   input,
@@ -77,6 +85,7 @@ const TypingSurface: React.FC<TypingSurfaceProps> = ({
 }) => {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const spanRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const [lineScroll, setLineScroll] = useState<LineScrollState>(initialLineScrollState);
 
   const spans = useMemo(() => parseReferenceSpans(referenceText), [referenceText]);
 
@@ -92,35 +101,86 @@ const TypingSurface: React.FC<TypingSurfaceProps> = ({
     }
   }, [readOnly, focusKey]);
 
+  /**
+   * Keeps the reference text clipped to a fixed number of lines: measures which
+   * row the active word sits on from the rendered spans, then translates the
+   * whole block up by whole line-heights so the active line becomes the top
+   * visible row — completed lines scroll out, new ones scroll in underneath.
+   *
+   * The transformed block itself carries no padding (that lives on a
+   * non-transformed wrapper), so the first span's offsetTop is just line-box
+   * leading — line math stays exact and no sliver of the previous line bleeds
+   * into the window.
+   */
+  const recalcLineScroll = useCallback(() => {
+    const firstSpan = spanRefs.current[0];
+    const currentSpan = spanRefs.current[currentSpanIndex];
+    if (!firstSpan || !currentSpan) return;
+
+    const firstRowTop = firstSpan.offsetTop;
+    const secondRowSpan = spanRefs.current.find((el) => !!el && el.offsetTop > firstRowTop);
+    const lineHeightPx = secondRowSpan
+      ? secondRowSpan.offsetTop - firstRowTop
+      : currentSpan.offsetHeight;
+
+    if (lineHeightPx <= 0) return;
+
+    const rowIndex = Math.round((currentSpan.offsetTop - firstRowTop) / lineHeightPx);
+    const offsetPx = Math.max(0, rowIndex) * lineHeightPx;
+
+    setLineScroll((previous) =>
+      previous.offsetPx === offsetPx && previous.lineHeightPx === lineHeightPx
+        ? previous
+        : { offsetPx, lineHeightPx },
+    );
+  }, [currentSpanIndex]);
+
+  useLayoutEffect(() => {
+    recalcLineScroll();
+  }, [recalcLineScroll, focusKey]);
+
   useEffect(() => {
-    const current = spanRefs.current[currentSpanIndex];
-    current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-  }, [currentSpanIndex, focusKey]);
+    window.addEventListener('resize', recalcLineScroll);
+    return () => window.removeEventListener('resize', recalcLineScroll);
+  }, [recalcLineScroll]);
 
   const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
     e.preventDefault();
   };
 
+  const windowHeightPx =
+    lineScroll.lineHeightPx > 0
+      ? lineScroll.lineHeightPx * TYPING_SURFACE_VISIBLE_LINES
+      : undefined;
+
   return (
-    <div className={cn(`relative ${size.typingMin} max-h-[40vh] overflow-y-auto`, className)}>
-      <div
-        className={cn(
-          'typing-face pointer-events-none select-none whitespace-pre-wrap break-words',
-          typingSurfaceTypography,
-          typingSurfacePadding,
-        )}
-        aria-hidden
-      >
-        {spans.map((span, spanIndex) => (
-          <ReferenceSpan
-            key={`${span.startIndex}-${span.text}`}
-            span={span}
-            index={spanIndex}
-            typedText={input.slice(span.startIndex, span.startIndex + span.text.length)}
-            isCurrentWord={!span.isWhitespace && spanIndex === currentSpanIndex}
-            setSpanRef={setSpanRef}
-          />
-        ))}
+    <div className={cn('relative', className)}>
+      <div className={typingSurfacePadding}>
+        <div
+          className={cn('relative overflow-hidden', !windowHeightPx && size.typingMin)}
+          style={windowHeightPx ? { height: windowHeightPx } : undefined}
+        >
+          <div
+            className={cn(
+              'typing-face pointer-events-none select-none whitespace-pre-wrap break-words',
+              motionTokens.transitionUi,
+              typingSurfaceTypography,
+            )}
+            style={{ transform: `translateY(-${lineScroll.offsetPx}px)` }}
+            aria-hidden
+          >
+            {spans.map((span, spanIndex) => (
+              <ReferenceSpan
+                key={`${span.startIndex}-${span.text}`}
+                span={span}
+                index={spanIndex}
+                typedText={input.slice(span.startIndex, span.startIndex + span.text.length)}
+                isCurrentWord={!span.isWhitespace && spanIndex === currentSpanIndex}
+                setSpanRef={setSpanRef}
+              />
+            ))}
+          </div>
+        </div>
       </div>
 
       <textarea

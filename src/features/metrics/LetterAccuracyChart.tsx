@@ -15,6 +15,8 @@ import { motion as motionTokens, size, space } from '@/shared/lib/tokens';
 
 interface LetterAccuracyChartProps {
   letterAccuracyData: Record<string, LetterMetrics>;
+  /** Bigger keys and spacing for spacious, full-screen layouts */
+  large?: boolean;
   className?: string;
 }
 
@@ -31,12 +33,13 @@ function formatAccuracy(correct: number, total: number): string {
 
 const LetterAccuracyChart: React.FC<LetterAccuracyChartProps> = ({
   letterAccuracyData,
+  large = false,
   className = '',
 }) => {
   const reduceMotion = useReducedMotion();
   const [selectedLetter, setSelectedLetter] = useState<string | null>(null);
   const [hoveredLetter, setHoveredLetter] = useState<string | null>(null);
-  const entranceEase = motionTokens.easeOut;
+  const entranceEase = [0.4, 0, 0.2, 1] as const;
 
   const fadeTransition = (delay = 0) => ({
     duration: reduceMotion ? 0.15 : 0.25,
@@ -50,9 +53,7 @@ const LetterAccuracyChart: React.FC<LetterAccuracyChartProps> = ({
     ease: entranceEase,
   });
 
-  const slideInitial = reduceMotion
-    ? { opacity: 0 }
-    : { opacity: 0, transform: 'translateY(12px)' };
+  const slideInitial = reduceMotion ? { opacity: 0 } : { opacity: 0, transform: 'translateY(6px)' };
 
   const slideAnimate = reduceMotion ? { opacity: 1 } : { opacity: 1, transform: 'translateY(0px)' };
 
@@ -93,14 +94,15 @@ const LetterAccuracyChart: React.FC<LetterAccuracyChartProps> = ({
         onFocus={() => setHoveredLetter(letter)}
         onBlur={() => setHoveredLetter((current) => (current === letter ? null : current))}
         className={cn(
-          size.key,
-          'typing-face cursor-pointer border border-border/80 text-xs font-semibold',
+          large ? size.keyLarge : size.key,
+          'typing-face cursor-pointer font-semibold opacity-80',
+          large ? 'text-sm' : 'text-xs',
           motionTokens.transitionUi,
-          'fine-hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card',
+          'fine-hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card',
           'rounded-sm',
           layoutClasses.flexCenter,
           getAccuracyColor(metrics.correct, metrics.total),
-          isActive && 'ring-1 ring-foreground/80 ring-offset-2 ring-offset-card',
+          isActive && 'opacity-100 ring-2 ring-foreground/60 ring-offset-2 ring-offset-card',
         )}
       >
         {letter.toUpperCase()}
@@ -111,7 +113,7 @@ const LetterAccuracyChart: React.FC<LetterAccuracyChartProps> = ({
   const renderKeyboardRow = (row: string[], rowIndex: number) => (
     <motion.div
       key={rowIndex}
-      className={`flex justify-center ${space.comfortable} mb-3`}
+      className={cn('flex justify-center', large ? space.loose : space.comfortable, 'mb-3')}
       initial={slideInitial}
       animate={slideAnimate}
       transition={slideTransition(0.04 * rowIndex)}
@@ -174,11 +176,10 @@ const LetterAccuracyChart: React.FC<LetterAccuracyChartProps> = ({
       */}
       <div
         className={cn(
-          `mb-4 mx-auto flex ${size.detailStrip} max-w-xs items-center justify-center border px-4 py-3 text-center`,
+          `mb-4 mx-auto flex ${size.detailStrip} max-w-xs items-center justify-center px-4 py-3 text-center`,
           'rounded-sm',
-          activeLetter
-            ? 'border-border bg-muted/40'
-            : 'border-dashed border-border/60 bg-transparent',
+          motionTokens.transitionColors,
+          activeLetter ? 'bg-muted/40' : 'bg-transparent',
         )}
         role="status"
         aria-live="polite"

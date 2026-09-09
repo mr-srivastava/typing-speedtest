@@ -55,6 +55,9 @@ export function getCharStatus(referenceText: string, input: string, index: numbe
 }
 
 export const typingSurfaceTypography =
-  'text-lg md:text-xl font-mono leading-loose tracking-wide [word-spacing:0.3em]';
+  'text-xl md:text-2xl font-mono leading-loose tracking-wide [word-spacing:0.3em]';
 
 export const typingSurfacePadding = 'px-1 py-4 md:py-6';
+
+/** Number of reference-text lines kept visible at once — the rest scrolls off. */
+export const TYPING_SURFACE_VISIBLE_LINES = 3;
