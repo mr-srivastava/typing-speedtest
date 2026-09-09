@@ -8,6 +8,9 @@ export type LiveTestMetrics = TestTiming & {
   correctChars: number;
   typedChars: number;
   letterAccuracy: Record<string, LetterMetrics>;
+  wpm: number;
+  rawWpm: number;
+  accuracy: number;
   /** Only available once the test has finished (event-sourced stats derived at finish time). */
   consistency?: number;
   wpmSeries?: WpmSeriesPoint[];

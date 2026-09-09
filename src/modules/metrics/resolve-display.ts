@@ -1,6 +1,5 @@
 import type { EnhancedStoredData } from '@/modules/session/types';
 import type { LetterMetrics } from '@/modules/typing-test/types';
-import { calculateCurrentAccuracy, calculateWpm, resolveLiveElapsedSeconds } from './calculate';
 import type { LiveTestMetrics, MetricsDisplayModel, MetricsPreference, MetricsView } from './types';
 
 const EMPTY_LIVE: LiveTestMetrics = {
@@ -12,6 +11,9 @@ const EMPTY_LIVE: LiveTestMetrics = {
   timerRemaining: 0,
   timerDuration: 60,
   letterAccuracy: {},
+  wpm: 0,
+  rawWpm: 0,
+  accuracy: 0,
 };
 
 function resolveView(
@@ -96,22 +98,15 @@ export function resolveMetricsDisplay(input: {
   const view = resolveView(session, preference, locked);
   const showingCumulative = resolveShowingCumulative(view, preference, canToggle);
 
-  const liveElapsedSeconds = resolveLiveElapsedSeconds(live);
-
-  const wpm =
-    showingCumulative && session
-      ? session.cumulative.weightedWPM
-      : calculateWpm(live.correctChars, liveElapsedSeconds);
+  const wpm = showingCumulative && session ? session.cumulative.weightedWPM : live.wpm;
 
   const rawWpm =
     showingCumulative && session
       ? (session.cumulative.weightedRawWPM ?? session.cumulative.weightedWPM)
-      : calculateWpm(live.typedChars, liveElapsedSeconds);
+      : live.rawWpm;
 
   const accuracy =
-    showingCumulative && session
-      ? session.cumulative.weightedAccuracy
-      : calculateCurrentAccuracy(live.correctWordCount, live.totalWordCount);
+    showingCumulative && session ? session.cumulative.weightedAccuracy : live.accuracy;
 
   const consistency = showingCumulative
     ? session?.cumulative.weightedConsistency

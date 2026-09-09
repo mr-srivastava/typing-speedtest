@@ -2,16 +2,21 @@ import { describe, expect, it } from 'vitest';
 import { buildTestSession } from './build-test-session';
 import type { TestTiming } from '@/modules/typing-test/config';
 import type { TypingTestFinishedSnapshot } from '@/modules/typing-test/create-typing-test';
+import { buildTypingTestResult, type TypingTestResultInput } from '@/modules/typing-test/result';
+import type { TypingEventLog } from '@/modules/typing-test/event-log';
 
 type AccuracyOverrides = Partial<
-  Omit<TypingTestFinishedSnapshot, 'mode' | 'timerRemaining' | 'timerDuration' | 'elapsedSeconds'>
+  Omit<
+    TypingTestFinishedSnapshot,
+    'mode' | 'timerRemaining' | 'timerDuration' | 'elapsedSeconds' | 'result'
+  >
 >;
 
 function makeSnapshot(
   timing: TestTiming,
   overrides: AccuracyOverrides = {},
 ): TypingTestFinishedSnapshot {
-  return {
+  const snapshot: TypingTestResultInput & { eventLog: TypingEventLog } = {
     correctWordCount: 10,
     totalWordCount: 10,
     correctChars: 50,
@@ -24,6 +29,7 @@ function makeSnapshot(
     ...timing,
     ...overrides,
   };
+  return { ...snapshot, result: buildTypingTestResult(snapshot) };
 }
 
 describe('buildTestSession', () => {

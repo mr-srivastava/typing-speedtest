@@ -3,53 +3,33 @@ import { Card } from '@/shared/ui/card';
 import TestToolbar from '@/features/typing-test/TestToolbar';
 import TestSettingsBar from '@/features/typing-test/TestSettingsBar';
 import TypingSurface from '@/features/typing-test/TypingSurface';
-import type { TestConfig, TestMode } from '@/modules/typing-test/config';
+import type { TestConfig } from '@/modules/typing-test/config';
+import { deriveLiveTypingAnalytics } from '@/modules/typing-test/analytics';
 import { gradients } from '@/shared/lib/theme';
 import { cn } from '@/shared/lib/cn';
+import { useTypingTestActions, useTypingTestState } from './typing-test-react';
 
 interface TestPanelProps {
-  referenceText: string;
-  input: string;
-  onInputChange: (value: string) => void;
-  readOnly: boolean;
-  focusKey?: string;
-  timer: number;
-  timerDuration: number;
-  mode: TestMode;
-  targetWordCount?: number;
   config: TestConfig;
   onConfigChange: (next: TestConfig) => void;
-  started: boolean;
-  finished: boolean;
-  loadError: string | null;
   onRestart: () => void;
-  wpm: number;
-  accuracy: number;
-  correctWords: number;
   className?: string;
 }
 
 const TestPanel: React.FC<TestPanelProps> = ({
-  referenceText,
-  input,
-  onInputChange,
-  readOnly,
-  focusKey,
-  timer,
-  timerDuration,
-  mode,
-  targetWordCount,
   config,
   onConfigChange,
-  started,
-  finished,
-  loadError,
   onRestart,
-  wpm,
-  accuracy,
-  correctWords,
   className = '',
 }) => {
+  const state = useTypingTestState();
+  const analytics = deriveLiveTypingAnalytics(state);
+  const { setInput } = useTypingTestActions();
+  const started = state.phase === 'active' || state.phase === 'finished';
+  const finished = state.phase === 'finished';
+  const timer = state.mode === 'time' ? state.timerRemaining : state.elapsedSeconds;
+  const timerDuration = state.mode === 'time' ? state.timerDuration : state.elapsedSeconds;
+
   return (
     <Card className={cn('relative overflow-hidden w-full', className)}>
       <div
@@ -61,23 +41,23 @@ const TestPanel: React.FC<TestPanelProps> = ({
       <TestToolbar
         timer={timer}
         timerDuration={timerDuration}
-        mode={mode}
-        targetWordCount={targetWordCount}
+        mode={state.mode}
+        targetWordCount={state.mode === 'words' ? config.wordCount : undefined}
         started={started}
         finished={finished}
-        loadError={loadError}
+        loadError={state.loadError}
         onRestart={onRestart}
-        wpm={wpm}
-        accuracy={accuracy}
-        correctWords={correctWords}
+        wpm={analytics.wpm}
+        accuracy={analytics.accuracy}
+        correctWords={state.correctWordCount}
       />
       <TestSettingsBar config={config} onConfigChange={onConfigChange} disabled={started} />
       <TypingSurface
-        referenceText={referenceText}
-        input={input}
-        onInputChange={onInputChange}
-        readOnly={readOnly}
-        focusKey={focusKey}
+        referenceText={state.referenceText}
+        input={state.input}
+        onInputChange={setInput}
+        readOnly={finished || state.phase === 'loading' || state.phase === 'error'}
+        focusKey={state.referenceText}
       />
     </Card>
   );

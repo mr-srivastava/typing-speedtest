@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { deriveLiveTypingAnalytics } from './analytics';
 import { DEFAULT_TEST_CONFIG } from './config';
 import type { TypingTestState } from './create-typing-test';
+import { buildTypingTestResult, type TypingTestResultInput } from './result';
+import type { TypingEventLog } from './event-log';
 
 function timeState(): Extract<TypingTestState, { mode: 'time' }> {
   return {
@@ -38,19 +40,22 @@ describe('deriveLiveTypingAnalytics', () => {
       ...timeState(),
       mode: 'words',
       elapsedSeconds: 10,
-      snapshot: {
-        mode: 'words',
-        elapsedSeconds: 10,
-        correctWordCount: 1,
-        totalWordCount: 1,
-        correctChars: 5,
-        typedChars: 5,
-        letterAccuracy: {},
-        eventLog: [],
-        wpmSeries: [{ second: 1, wpm: 60, rawWpm: 60 }],
-        consistency: 92,
-        burst: 75,
-      },
+      snapshot: (() => {
+        const snapshot: TypingTestResultInput & { eventLog: TypingEventLog } = {
+          mode: 'words',
+          elapsedSeconds: 10,
+          correctWordCount: 1,
+          totalWordCount: 1,
+          correctChars: 5,
+          typedChars: 5,
+          letterAccuracy: {},
+          eventLog: [],
+          wpmSeries: [{ second: 1, wpm: 60, rawWpm: 60 }],
+          consistency: 92,
+          burst: 75,
+        };
+        return { ...snapshot, result: buildTypingTestResult(snapshot) };
+      })(),
     });
 
     expect(analytics.wpm).toBe(6);

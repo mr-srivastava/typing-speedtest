@@ -12,6 +12,7 @@ export type LiveTypingAnalytics = TestTiming & {
   typedChars: number;
   letterAccuracy: Record<string, LetterMetrics>;
   wpm: number;
+  rawWpm: number;
   accuracy: number;
   /** Only populated after event-log analytics have been finalized. */
   consistency?: number;
@@ -36,7 +37,8 @@ export function deriveLiveTypingAnalytics(state: TypingTestState): LiveTypingAna
     correctChars: state.correctChars,
     typedChars: state.typedChars,
     letterAccuracy: state.letterAccuracy,
-    wpm: calculateWpm(state.correctChars, seconds),
+    wpm: state.snapshot?.result.wpm ?? calculateWpm(state.correctChars, seconds),
+    rawWpm: state.snapshot?.result.rawWpm ?? calculateWpm(state.typedChars, seconds),
     accuracy: calculateCurrentAccuracy(state.correctWordCount, state.totalWordCount),
     consistency: state.snapshot?.consistency,
     wpmSeries: state.snapshot?.wpmSeries,

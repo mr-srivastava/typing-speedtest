@@ -3,6 +3,7 @@ import { assign, fromPromise, setup } from 'xstate';
 import type { TestConfig, TestTiming } from './config';
 import { diffInputToEvents, type TypingEventLog } from './event-log';
 import { deriveBurst, deriveConsistency, deriveWpmSeries, type WpmSeriesPoint } from './replay';
+import { buildTypingTestResult, type TypingTestResult, type TypingTestResultInput } from './result';
 import { countWordAccuracy, isTestComplete, recordLetterAccuracy } from './typing-engine';
 import type { LetterMetrics } from './types';
 
@@ -18,6 +19,7 @@ export type TypingTestFinishedSnapshot = {
     wpmSeries: WpmSeriesPoint[];
     consistency: number;
     burst: number;
+    result: TypingTestResult;
   };
 
 export type TypingTestEvent =
@@ -88,7 +90,7 @@ function buildSnapshot(context: TypingTestContext): TypingTestFinishedSnapshot {
         }
       : { mode: 'words', elapsedSeconds: context.elapsedSeconds };
 
-  return {
+  const snapshot: TypingTestResultInput & { eventLog: TypingEventLog } = {
     correctWordCount: context.correctWordCount,
     totalWordCount: context.totalWordCount,
     correctChars: context.correctChars,
@@ -100,6 +102,8 @@ function buildSnapshot(context: TypingTestContext): TypingTestFinishedSnapshot {
     consistency: deriveConsistency(wpmSeries),
     burst: deriveBurst(context.eventLog),
   };
+
+  return { ...snapshot, result: buildTypingTestResult(snapshot) };
 }
 
 /** Checks whether input or time has ended the test. */

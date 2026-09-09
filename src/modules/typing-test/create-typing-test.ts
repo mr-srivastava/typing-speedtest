@@ -22,6 +22,8 @@ export type TypingTestState = DistributiveOmit<TypingTestContext, 'getReferenceT
 
 export interface TypingTest {
   getState(): TypingTestState;
+  /** Notifies whenever the SDK state changes. */
+  subscribe(listener: () => void): () => void;
   dispatch(event: TypingTestEvent): void;
   /** Runs after reference text loads. */
   onReady(listener: () => void): () => void;
@@ -37,9 +39,14 @@ export function createTypingTest(config: {
   });
 
   const readyListeners = new Set<() => void>();
+  const stateListeners = new Set<() => void>();
   let prevValue = actor.getSnapshot().value;
+  let state = toState(actor.getSnapshot());
 
   actor.subscribe((snapshot) => {
+    state = toState(snapshot);
+    stateListeners.forEach((listener) => listener());
+
     if (prevValue !== 'idle' && snapshot.value === 'idle') {
       readyListeners.forEach((listener) => listener());
     }
@@ -48,8 +55,7 @@ export function createTypingTest(config: {
 
   actor.start();
 
-  function getState(): TypingTestState {
-    const snapshot = actor.getSnapshot();
+  function toState(snapshot: ReturnType<typeof actor.getSnapshot>): TypingTestState {
     // The loader stays inside the machine.
     const { getReferenceText: _getReferenceText, ...rest } = snapshot.context;
     return {
@@ -59,7 +65,11 @@ export function createTypingTest(config: {
   }
 
   return {
-    getState,
+    getState: () => state,
+    subscribe: (listener) => {
+      stateListeners.add(listener);
+      return () => stateListeners.delete(listener);
+    },
     dispatch: (event) => actor.send(event),
     onReady: (listener) => {
       readyListeners.add(listener);

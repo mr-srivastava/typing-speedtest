@@ -16,8 +16,8 @@ export {
   getElapsedSecondsForWpm,
 } from './scoring';
 export type { LetterMetrics } from './types';
-export { useTypingTest } from './use-typing-test';
-export type { UseTypingTestOptions } from './use-typing-test';
+export { buildTypingTestResult } from './result';
+export type { TypingTestResult, TypingTestResultInput } from './result';
 export { default as getReferenceText } from './text-provider';
 export type { TestMode, TestConfig, TestTiming } from './config';
 export { TIME_PRESETS, WORD_COUNT_PRESETS, DEFAULT_TEST_CONFIG } from './config';

@@ -28,6 +28,21 @@ describe('createTypingTest', () => {
     expect(state.letterAccuracy.h).toEqual({ correct: 1, total: 1 });
   });
 
+  it('notifies subscribers with a stable current state after each transition', async () => {
+    const test = await createTest();
+    let notifications = 0;
+    const unsubscribe = test.subscribe(() => notifications++);
+
+    const beforeInput = test.getState();
+    expect(test.getState()).toBe(beforeInput);
+
+    test.dispatch({ type: 'input', value: 'h' });
+
+    expect(notifications).toBeGreaterThan(0);
+    expect(test.getState().phase).toBe('active');
+    unsubscribe();
+  });
+
   it('finishes with a snapshot when input is complete', async () => {
     const test = await createTest();
     test.dispatch({ type: 'input', value: SAMPLE });
@@ -48,6 +63,14 @@ describe('createTypingTest', () => {
     expect(state.snapshot?.wpmSeries.length).toBeGreaterThan(0);
     expect(typeof state.snapshot?.consistency).toBe('number');
     expect(typeof state.snapshot?.burst).toBe('number');
+    expect(state.snapshot?.result).toMatchObject({
+      wpm: 132,
+      rawWpm: 132,
+      accuracy: 100,
+      testDuration: 1,
+      wordsTyped: 2,
+      correctWords: 2,
+    });
   });
 
   it('resets all state on restart', async () => {
