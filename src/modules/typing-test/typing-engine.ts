@@ -1,10 +1,4 @@
-/**
- * Pure typing-test domain logic. No React imports.
- *
- * Letter accuracy: only [a-z] keys are tracked. Backspace does not
- * decrement counts — only the last character of a growing/changed input
- * is recorded when evaluateInput runs (same behavior as before).
- */
+/** Letter accuracy only tracks [a-z] keys; backspace does not decrement counts. */
 
 import type { LetterMetrics } from '@/modules/session';
 
@@ -26,12 +20,7 @@ interface AccuracyCounts {
   typedChars: number;
 }
 
-/**
- * What `buildFinishedSnapshot` alone can determine: accuracy counts and letter accuracy.
- * This module is mode-agnostic — it has no notion of a countdown vs. count-up timer, so it
- * doesn't carry one. `create-typing-test.ts` merges this with `TestTiming` (its own
- * mode-aware timing) and the event-sourced stats into the full `TypingTestFinishedSnapshot`.
- */
+/** Accuracy counts and letter accuracy; mode-agnostic, so it carries no timer. */
 export interface AccuracySnapshot extends AccuracyCounts {
   letterAccuracy: Record<string, LetterMetrics>;
 }
@@ -66,11 +55,7 @@ export function isTestComplete(referenceText: string, input: string): boolean {
   return input.length === referenceText.length;
 }
 
-/**
- * Per-character correctness against the reference text, position by position.
- * `typedChars` is every character typed so far (raw); `correctChars` is the
- * subset that matches the reference at that position (correct).
- */
+/** Per-character correctness against the reference text, position by position. */
 export function countCharAccuracy(referenceText: string, input: string): CharAccuracy {
   let correctChars = 0;
   for (let i = 0; i < input.length; i++) {

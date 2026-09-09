@@ -12,11 +12,7 @@ function weightedAverage(
   return (current * currentWeight + next * nextWeight) / totalWeight;
 }
 
-/**
- * Weighted average for a metric that's optional on `TestSession` (added after older tests were
- * recorded). Carries `current` forward untouched when `next` is absent, instead of fabricating a
- * value for a test that never tracked this stat.
- */
+/** Like `weightedAverage`, but keeps `current` untouched if `next` is missing (older tests lack this stat). */
 function weightedAverageOptional(
   current: number | undefined,
   currentWeight: number,

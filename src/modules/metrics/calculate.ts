@@ -15,21 +15,13 @@ export function getElapsedSecondsForWpm(timerDuration: number, timerRemaining: n
   return elapsed > 0 ? elapsed : 1;
 }
 
-/**
- * Standard typing-test WPM: 5 characters = 1 "word", regardless of whether
- * typed word boundaries line up with the reference text.
- */
+/** Standard typing WPM: 5 characters = 1 word, ignoring actual word boundaries. */
 export function calculateWpm(charCount: number, elapsedSeconds: number): number {
   if (elapsedSeconds <= 0) return 0;
   return Math.round(charCount / 5 / (elapsedSeconds / 60));
 }
 
-/**
- * Elapsed seconds for a live (in-progress or just-finished) WPM calculation, mode-aware:
- * time mode counts down (`timerDuration - timerRemaining`), word mode counts up with no
- * ceiling, so its own `elapsedSeconds` is the value directly. Both are floored at 1s to
- * avoid a huge WPM spike in the first instant of a test.
- */
+/** Mode-aware elapsed seconds for live WPM: time mode counts down, word mode counts up. */
 export function resolveLiveElapsedSeconds(timing: TestTiming): number {
   return timing.mode === 'time'
     ? getElapsedSecondsForWpm(timing.timerDuration, timing.timerRemaining)

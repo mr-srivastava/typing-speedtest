@@ -11,10 +11,7 @@ import {
   type AccuracySnapshot,
 } from './typing-engine';
 
-/**
- * Full result of a finished test: `buildFinishedSnapshot`'s accuracy counts, this test's
- * `TestTiming`, and the event-sourced stats derived by replaying the event log.
- */
+/** Full result of a finished test: accuracy counts, final `TestTiming`, and event-sourced stats. */
 export type TypingTestFinishedSnapshot = AccuracySnapshot &
   TestTiming & {
     eventLog: TypingEventLog;
@@ -29,10 +26,9 @@ export type TypingTestEvent =
   | { type: 'reconfigure'; config: TestConfig }
   | { type: 'tick' };
 
-/** Machine context — same shape as the old hand-rolled state, minus `phase` (now the state value). */
 export type TypingTestContext = TestTiming & {
   config: TestConfig;
-  /** Held in context (not just input) so it survives the `loading` state being re-entered on restart/reconfigure. */
+  /** Kept in context so it survives the `loading` state being re-entered on restart/reconfigure. */
   getReferenceText: (config: TestConfig) => Promise<string>;
   referenceText: string;
   input: string;
@@ -78,12 +74,7 @@ function createLoadingContext(
   };
 }
 
-/**
- * Builds the finish snapshot straight from context: `correctWordCount`/`totalWordCount`/
- * `correctChars`/`typedChars`/`letterAccuracy` are already accurate and up to date — they're
- * maintained incrementally by `applyInput` on every keystroke, so there's nothing left to
- * recompute here.
- */
+/** Builds the finish snapshot straight from context — the counts are already accurate, kept incremental by `applyInput`. */
 function buildSnapshot(context: TypingTestContext): TypingTestFinishedSnapshot {
   const wpmSeries = deriveWpmSeries(context.eventLog);
   const timing: TestTiming =

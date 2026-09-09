@@ -19,8 +19,7 @@ export interface UseTypingTestOptions {
   getReferenceText?: (config: TestConfig) => Promise<string>;
 }
 
-/** Pulls the real discriminated `TestTiming` out of `state` — the mode-safe source consumers
- *  that need to branch on it (WPM calc, the results modal) should read from directly. */
+/** Pulls the discriminated `TestTiming` out of `state` for consumers that need to branch on mode. */
 function extractTiming(state: TypingTestState): TestTiming {
   return state.mode === 'time'
     ? { mode: 'time', timerRemaining: state.timerRemaining, timerDuration: state.timerDuration }

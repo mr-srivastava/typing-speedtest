@@ -34,10 +34,7 @@ function capitalize(word: string): string {
   return word.length === 0 ? word : word[0].toUpperCase() + word.slice(1);
 }
 
-/**
- * Capitalizes the first word and words that follow sentence-ending punctuation,
- * and appends comma/sentence-ending punctuation at intervals.
- */
+/** Capitalizes sentence starts and sprinkles in comma/sentence-ending punctuation. */
 export function applyPunctuation(words: string[]): string[] {
   if (words.length === 0) {
     return words;

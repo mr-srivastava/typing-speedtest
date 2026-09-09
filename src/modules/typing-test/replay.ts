@@ -13,13 +13,7 @@ function isCharEvent(event: TypingLogEvent): event is CharEvent {
   return event.type === 'char';
 }
 
-/**
- * Per-second instantaneous WPM/raw-WPM, derived by replaying the event log and
- * bucketing char/backspace deltas into 1-second windows since the first event.
- * Each event already carries the correctness of the char it adds or removes
- * (computed once, in `diffInputToEvents`), so a backspace nets out its
- * `wasCorrect` char directly — no need to reconstruct which char is "on top".
- */
+/** Per-second instantaneous WPM/raw-WPM, derived by bucketing char/backspace deltas into 1s windows. */
 export function deriveWpmSeries(log: TypingEventLog): WpmSeriesPoint[] {
   if (log.length === 0) {
     return [];

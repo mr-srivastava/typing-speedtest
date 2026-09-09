@@ -1,12 +1,4 @@
-/**
- * Timestamped keystroke log, derived by diffing consecutive `input` values.
- *
- * This app drives typing through a controlled `<textarea onChange>`, not raw
- * keydown/keyup listeners, so "diff prevInput -> nextInput" is the natural
- * equivalent of Monkeytype's literal keystroke capture — it needs no new DOM
- * event wiring and stays purely a function of state already flowing through
- * the engine.
- */
+/** Timestamped keystroke log, derived by diffing consecutive `input` values instead of raw key events. */
 
 export type TypingLogEvent =
   | { type: 'char'; t: number; char: string; expected: string; correct: boolean }
@@ -14,16 +6,7 @@ export type TypingLogEvent =
 
 export type TypingEventLog = TypingLogEvent[];
 
-/**
- * Diffs `prevInput` -> `nextInput` into 0+ timestamped events, all stamped `t`.
- * Handles the common single-char append/remove path, and multi-char deltas
- * (paste, IME commit) by emitting one event per changed character.
- *
- * Each event carries the correctness of the character it adds or removes
- * (checked against `referenceText` at that position) — the single place this
- * fact is computed. Callers (live counters, replay-derived stats) both read
- * it off the event rather than re-deriving character correctness themselves.
- */
+/** Diffs `prevInput` -> `nextInput` into 0+ timestamped events, handling multi-char deltas like paste or IME commit. */
 export function diffInputToEvents(
   prevInput: string,
   nextInput: string,
