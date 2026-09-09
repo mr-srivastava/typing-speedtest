@@ -1,14 +1,21 @@
 'use client';
-import React, { useCallback, useMemo, useState, startTransition } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState, startTransition } from 'react';
 import dynamic from 'next/dynamic';
 import TestPanel from '@/features/typing-test/TestPanel';
 import { AppShell } from '@/shared/layout/AppShell';
-import { useTypingTest, type TypingTestFinishedSnapshot } from '@/modules/typing-test';
+import {
+  DEFAULT_TEST_CONFIG,
+  useTypingTest,
+  type TestConfig,
+  type TestTiming,
+  type TypingTestFinishedSnapshot,
+} from '@/modules/typing-test';
 import { useSession } from '@/modules/session';
 import {
   buildTestSession,
   calculateCurrentAccuracy,
-  calculateLiveWpm,
+  calculateWpm,
+  resolveLiveElapsedSeconds,
   type LiveTestMetrics,
 } from '@/modules/metrics';
 import { layoutClasses } from '@/shared/layout/layout-utils';
@@ -27,23 +34,57 @@ interface TestScreenProps {
 const TestScreen: React.FC<TestScreenProps> = ({ defaultTimer = 60, className = '' }) => {
   const { recordTest, data } = useSession();
   const [isMetricsModalOpen, setIsMetricsModalOpen] = useState(false);
+  const [config, setConfig] = useState<TestConfig>(() => ({
+    ...DEFAULT_TEST_CONFIG,
+    timeSeconds: defaultTimer,
+  }));
 
   const handleFinished = useCallback(
     (snapshot: TypingTestFinishedSnapshot) => {
       startTransition(() => setIsMetricsModalOpen(true));
-      recordTest(buildTestSession(snapshot, defaultTimer));
+      recordTest(buildTestSession(snapshot));
     },
-    [defaultTimer, recordTest],
+    [recordTest],
   );
 
-  const { content, status, timer, metrics, actions } = useTypingTest(defaultTimer, {
+  const { content, status, mode, timer, metrics, snapshot, actions } = useTypingTest(config, {
     onFinished: handleFinished,
   });
+
+  const isFirstConfigRender = useRef(true);
+  useEffect(() => {
+    if (isFirstConfigRender.current) {
+      isFirstConfigRender.current = false;
+      return;
+    }
+    actions.reconfigure(config);
+  }, [config, actions]);
 
   const handleRestart = useCallback(() => {
     actions.restart();
     setIsMetricsModalOpen(false);
   }, [actions]);
+
+  // Word mode counts elapsed seconds up with no countdown, so the toolbar clock needs a
+  // mode-aware source instead of timer.remaining.
+  const displayTimer = mode === 'time' ? timer.remaining : timer.elapsedSeconds;
+  const displayTimerDuration = mode === 'time' ? timer.duration : timer.elapsedSeconds;
+  const targetWordCount = mode === 'words' ? config.wordCount : undefined;
+
+  // The hook exposes a flattened timer shape for UI ergonomics; rebuild the discriminated
+  // TestTiming once here for anything that needs mode-safe access (WPM calc, the modal).
+  const currentTiming: TestTiming = useMemo(
+    () =>
+      mode === 'time'
+        ? { mode: 'time', timerRemaining: timer.remaining, timerDuration: timer.duration }
+        : { mode: 'words', elapsedSeconds: timer.elapsedSeconds },
+    [mode, timer.remaining, timer.duration, timer.elapsedSeconds],
+  );
+
+  const liveElapsedSeconds = useMemo(
+    () => resolveLiveElapsedSeconds(currentTiming),
+    [currentTiming],
+  );
 
   const liveMetrics: LiveTestMetrics = useMemo(
     () => ({
@@ -51,24 +92,26 @@ const TestScreen: React.FC<TestScreenProps> = ({ defaultTimer = 60, className = 
       totalWordCount: metrics.totalWordCount,
       correctChars: metrics.correctChars,
       typedChars: metrics.typedChars,
-      timerRemaining: timer.remaining,
-      timerDuration: timer.duration,
+      ...currentTiming,
       letterAccuracy: metrics.letterAccuracy,
+      // Event-sourced stats only exist once the test has finished.
+      consistency: snapshot?.consistency,
+      wpmSeries: snapshot?.wpmSeries,
     }),
     [
+      currentTiming,
       metrics.correctWordCount,
       metrics.totalWordCount,
       metrics.correctChars,
       metrics.typedChars,
       metrics.letterAccuracy,
-      timer.remaining,
-      timer.duration,
+      snapshot,
     ],
   );
 
   const liveWpm = useMemo(
-    () => calculateLiveWpm(metrics.correctChars, timer.duration, timer.remaining),
-    [metrics.correctChars, timer.duration, timer.remaining],
+    () => calculateWpm(metrics.correctChars, liveElapsedSeconds),
+    [metrics.correctChars, liveElapsedSeconds],
   );
   const liveAccuracy = useMemo(
     () => calculateCurrentAccuracy(metrics.correctWordCount, metrics.totalWordCount),
@@ -88,10 +131,14 @@ const TestScreen: React.FC<TestScreenProps> = ({ defaultTimer = 60, className = 
             referenceText={content.text}
             input={content.input}
             onInputChange={actions.setInput}
-            readOnly={status.finished}
+            readOnly={status.finished || status.loading}
             focusKey={content.text}
-            timer={timer.remaining}
-            timerDuration={timer.duration}
+            timer={displayTimer}
+            timerDuration={displayTimerDuration}
+            mode={mode}
+            targetWordCount={targetWordCount}
+            config={config}
+            onConfigChange={setConfig}
             started={status.started}
             finished={status.finished}
             onRestart={handleRestart}

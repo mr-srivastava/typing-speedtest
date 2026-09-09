@@ -12,6 +12,21 @@ function weightedAverage(
   return (current * currentWeight + next * nextWeight) / totalWeight;
 }
 
+/**
+ * Weighted average for a metric that's optional on `TestSession` (added after older tests were
+ * recorded). Carries `current` forward untouched when `next` is absent, instead of fabricating a
+ * value for a test that never tracked this stat.
+ */
+function weightedAverageOptional(
+  current: number | undefined,
+  currentWeight: number,
+  next: number | undefined,
+  nextWeight: number,
+): number | undefined {
+  if (next === undefined) return current;
+  return weightedAverage(current ?? next, currentWeight, next, nextWeight);
+}
+
 export function createInitialCumulativeStats(newTest: TestSession): CumulativeStats {
   return {
     totalTests: 1,
@@ -21,6 +36,8 @@ export function createInitialCumulativeStats(newTest: TestSession): CumulativeSt
     weightedWPM: newTest.wpm,
     weightedRawWPM: newTest.rawWpm,
     weightedAccuracy: newTest.accuracy,
+    weightedConsistency: newTest.consistency,
+    weightedBurst: newTest.burst,
     letterStats: { ...newTest.letterAccuracy },
     firstTestDate: newTest.testDate,
     lastTestDate: newTest.testDate,
@@ -57,6 +74,20 @@ export function updateCumulativeStats(
     newTest.wordsTyped,
   );
 
+  const weightedConsistency = weightedAverageOptional(
+    current.weightedConsistency,
+    current.totalTimeSpent,
+    newTest.consistency,
+    newTest.testDuration,
+  );
+
+  const weightedBurst = weightedAverageOptional(
+    current.weightedBurst,
+    current.totalTimeSpent,
+    newTest.burst,
+    newTest.testDuration,
+  );
+
   const updatedLetterStats = { ...current.letterStats };
 
   Object.entries(newTest.letterAccuracy).forEach(([letter, metrics]) => {
@@ -76,6 +107,9 @@ export function updateCumulativeStats(
     weightedWPM: Math.round(weightedWPM),
     weightedRawWPM: Math.round(weightedRawWPM),
     weightedAccuracy: Math.round(weightedAccuracy),
+    weightedConsistency:
+      weightedConsistency !== undefined ? Math.round(weightedConsistency) : undefined,
+    weightedBurst: weightedBurst !== undefined ? Math.round(weightedBurst) : undefined,
     letterStats: updatedLetterStats,
     firstTestDate: current.firstTestDate || newTest.testDate,
     lastTestDate: newTest.testDate,

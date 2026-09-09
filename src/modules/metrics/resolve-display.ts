@@ -1,5 +1,5 @@
 import type { EnhancedStoredData, LetterMetrics } from '@/modules/session/types';
-import { calculateCurrentAccuracy, calculateLiveWpm, calculateRawWpm } from './calculate';
+import { calculateCurrentAccuracy, calculateWpm, resolveLiveElapsedSeconds } from './calculate';
 import type { LiveTestMetrics, MetricsDisplayModel, MetricsPreference, MetricsView } from './types';
 
 const EMPTY_LIVE: LiveTestMetrics = {
@@ -7,6 +7,7 @@ const EMPTY_LIVE: LiveTestMetrics = {
   totalWordCount: 0,
   correctChars: 0,
   typedChars: 0,
+  mode: 'time',
   timerRemaining: 0,
   timerDuration: 60,
   letterAccuracy: {},
@@ -94,20 +95,26 @@ export function resolveMetricsDisplay(input: {
   const view = resolveView(session, preference, locked);
   const showingCumulative = resolveShowingCumulative(view, preference, canToggle);
 
+  const liveElapsedSeconds = resolveLiveElapsedSeconds(live);
+
   const wpm =
     showingCumulative && session
       ? session.cumulative.weightedWPM
-      : calculateLiveWpm(live.correctChars, live.timerDuration, live.timerRemaining);
+      : calculateWpm(live.correctChars, liveElapsedSeconds);
 
   const rawWpm =
     showingCumulative && session
       ? (session.cumulative.weightedRawWPM ?? session.cumulative.weightedWPM)
-      : calculateRawWpm(live.typedChars, live.timerDuration, live.timerRemaining);
+      : calculateWpm(live.typedChars, liveElapsedSeconds);
 
   const accuracy =
     showingCumulative && session
       ? session.cumulative.weightedAccuracy
       : calculateCurrentAccuracy(live.correctWordCount, live.totalWordCount);
+
+  const consistency = showingCumulative
+    ? session?.cumulative.weightedConsistency
+    : live.consistency;
 
   return {
     wpm,
@@ -119,5 +126,8 @@ export function resolveMetricsDisplay(input: {
     canToggle: view.scope === 'toggle',
     showingCumulative,
     totalTests: session?.cumulative.totalTests ?? 0,
+    consistency,
+    // A WPM-over-time history only makes sense for one finished test, not an aggregate.
+    wpmSeries: showingCumulative ? undefined : live.wpmSeries,
   };
 }

@@ -1,20 +1,22 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { TestConfig } from './config';
 import {
   createTypingTest,
+  type TypingTestEvent,
   type TypingTestFinishedSnapshot,
   type TypingTestPhase,
   type TypingTestState,
 } from './create-typing-test';
-import getText from './text-provider';
+import getReferenceText from './text-provider';
 
 export type { TypingTestFinishedSnapshot };
 export type { TypingTestPhase } from './create-typing-test';
 
 export interface UseTypingTestOptions {
   onFinished?: (snapshot: TypingTestFinishedSnapshot) => void;
-  getText?: () => string;
+  getReferenceText?: (config: TestConfig) => Promise<string>;
 }
 
 function toHookReturn(state: TypingTestState) {
@@ -22,10 +24,18 @@ function toHookReturn(state: TypingTestState) {
     content: { text: state.referenceText, input: state.input },
     status: {
       phase: state.phase,
+      loading: state.phase === 'loading',
       started: state.phase === 'active' || state.phase === 'finished',
       finished: state.phase === 'finished',
     },
-    timer: { remaining: state.timerRemaining, duration: state.duration },
+    mode: state.mode,
+    // Flattened for UI ergonomics: the inactive mode's field(s) read as 0, matching the
+    // discriminated `TestTiming`'s absence of that field for the current mode.
+    timer: {
+      remaining: state.mode === 'time' ? state.timerRemaining : 0,
+      duration: state.mode === 'time' ? state.timerDuration : 0,
+      elapsedSeconds: state.mode === 'words' ? state.elapsedSeconds : 0,
+    },
     metrics: {
       correctWordCount: state.correctWordCount,
       totalWordCount: state.totalWordCount,
@@ -33,11 +43,13 @@ function toHookReturn(state: TypingTestState) {
       typedChars: state.typedChars,
       letterAccuracy: state.letterAccuracy,
     },
+    /** Event-sourced stats (wpmSeries/consistency/burst) — populated once the test finishes. */
+    snapshot: state.snapshot,
   };
 }
 
-export function useTypingTest(defaultTimer: number, options: UseTypingTestOptions = {}) {
-  const { onFinished, getText: getTextOption } = options;
+export function useTypingTest(testConfig: TestConfig, options: UseTypingTestOptions = {}) {
+  const { onFinished, getReferenceText: getReferenceTextOption } = options;
   const onFinishedRef = useRef(onFinished);
 
   useEffect(() => {
@@ -46,8 +58,8 @@ export function useTypingTest(defaultTimer: number, options: UseTypingTestOption
 
   const [engine] = useState(() =>
     createTypingTest({
-      duration: defaultTimer,
-      getText: getTextOption ?? getText,
+      testConfig,
+      getReferenceText: getReferenceTextOption ?? getReferenceText,
     }),
   );
 
@@ -72,38 +84,54 @@ export function useTypingTest(defaultTimer: number, options: UseTypingTestOption
     [engine],
   );
 
-  useEffect(() => {
-    if (state.phase !== 'active') {
-      return;
-    }
-
-    const intervalId = setInterval(() => {
+  const dispatchAndSync = useCallback(
+    (event: TypingTestEvent) => {
       const prevPhase = engine.getState().phase;
-      engine.dispatch({ type: 'tick' });
-      sync(prevPhase);
-    }, 1000);
-
-    return () => clearInterval(intervalId);
-  }, [state.phase, engine, sync]);
-
-  const setInput = useCallback(
-    (value: string) => {
-      const prevPhase = engine.getState().phase;
-      engine.dispatch({ type: 'input', value });
+      engine.dispatch(event);
       sync(prevPhase);
     },
     [engine, sync],
   );
 
-  const restart = useCallback(() => {
-    engine.dispatch({ type: 'restart' });
-    sync();
+  useEffect(() => {
+    const unsubscribe = engine.onReady(() => sync());
+    sync(); // catch up in case the reference text resolved before this effect ran
+    return unsubscribe;
   }, [engine, sync]);
+
+  useEffect(() => {
+    if (state.phase !== 'active') {
+      return;
+    }
+
+    const intervalId = setInterval(() => dispatchAndSync({ type: 'tick' }), 1000);
+
+    return () => clearInterval(intervalId);
+  }, [state.phase, dispatchAndSync]);
+
+  const setInput = useCallback(
+    (value: string) => dispatchAndSync({ type: 'input', value }),
+    [dispatchAndSync],
+  );
+
+  const restart = useCallback(() => dispatchAndSync({ type: 'restart' }), [dispatchAndSync]);
+
+  const reconfigure = useCallback(
+    (nextConfig: TestConfig) => dispatchAndSync({ type: 'reconfigure', config: nextConfig }),
+    [dispatchAndSync],
+  );
 
   const view = toHookReturn(state);
 
+  // Stable reference so consumers can depend on the whole `actions` object (e.g. in a
+  // useEffect) without it changing identity every render.
+  const actions = useMemo(
+    () => ({ restart, setInput, reconfigure }),
+    [restart, setInput, reconfigure],
+  );
+
   return {
     ...view,
-    actions: { restart, setInput },
+    actions,
   };
 }

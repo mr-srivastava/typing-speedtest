@@ -1,7 +1,9 @@
 import React from 'react';
 import { Card } from '@/shared/ui/card';
 import TestToolbar from '@/features/typing-test/TestToolbar';
+import TestSettingsBar from '@/features/typing-test/TestSettingsBar';
 import TypingSurface from '@/features/typing-test/TypingSurface';
+import type { TestConfig, TestMode } from '@/modules/typing-test';
 import { gradients } from '@/shared/lib/theme';
 import { cn } from '@/shared/lib/cn';
 
@@ -13,6 +15,10 @@ interface TestPanelProps {
   focusKey?: string;
   timer: number;
   timerDuration: number;
+  mode: TestMode;
+  targetWordCount?: number;
+  config: TestConfig;
+  onConfigChange: (next: TestConfig) => void;
   started: boolean;
   finished: boolean;
   onRestart: () => void;
@@ -30,6 +36,10 @@ const TestPanel: React.FC<TestPanelProps> = ({
   focusKey,
   timer,
   timerDuration,
+  mode,
+  targetWordCount,
+  config,
+  onConfigChange,
   started,
   finished,
   onRestart,
@@ -49,6 +59,8 @@ const TestPanel: React.FC<TestPanelProps> = ({
       <TestToolbar
         timer={timer}
         timerDuration={timerDuration}
+        mode={mode}
+        targetWordCount={targetWordCount}
         started={started}
         finished={finished}
         onRestart={onRestart}
@@ -56,6 +68,7 @@ const TestPanel: React.FC<TestPanelProps> = ({
         accuracy={accuracy}
         correctWords={correctWords}
       />
+      <TestSettingsBar config={config} onConfigChange={onConfigChange} disabled={started} />
       <TypingSurface
         referenceText={referenceText}
         input={input}

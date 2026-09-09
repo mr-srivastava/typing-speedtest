@@ -12,6 +12,9 @@ const live: LiveTestMetrics = {
   timerRemaining: 20,
   timerDuration: 60,
   letterAccuracy: { a: { correct: 5, total: 6 } },
+  mode: 'time',
+  consistency: 88,
+  wpmSeries: [{ second: 1, wpm: 45, rawWpm: 48 }],
 };
 
 function makeSession(totalTests: number): EnhancedStoredData {
@@ -34,6 +37,7 @@ function makeSession(totalTests: number): EnhancedStoredData {
       weightedWPM: 55,
       weightedRawWPM: 60,
       weightedAccuracy: 92,
+      weightedConsistency: 75,
       letterStats: { a: { correct: 20, total: 22 }, b: { correct: 5, total: 5 } },
       firstTestDate: '2026-01-01T00:00:00.000Z',
       lastTestDate: '2026-01-02T00:00:00.000Z',
@@ -55,6 +59,8 @@ describe('resolveMetricsDisplay', () => {
     expect(model.accuracy).toBe(94);
     expect(model.letterAccuracy).toEqual(live.letterAccuracy);
     expect(model.statsTitle).toBeNull();
+    expect(model.consistency).toBe(88);
+    expect(model.wpmSeries).toEqual([{ second: 1, wpm: 45, rawWpm: 48 }]);
   });
 
   it('returns live without toggle when session has 1 test', () => {
@@ -101,6 +107,10 @@ describe('resolveMetricsDisplay', () => {
       b: { correct: 5, total: 5 },
     });
     expect(model.statsTitle).toBe('3 tests • 2 minutes total');
+    // cumulative view: consistency comes from the weighted average, but there's no sensible
+    // per-second history to chart across multiple tests
+    expect(model.consistency).toBe(75);
+    expect(model.wpmSeries).toBeUndefined();
   });
 
   it('locks to cumulative-only when locked is true', () => {

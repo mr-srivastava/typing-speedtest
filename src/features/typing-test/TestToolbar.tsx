@@ -2,12 +2,16 @@ import React from 'react';
 import { ResetIcon } from '@radix-ui/react-icons';
 import TimerDisplay from '@/shared/ui/TimerDisplay';
 import { Button } from '@/shared/ui/button';
+import type { TestMode } from '@/modules/typing-test';
 import { layoutClasses } from '@/shared/layout/layout-utils';
 import { cn } from '@/shared/lib/cn';
 
 interface TestToolbarProps {
   timer: number;
   timerDuration: number;
+  mode: TestMode;
+  /** Word-mode target word count, shown as "correct/target" instead of a bare count. */
+  targetWordCount?: number;
   started: boolean;
   finished: boolean;
   onRestart: () => void;
@@ -20,6 +24,8 @@ interface TestToolbarProps {
 const TestToolbar: React.FC<TestToolbarProps> = ({
   timer,
   timerDuration,
+  mode,
+  targetWordCount,
   started,
   finished,
   onRestart,
@@ -66,7 +72,9 @@ const TestToolbar: React.FC<TestToolbarProps> = ({
             </span>
             <span className="text-muted-foreground hidden sm:inline">•</span>
             <span className="tabular-nums">
-              <span className="font-semibold">{correctWords}</span>
+              <span className="font-semibold">
+                {targetWordCount ? `${correctWords}/${targetWordCount}` : correctWords}
+              </span>
               <span className="text-muted-foreground ml-1">words</span>
             </span>
           </>
@@ -77,7 +85,7 @@ const TestToolbar: React.FC<TestToolbarProps> = ({
         )}
       </div>
 
-      <TimerDisplay timer={timer} timerDuration={timerDuration} className="shrink-0" />
+      <TimerDisplay timer={timer} timerDuration={timerDuration} mode={mode} className="shrink-0" />
     </div>
   );
 };

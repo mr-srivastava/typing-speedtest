@@ -26,8 +26,13 @@ interface AccuracyCounts {
   typedChars: number;
 }
 
-export interface TypingTestFinishedSnapshot extends AccuracyCounts {
-  timer: number;
+/**
+ * What `buildFinishedSnapshot` alone can determine: accuracy counts and letter accuracy.
+ * This module is mode-agnostic — it has no notion of a countdown vs. count-up timer, so it
+ * doesn't carry one. `create-typing-test.ts` merges this with `TestTiming` (its own
+ * mode-aware timing) and the event-sourced stats into the full `TypingTestFinishedSnapshot`.
+ */
+export interface AccuracySnapshot extends AccuracyCounts {
   letterAccuracy: Record<string, LetterMetrics>;
 }
 
@@ -133,12 +138,10 @@ export function evaluateInput(
 export function buildFinishedSnapshot(
   referenceText: string,
   input: string,
-  timerRemaining: number,
   letterAccuracy: Record<string, LetterMetrics>,
-): TypingTestFinishedSnapshot {
+): AccuracySnapshot {
   return {
     ...countAccuracy(referenceText, input),
-    timer: timerRemaining,
     letterAccuracy,
   };
 }

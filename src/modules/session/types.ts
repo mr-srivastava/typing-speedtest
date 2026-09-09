@@ -1,3 +1,6 @@
+import type { TestMode } from '@/modules/typing-test/config';
+import type { WpmSeriesPoint } from '@/modules/typing-test/replay';
+
 export interface LetterMetrics {
   correct: number;
   total: number;
@@ -11,6 +14,8 @@ export interface CumulativeStats {
   weightedWPM: number;
   weightedRawWPM?: number; // optional: absent in data recorded before raw WPM tracking
   weightedAccuracy: number;
+  weightedConsistency?: number; // optional: absent in data recorded before event-log tracking
+  weightedBurst?: number; // optional: absent in data recorded before event-log tracking
   letterStats: Record<string, LetterMetrics>; // aggregated across all tests
   firstTestDate: string;
   lastTestDate: string;
@@ -25,6 +30,10 @@ export interface TestSession {
   wordsTyped: number;
   correctWords: number;
   letterAccuracy: Record<string, LetterMetrics>;
+  mode?: TestMode; // optional: absent in data recorded before mode/customization support
+  consistency?: number; // optional: absent in data recorded before event-log tracking
+  burst?: number; // optional: absent in data recorded before event-log tracking
+  wpmSeries?: WpmSeriesPoint[]; // optional: absent in data recorded before event-log tracking
 }
 
 export interface EnhancedStoredData {

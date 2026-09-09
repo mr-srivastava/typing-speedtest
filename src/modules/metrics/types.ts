@@ -1,14 +1,17 @@
 import type { LetterMetrics } from '@/modules/session/types';
+import type { TestTiming } from '@/modules/typing-test/config';
+import type { WpmSeriesPoint } from '@/modules/typing-test/replay';
 
-export interface LiveTestMetrics {
+export type LiveTestMetrics = TestTiming & {
   correctWordCount: number;
   totalWordCount: number;
   correctChars: number;
   typedChars: number;
-  timerRemaining: number;
-  timerDuration: number;
   letterAccuracy: Record<string, LetterMetrics>;
-}
+  /** Only available once the test has finished (event-sourced stats derived at finish time). */
+  consistency?: number;
+  wpmSeries?: WpmSeriesPoint[];
+};
 
 export type MetricsView =
   | { scope: 'live' }
@@ -27,4 +30,8 @@ export interface MetricsDisplayModel {
   canToggle: boolean;
   showingCumulative: boolean;
   totalTests: number;
+  /** Weighted-average consistency in cumulative view; this test's consistency in live view. */
+  consistency?: number;
+  /** Per-second WPM history — only available for a single finished test, not cumulative. */
+  wpmSeries?: WpmSeriesPoint[];
 }

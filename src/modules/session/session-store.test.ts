@@ -86,6 +86,35 @@ describe('SessionStore (in-memory)', () => {
     expect(data.cumulative.lastTestDate).toBe('2026-01-02T00:00:00.000Z');
   });
 
+  it('merges weighted consistency/burst when both tests track them', () => {
+    const store = createInMemorySessionStore();
+    store.recordTest(makeTest({ testDuration: 60, consistency: 80, burst: 90 }));
+    const data = store.recordTest(makeTest({ testDuration: 60, consistency: 100, burst: 110 }));
+
+    // (80*60 + 100*60) / 120 = 90
+    expect(data.cumulative.weightedConsistency).toBe(90);
+    // (90*60 + 110*60) / 120 = 100
+    expect(data.cumulative.weightedBurst).toBe(100);
+  });
+
+  it('carries the weighted consistency/burst forward when a later test lacks them', () => {
+    const store = createInMemorySessionStore();
+    store.recordTest(makeTest({ consistency: 80, burst: 90 }));
+    const data = store.recordTest(makeTest({ consistency: undefined, burst: undefined }));
+
+    expect(data.cumulative.weightedConsistency).toBe(80);
+    expect(data.cumulative.weightedBurst).toBe(90);
+  });
+
+  it('leaves weighted consistency/burst undefined when no test has tracked them', () => {
+    const store = createInMemorySessionStore();
+    store.recordTest(makeTest());
+    const data = store.recordTest(makeTest());
+
+    expect(data.cumulative.weightedConsistency).toBeUndefined();
+    expect(data.cumulative.weightedBurst).toBeUndefined();
+  });
+
   it('round-trips recordTest → load', () => {
     const store = createInMemorySessionStore();
     const recorded = store.recordTest(makeTest());
@@ -114,6 +143,47 @@ describe('validateStoredData', () => {
       validateStoredData({
         lastSession: { wpm: 'bad' },
         cumulative: {},
+      }),
+    ).toBe(false);
+  });
+
+  it('accepts stored data without the newer optional fields (pre-existing localStorage data)', () => {
+    const store = createInMemorySessionStore();
+    const data = store.recordTest(makeTest()); // no mode/consistency/burst/wpmSeries
+    expect(validateStoredData(data)).toBe(true);
+  });
+
+  it('accepts stored data with the newer optional fields present and well-typed', () => {
+    const store = createInMemorySessionStore();
+    const data = store.recordTest(
+      makeTest({ mode: 'words', consistency: 90, burst: 72, wpmSeries: [] }),
+    );
+    expect(validateStoredData(data)).toBe(true);
+  });
+
+  it('rejects stored data with a wrongly-typed optional field', () => {
+    const store = createInMemorySessionStore();
+    const data = store.recordTest(makeTest());
+
+    expect(validateStoredData({ ...data, lastSession: { ...data.lastSession, mode: 42 } })).toBe(
+      false,
+    );
+    expect(
+      validateStoredData({
+        ...data,
+        lastSession: { ...data.lastSession, consistency: 'high' },
+      }),
+    ).toBe(false);
+    expect(
+      validateStoredData({
+        ...data,
+        lastSession: { ...data.lastSession, wpmSeries: 'not-an-array' },
+      }),
+    ).toBe(false);
+    expect(
+      validateStoredData({
+        ...data,
+        cumulative: { ...data.cumulative, weightedConsistency: 'bad' },
       }),
     ).toBe(false);
   });

@@ -1,4 +1,5 @@
 import type { LetterMetrics } from '@/modules/session/types';
+import type { TestTiming } from '@/modules/typing-test/config';
 
 /** Elapsed test time in seconds (non-negative). */
 function getElapsedSeconds(timerDuration: number, timerRemaining: number): number {
@@ -23,22 +24,16 @@ export function calculateWpm(charCount: number, elapsedSeconds: number): number 
   return Math.round(charCount / 5 / (elapsedSeconds / 60));
 }
 
-/** Correct WPM: only characters that matched the reference text. */
-export function calculateLiveWpm(
-  correctChars: number,
-  timerDuration: number,
-  timerRemaining: number,
-): number {
-  return calculateWpm(correctChars, getElapsedSecondsForWpm(timerDuration, timerRemaining));
-}
-
-/** Raw WPM: every character typed, correct or not. */
-export function calculateRawWpm(
-  typedChars: number,
-  timerDuration: number,
-  timerRemaining: number,
-): number {
-  return calculateWpm(typedChars, getElapsedSecondsForWpm(timerDuration, timerRemaining));
+/**
+ * Elapsed seconds for a live (in-progress or just-finished) WPM calculation, mode-aware:
+ * time mode counts down (`timerDuration - timerRemaining`), word mode counts up with no
+ * ceiling, so its own `elapsedSeconds` is the value directly. Both are floored at 1s to
+ * avoid a huge WPM spike in the first instant of a test.
+ */
+export function resolveLiveElapsedSeconds(timing: TestTiming): number {
+  return timing.mode === 'time'
+    ? getElapsedSecondsForWpm(timing.timerDuration, timing.timerRemaining)
+    : Math.max(1, timing.elapsedSeconds);
 }
 
 export function calculateCurrentAccuracy(correctWordCount: number, totalWordCount: number): number {

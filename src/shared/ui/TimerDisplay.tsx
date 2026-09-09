@@ -14,15 +14,18 @@ const MIN_IN_SEC = 60;
 interface TimerDisplayProps {
   timer: number;
   timerDuration?: number;
+  /** 'words' mode counts up with no fixed ceiling, so the near-expiry warning never applies. */
+  mode?: 'time' | 'words';
   className?: string;
 }
 
 const TimerDisplay: React.FC<TimerDisplayProps> = ({
   timer,
   timerDuration = 60,
+  mode = 'time',
   className = '',
 }) => {
-  const isNearExpiry = timer !== timerDuration && timer % MIN_IN_SEC <= 10;
+  const isNearExpiry = mode === 'time' && timer !== timerDuration && timer % MIN_IN_SEC <= 10;
 
   function formatNumberWithTwoDigit(num: number) {
     return num.toLocaleString('en-US', {
@@ -48,7 +51,7 @@ const TimerDisplay: React.FC<TimerDisplayProps> = ({
           orbitron.className,
         )}
         aria-live="polite"
-        aria-label="Time remaining"
+        aria-label={mode === 'words' ? 'Time elapsed' : 'Time remaining'}
       >
         {getTime()}
       </span>

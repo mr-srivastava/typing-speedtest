@@ -1,4 +1,5 @@
 import { themeColors } from '@/shared/lib/theme';
+import type { ChartConfig } from '@/shared/ui/chart';
 
 export interface RadialMetricFeedbackMessages {
   excellent: string;
@@ -44,4 +45,9 @@ export const accuracyChartConfig: RadialMetricConfig = {
   },
   averageInfo: 'The average typing accuracy for humans is around 92%.',
   fillColor: themeColors.success,
+};
+
+export const wpmHistoryChartConfig: ChartConfig = {
+  wpm: { label: 'Correct WPM', color: themeColors.success },
+  rawWpm: { label: 'Raw WPM', color: themeColors.chart2 },
 };

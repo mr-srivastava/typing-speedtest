@@ -41,6 +41,12 @@ export function validateStoredData(value: unknown): value is EnhancedStoredData 
     return false;
   if (!isLetterMetricsRecord(lastSession.letterAccuracy)) return false;
 
+  if (lastSession.mode !== undefined && typeof lastSession.mode !== 'string') return false;
+  if (lastSession.consistency !== undefined && typeof lastSession.consistency !== 'number')
+    return false;
+  if (lastSession.burst !== undefined && typeof lastSession.burst !== 'number') return false;
+  if (lastSession.wpmSeries !== undefined && !Array.isArray(lastSession.wpmSeries)) return false;
+
   if (
     typeof cumulative.totalTests !== 'number' ||
     typeof cumulative.totalWordsTyped !== 'number' ||
@@ -53,6 +59,14 @@ export function validateStoredData(value: unknown): value is EnhancedStoredData 
   )
     return false;
   if (!isLetterMetricsRecord(cumulative.letterStats)) return false;
+
+  if (
+    cumulative.weightedConsistency !== undefined &&
+    typeof cumulative.weightedConsistency !== 'number'
+  )
+    return false;
+  if (cumulative.weightedBurst !== undefined && typeof cumulative.weightedBurst !== 'number')
+    return false;
 
   return true;
 }
