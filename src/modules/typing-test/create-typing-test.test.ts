@@ -220,4 +220,29 @@ describe('createTypingTest', () => {
 
     expect(calls).toBe(0);
   });
+
+  it('with autoStart false, stays loading with no text until start() is called', async () => {
+    let loads = 0;
+    const test = createTypingTest({
+      testConfig: DEFAULT_TEST_CONFIG,
+      getReferenceText: async () => {
+        loads++;
+        return SAMPLE;
+      },
+      autoStart: false,
+    });
+
+    expect(test.getState().phase).toBe('loading');
+    expect(test.getState().referenceText).toBe('');
+    expect(loads).toBe(0);
+
+    await new Promise<void>((resolve) => {
+      test.onReady(resolve);
+      test.start();
+    });
+
+    expect(loads).toBe(1);
+    expect(test.getState().phase).toBe('idle');
+    expect(test.getState().referenceText).toBe(SAMPLE);
+  });
 });

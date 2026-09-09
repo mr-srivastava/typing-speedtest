@@ -38,7 +38,7 @@ export function TypingTestProvider({
   children,
 }: TypingTestProviderProps) {
   const [test] = useState(() =>
-    createTypingTest({ testConfig: config, getReferenceText: loadReferenceText }),
+    createTypingTest({ testConfig: config, getReferenceText: loadReferenceText, autoStart: false }),
   );
   const state = useSyncExternalStore(test.subscribe, test.getState, test.getState);
   const onFinishedRef = useRef(onFinished);
@@ -48,6 +48,13 @@ export function TypingTestProvider({
   useEffect(() => {
     onFinishedRef.current = onFinished;
   }, [onFinished]);
+
+  // Starting the actor kicks off reference-text generation, which is randomized — deferring it to
+  // an effect guarantees it only ever runs client-side, after hydration, so server and client can
+  // never render different (random) text and diverge on hydration.
+  useEffect(() => {
+    test.start();
+  }, [test]);
 
   useEffect(() => {
     if (isInitialConfig.current) {

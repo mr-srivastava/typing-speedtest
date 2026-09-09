@@ -19,7 +19,9 @@ const OverallStatsBlock: React.FC<OverallStatsBlockProps> = ({ metrics, classNam
   return (
     <div className={cn(classes.container, className)}>
       <div className={classes.statsRow}>
-        <span className="text-muted-foreground">Overall stats:</span>
+        <span className="typing-face text-[10px] font-medium tracking-[0.16em] text-muted-foreground uppercase">
+          overall
+        </span>
         <MetricGroup metrics={data.primaryMetrics} />
       </div>
       <div className={classes.detailsRow}>

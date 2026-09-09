@@ -1,6 +1,5 @@
 'use client';
 import { cn } from '@/shared/lib/cn';
-import { radiusClasses } from '@/shared/layout/layout-utils';
 import { width } from '@/shared/lib/tokens';
 import { useOutsideClick } from '@/shared/hooks/useOutsideClick';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
@@ -10,6 +9,7 @@ import React, {
   createContext,
   useContext,
   useEffect,
+  useId,
   useRef,
 } from 'react';
 import { Button } from '@/shared/ui/button';
@@ -60,6 +60,7 @@ export const ModalBody = ({
 }) => {
   const { open, setOpen } = useModal();
   const reduceMotion = useReducedMotion();
+  const titleId = useId();
 
   useEffect(() => {
     if (open) {
@@ -74,6 +75,49 @@ export const ModalBody = ({
 
   const modalRef = useRef<HTMLDivElement | null>(null);
   useOutsideClick(modalRef, () => setOpen(false));
+
+  useEffect(() => {
+    if (!open) return;
+
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    const getFocusable = () =>
+      Array.from(
+        modalRef.current?.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+        ) ?? [],
+      );
+
+    getFocusable()[0]?.focus();
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setOpen(false);
+        return;
+      }
+
+      if (event.key !== 'Tab') return;
+
+      const focusable = getFocusable();
+      if (focusable.length === 0) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      previouslyFocused?.focus();
+    };
+  }, [open, setOpen]);
 
   const panelTransition = reduceMotion
     ? { duration: 0.2 }
@@ -99,9 +143,12 @@ export const ModalBody = ({
 
           <motion.div
             ref={modalRef}
+            role='dialog'
+            aria-modal='true'
+            aria-labelledby={title ? titleId : undefined}
             className={cn(
               `relative z-50 flex w-full ${width.section} max-h-[90%] min-h-[50%] flex-col border border-border bg-card text-card-foreground pointer-events-auto`,
-              radiusClasses.panel,
+              'rounded-lg shadow-2xl shadow-black/10',
               className,
             )}
             initial={panelInitial}
@@ -109,10 +156,10 @@ export const ModalBody = ({
             exit={panelExit}
             transition={panelTransition}
           >
-            <div className='flex items-start justify-between gap-4 border-b border-border p-4'>
+            <div className='flex items-start justify-between gap-4 border-b border-border p-5 sm:p-6'>
               <div className='min-w-0'>
                 {title ? (
-                  <h2 className='text-xl sm:text-2xl font-bold leading-tight'>
+                  <h2 id={titleId} className='text-xl font-semibold tracking-tight sm:text-2xl'>
                     {title}
                   </h2>
                 ) : null}
@@ -177,7 +224,7 @@ export const ModalFooter = ({
   return (
     <div
       className={cn(
-        'sticky bottom-0 flex justify-end border-t border-border bg-muted/50 p-4',
+        'sticky bottom-0 flex justify-end border-t border-border bg-card p-4 sm:px-6',
         className,
       )}
     >

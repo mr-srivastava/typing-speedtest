@@ -4,7 +4,7 @@ import WpmHistoryChart from '@/features/metrics/WpmHistoryChart';
 import LetterAccuracyChart from '@/features/metrics/LetterAccuracyChart';
 import OverallStatsBlock from '@/features/metrics/OverallStatsBlock';
 import { type OverallMetricsData } from '@/features/metrics/metrics-display-utils';
-import { layoutClasses, textClasses } from '@/shared/layout/layout-utils';
+import { textClasses } from '@/shared/layout/layout-utils';
 import { width as widthTokens } from '@/shared/lib/tokens';
 import type { MetricsDisplayModel } from '@/modules/metrics/types';
 import MetricGroup from '@/shared/ui/MetricGroup';
@@ -26,15 +26,15 @@ const MetricsDisplay: React.FC<MetricsDisplayProps> = ({
   className = '',
 }) => {
   return (
-    <div className={cn('w-full text-center space-y-6', className)}>
+    <div className={cn('w-full space-y-7 text-center', className)}>
       {overallMetrics ? <OverallStatsBlock metrics={overallMetrics} className="mb-2" /> : null}
 
       {model.statsTitle && !compact ? (
         <div className={cn(textClasses.mutedSmall)}>{model.statsTitle}</div>
       ) : null}
 
-      <div className={layoutClasses.responsiveFlex}>
-        <div className={cn('w-full', widthTokens.chart)}>
+      <div className="grid grid-cols-1 divide-y divide-border/70 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
+        <div className={cn('w-full justify-self-center', widthTokens.chart)}>
           <RadialChart
             value={model.wpm}
             title="Words per minute"
@@ -43,7 +43,7 @@ const MetricsDisplay: React.FC<MetricsDisplayProps> = ({
             compact={compact}
           />
         </div>
-        <div className={cn('w-full', widthTokens.chart)}>
+        <div className={cn('w-full justify-self-center', widthTokens.chart)}>
           <RadialChart
             value={model.accuracy}
             title="Accuracy"
@@ -64,7 +64,7 @@ const MetricsDisplay: React.FC<MetricsDisplayProps> = ({
         <WpmHistoryChart data={model.wpmSeries} compact={compact} />
       ) : null}
 
-      <div className="border-t border-border/60 pt-4">
+      <div className="border-t border-border/70 pt-5">
         <LetterAccuracyChart key={model.view.scope} letterAccuracyData={model.letterAccuracy} />
       </div>
     </div>

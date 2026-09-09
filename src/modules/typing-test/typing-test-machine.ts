@@ -4,7 +4,12 @@ import type { TestConfig, TestTiming } from './config';
 import { diffInputToEvents, type TypingEventLog } from './event-log';
 import { deriveBurst, deriveConsistency, deriveWpmSeries, type WpmSeriesPoint } from './replay';
 import { buildTypingTestResult, type TypingTestResult, type TypingTestResultInput } from './result';
-import { countWordAccuracy, isTestComplete, recordLetterAccuracy } from './typing-engine';
+import {
+  countWordAccuracyFromReferenceWords,
+  isTestComplete,
+  recordLetterAccuracy,
+  splitWords,
+} from './typing-engine';
 import type { LetterMetrics } from './types';
 
 /** State captured when a test ends. */
@@ -33,6 +38,8 @@ export type TypingTestContext = TestTiming & {
   /** Persists across reloads triggered by restart or reconfiguration. */
   getReferenceText: (config: TestConfig) => Promise<string>;
   referenceText: string;
+  /** Pre-tokenized once when the reference text loads; never recomputed per keystroke. */
+  referenceWords: string[];
   input: string;
   correctWordCount: number;
   totalWordCount: number;
@@ -65,6 +72,7 @@ function createLoadingContext(
     getReferenceText,
     ...createInitialTiming(cfg),
     referenceText: '',
+    referenceWords: [],
     input: '',
     correctWordCount: 0,
     totalWordCount: 0,
@@ -154,10 +162,8 @@ export const typingTestMachine = setup({
       }
       correctChars = Math.max(0, correctChars);
 
-      const { correct: correctWordCount, total: totalWordCount } = countWordAccuracy(
-        context.referenceText,
-        event.value,
-      );
+      const { correct: correctWordCount, total: totalWordCount } =
+        countWordAccuracyFromReferenceWords(context.referenceWords, event.value);
       const lastChar = event.value[event.value.length - 1] ?? '';
       const expectedChar = context.referenceText[event.value.length - 1] ?? '';
       const letterAccuracy = recordLetterAccuracy(context.letterAccuracy, lastChar, expectedChar);
@@ -206,7 +212,10 @@ export const typingTestMachine = setup({
         }),
         onDone: {
           target: 'idle',
-          actions: assign(({ event }) => ({ referenceText: event.output })),
+          actions: assign(({ event }) => ({
+            referenceText: event.output,
+            referenceWords: splitWords(event.output),
+          })),
         },
         onError: {
           target: 'error',

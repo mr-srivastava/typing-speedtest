@@ -26,12 +26,12 @@ export const wpmChartConfig: RadialMetricConfig = {
   showPercentage: false,
   feedbackThresholds: { excellent: 80, average: 40 },
   feedbackMessages: {
-    excellent: "Excellent! You're typing like a pro.",
-    average: 'Good speed! Keep practicing to improve.',
-    belowAverage: 'Focus on building up your speed.',
+    excellent: 'Fast and controlled.',
+    average: 'A solid pace to build on.',
+    belowAverage: 'Keep a steady rhythm.',
   },
-  averageInfo: 'The average typing speed is around 40 WPM.',
-  fillColor: themeColors.success,
+  averageInfo: 'A typical typing pace is around 40 WPM.',
+  fillColor: themeColors.primary,
 };
 
 export const accuracyChartConfig: RadialMetricConfig = {
@@ -39,15 +39,15 @@ export const accuracyChartConfig: RadialMetricConfig = {
   showPercentage: true,
   feedbackThresholds: { excellent: 95, average: 90 },
   feedbackMessages: {
-    excellent: 'Excellent! Your accuracy is top-notch.',
-    average: "Keep practicing! You're close to average.",
-    belowAverage: 'Focus on accuracy. Reduce those errors.',
+    excellent: 'Clean work.',
+    average: 'Accuracy is holding steady.',
+    belowAverage: 'Slow down for fewer corrections.',
   },
-  averageInfo: 'The average typing accuracy for humans is around 92%.',
+  averageInfo: 'A useful target is 92% accuracy or higher.',
   fillColor: themeColors.success,
 };
 
 export const wpmHistoryChartConfig: ChartConfig = {
-  wpm: { label: 'Correct WPM', color: themeColors.success },
+  wpm: { label: 'Correct WPM', color: themeColors.primary },
   rawWpm: { label: 'Raw WPM', color: themeColors.chart2 },
 };

@@ -9,12 +9,17 @@ const BackgroundBeams = dynamic(
   { ssr: false },
 );
 
-export function AmbientBackground() {
+interface AmbientBackgroundProps {
+  /** Decorative SVG animation is opt-in so it never competes with interactive pages. */
+  animated?: boolean;
+}
+
+export function AmbientBackground({ animated = false }: AmbientBackgroundProps) {
   return (
     <>
       <div className="grain-overlay" aria-hidden />
       <div className={cn('pointer-events-none absolute inset-0 z-[1]', gradients.primaryRadial)} />
-      <BackgroundBeams />
+      {animated ? <BackgroundBeams /> : null}
     </>
   );
 }

@@ -18,9 +18,11 @@ const WpmHistoryChart: React.FC<WpmHistoryChartProps> = ({
   className = '',
 }) => {
   return (
-    <Card className={cn('border-border/60 shadow-none', compact && 'bg-transparent', className)}>
+    <Card className={cn('border-0 bg-transparent shadow-none', className)}>
       <CardHeader className={cn('items-center', compact ? 'pb-0 pt-3' : 'pb-0')}>
-        <CardTitle className={cn(compact && 'text-sm font-medium')}>Speed over time</CardTitle>
+        <CardTitle className="text-[10px] font-medium tracking-[0.18em] text-muted-foreground uppercase">
+          Speed over time
+        </CardTitle>
       </CardHeader>
       <CardContent className={cn(compact ? 'pt-2 pb-3' : 'pt-4 pb-4')}>
         <ChartContainer
@@ -28,7 +30,7 @@ const WpmHistoryChart: React.FC<WpmHistoryChartProps> = ({
           className={cn('w-full', compact ? 'h-[140px]' : 'h-[220px]')}
         >
           <LineChart data={data} margin={{ left: -20, right: 8, top: 8, bottom: 0 }}>
-            <CartesianGrid vertical={false} strokeDasharray="3 3" />
+            <CartesianGrid vertical={false} stroke="hsl(var(--border))" strokeDasharray="2 5" />
             <XAxis
               dataKey="second"
               tickLine={false}

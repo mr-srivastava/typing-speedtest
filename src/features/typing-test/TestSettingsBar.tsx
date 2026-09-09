@@ -69,13 +69,18 @@ const TestSettingsBar: React.FC<TestSettingsBarProps> = ({
   return (
     <div
       className={cn(
-        'flex flex-wrap items-center gap-2 border-b border-border px-4 py-2 md:px-6',
+        'flex flex-wrap items-center gap-x-1 gap-y-2 border-b border-border px-4 py-2.5 md:px-6',
         className,
       )}
     >
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="sm" disabled={disabled}>
+          <Button
+            variant="ghost"
+            size="sm"
+            disabled={disabled}
+            className="font-normal text-muted-foreground hover:text-foreground"
+          >
             {config.mode === 'time' ? 'Time' : 'Words'}
           </Button>
         </DropdownMenuTrigger>
@@ -92,7 +97,12 @@ const TestSettingsBar: React.FC<TestSettingsBarProps> = ({
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="sm" disabled={disabled}>
+          <Button
+            variant="ghost"
+            size="sm"
+            disabled={disabled}
+            className="font-normal text-muted-foreground hover:text-foreground"
+          >
             {valueLabel}
           </Button>
         </DropdownMenuTrigger>
@@ -130,7 +140,12 @@ const TestSettingsBar: React.FC<TestSettingsBarProps> = ({
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="sm" disabled={disabled}>
+          <Button
+            variant="ghost"
+            size="sm"
+            disabled={disabled}
+            className="font-normal text-muted-foreground hover:text-foreground"
+          >
             {LANGUAGES.find(({ code }) => code === config.language)?.label}
           </Button>
         </DropdownMenuTrigger>

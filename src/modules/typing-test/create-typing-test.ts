@@ -16,7 +16,10 @@ export type TypingTestPhase = 'loading' | 'error' | 'idle' | 'active' | 'finishe
 type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K> : never;
 
 /** Machine context exposed without its text-loader closure. */
-export type TypingTestState = DistributiveOmit<TypingTestContext, 'getReferenceText'> & {
+export type TypingTestState = DistributiveOmit<
+  TypingTestContext,
+  'getReferenceText' | 'referenceWords'
+> & {
   phase: TypingTestPhase;
 };
 
@@ -27,12 +30,20 @@ export interface TypingTest {
   dispatch(event: TypingTestEvent): void;
   /** Runs after reference text loads. */
   onReady(listener: () => void): () => void;
+  /** No-op if already started. Only needed when created with `autoStart: false`. */
+  start(): void;
 }
 
 /** Runs the typing-test machine behind the TypingTest interface. */
 export function createTypingTest(config: {
   testConfig: TestConfig;
   getReferenceText: (config: TestConfig) => Promise<string>;
+  /**
+   * Set false to defer starting the actor — and thus loading reference text — until `start()`
+   * is called explicitly. Reading `getState()`/`subscribe()` is safe either way: before start,
+   * state simply stays at its initial 'loading' snapshot.
+   */
+  autoStart?: boolean;
 }): TypingTest {
   const actor = createActor(typingTestMachine, {
     input: { testConfig: config.testConfig, getReferenceText: config.getReferenceText },
@@ -53,11 +64,17 @@ export function createTypingTest(config: {
     prevValue = snapshot.value;
   });
 
-  actor.start();
+  if (config.autoStart ?? true) {
+    actor.start();
+  }
 
   function toState(snapshot: ReturnType<typeof actor.getSnapshot>): TypingTestState {
     // The loader stays inside the machine.
-    const { getReferenceText: _getReferenceText, ...rest } = snapshot.context;
+    const {
+      getReferenceText: _getReferenceText,
+      referenceWords: _referenceWords,
+      ...rest
+    } = snapshot.context;
     return {
       phase: snapshot.value as TypingTestPhase,
       ...rest,
@@ -75,5 +92,6 @@ export function createTypingTest(config: {
       readyListeners.add(listener);
       return () => readyListeners.delete(listener);
     },
+    start: () => actor.start(),
   };
 }

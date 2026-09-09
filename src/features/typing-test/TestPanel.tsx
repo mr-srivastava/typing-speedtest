@@ -4,7 +4,6 @@ import TestToolbar from '@/features/typing-test/TestToolbar';
 import TestSettingsBar from '@/features/typing-test/TestSettingsBar';
 import TypingSurface from '@/features/typing-test/TypingSurface';
 import { deriveLiveTypingAnalytics, type TestConfig } from '@/modules/typing-test';
-import { gradients } from '@/shared/lib/theme';
 import { cn } from '@/shared/lib/cn';
 import { useTypingTestActions, useTypingTestState } from './typing-test-react';
 
@@ -30,13 +29,12 @@ const TestPanel: React.FC<TestPanelProps> = ({
   const timerDuration = state.mode === 'time' ? state.timerDuration : state.elapsedSeconds;
 
   return (
-    <Card className={cn('relative overflow-hidden w-full', className)}>
-      <div
-        className={cn(
-          'pointer-events-none absolute inset-x-0 top-0 h-[2px]',
-          gradients.primaryLinear,
-        )}
-      />
+    <Card
+      className={cn(
+        'w-full overflow-hidden rounded-lg border-border/80 bg-card shadow-none',
+        className,
+      )}
+    >
       <TestToolbar
         timer={timer}
         timerDuration={timerDuration}

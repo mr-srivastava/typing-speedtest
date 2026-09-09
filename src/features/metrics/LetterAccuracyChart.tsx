@@ -5,7 +5,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import type { LetterMetrics } from '@/modules/typing-test';
 import { calculateOverallWeightedAccuracy } from '@/modules/metrics/calculate';
 import { cn } from '@/shared/lib/cn';
-import { layoutClasses, radiusClasses } from '@/shared/layout/layout-utils';
+import { layoutClasses } from '@/shared/layout/layout-utils';
 import {
   accuracyLegendData,
   getLegendItemClasses,
@@ -94,13 +94,13 @@ const LetterAccuracyChart: React.FC<LetterAccuracyChartProps> = ({
         onBlur={() => setHoveredLetter((current) => (current === letter ? null : current))}
         className={cn(
           size.key,
-          'font-bold cursor-pointer',
+          'typing-face cursor-pointer border border-border/80 text-xs font-semibold',
           motionTokens.transitionUi,
           'fine-hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card',
-          radiusClasses.control,
+          'rounded-sm',
           layoutClasses.flexCenter,
           getAccuracyColor(metrics.correct, metrics.total),
-          isActive && 'ring-2 ring-foreground/80 ring-offset-2 ring-offset-card',
+          isActive && 'ring-1 ring-foreground/80 ring-offset-2 ring-offset-card',
         )}
       >
         {letter.toUpperCase()}
@@ -150,7 +150,9 @@ const LetterAccuracyChart: React.FC<LetterAccuracyChartProps> = ({
         animate={{ opacity: 1 }}
         transition={fadeTransition(0.08)}
       >
-        <p className="text-sm font-medium text-foreground">Key accuracy</p>
+        <p className="text-[10px] font-medium tracking-[0.18em] text-muted-foreground uppercase">
+          Key accuracy
+        </p>
         <p className="text-xs text-muted-foreground mt-1">
           Weighted average {overallWeightedAccuracy}% · Hover or tap a key for details
         </p>
@@ -173,7 +175,7 @@ const LetterAccuracyChart: React.FC<LetterAccuracyChartProps> = ({
       <div
         className={cn(
           `mb-4 mx-auto flex ${size.detailStrip} max-w-xs items-center justify-center border px-4 py-3 text-center`,
-          radiusClasses.surface,
+          'rounded-sm',
           activeLetter
             ? 'border-border bg-muted/40'
             : 'border-dashed border-border/60 bg-transparent',

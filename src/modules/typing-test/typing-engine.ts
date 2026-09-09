@@ -15,12 +15,19 @@ export function splitWords(text: string): string[] {
 }
 
 export function countWordAccuracy(referenceText: string, input: string): WordAccuracy {
+  return countWordAccuracyFromReferenceWords(splitWords(referenceText), input);
+}
+
+/** Calculates accuracy against reference words already prepared when a test loads. */
+export function countWordAccuracyFromReferenceWords(
+  referenceWords: readonly string[],
+  input: string,
+): WordAccuracy {
   const typedWords = splitWords(input);
-  const textWords = splitWords(referenceText);
 
   let correct = 0;
   for (let i = 0; i < typedWords.length; i++) {
-    if (i < textWords.length && typedWords[i] === textWords[i]) {
+    if (i < referenceWords.length && typedWords[i] === referenceWords[i]) {
       correct++;
     }
   }

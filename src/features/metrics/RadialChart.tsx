@@ -55,16 +55,12 @@ const RadialChart: React.FC<RadialChartProps> = ({
   }
 
   return (
-    <Card
-      className={cn(
-        'flex flex-col border-border/60 shadow-none',
-        compact && 'bg-transparent',
-        className,
-      )}
-    >
-      <CardHeader className={cn('items-center', compact ? 'pb-0 pt-3' : 'pb-0')}>
+    <Card className={cn('flex flex-col border-0 bg-transparent shadow-none', className)}>
+      <CardHeader className={cn('items-center px-2', compact ? 'pb-0 pt-3' : 'pb-0')}>
         {title ? (
-          <CardTitle className={cn(compact && 'text-sm font-medium')}>{title}</CardTitle>
+          <CardTitle className="text-[10px] font-medium tracking-[0.18em] text-muted-foreground uppercase">
+            {title}
+          </CardTitle>
         ) : null}
         {description ? <CardDescription>{description}</CardDescription> : null}
       </CardHeader>
@@ -102,7 +98,7 @@ const RadialChart: React.FC<RadialChartProps> = ({
                         <tspan
                           x={viewBox.cx}
                           y={viewBox.cy}
-                          className="fill-foreground text-2xl font-bold"
+                          className="typing-face fill-foreground text-2xl font-semibold"
                         >
                           {value.toLocaleString()}
                           {showPercentage ? '%' : ''}
@@ -117,9 +113,12 @@ const RadialChart: React.FC<RadialChartProps> = ({
           </RadialBarChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className={cn('flex-col text-xs', compact ? 'gap-1 pt-1 pb-3' : 'gap-2')}>
+      <CardFooter className={cn('flex-col px-2 text-xs', compact ? 'gap-1 pt-1 pb-3' : 'gap-2')}>
         <div
-          className={cn(layoutClasses.flexStart, 'gap-2', 'font-medium text-center justify-center')}
+          className={cn(
+            layoutClasses.flexStart,
+            'gap-2 font-normal text-center justify-center text-muted-foreground',
+          )}
         >
           {getFeedbackMessage(value)}
         </div>

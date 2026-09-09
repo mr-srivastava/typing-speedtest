@@ -10,7 +10,6 @@ import type { EnhancedStoredData } from '@/modules/session/types';
 import { resolveMetricsDisplay } from '@/modules/metrics/resolve-display';
 import type { LiveTestMetrics, MetricsPreference } from '@/modules/metrics/types';
 import { Button } from '@/shared/ui/button';
-import { radiusClasses } from '@/shared/layout/layout-utils';
 import { cn } from '@/shared/lib/cn';
 
 interface ViewToggleProps {
@@ -21,18 +20,28 @@ interface ViewToggleProps {
 
 function ViewToggle({ showCumulative, onToggle, totalTests }: ViewToggleProps) {
   return (
-    <div className={cn('flex bg-muted p-1', radiusClasses.surface)}>
+    <div className="flex border border-border/80 p-0.5">
       <Button
-        variant={!showCumulative ? 'default' : 'ghost'}
+        variant="ghost"
         size="sm"
         onClick={() => onToggle(false)}
+        className={cn(
+          'rounded-sm font-normal text-muted-foreground',
+          !showCumulative &&
+            'bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground',
+        )}
       >
         This Test
       </Button>
       <Button
-        variant={showCumulative ? 'default' : 'ghost'}
+        variant="ghost"
         size="sm"
         onClick={() => onToggle(true)}
+        className={cn(
+          'rounded-sm font-normal text-muted-foreground',
+          showCumulative &&
+            'bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground',
+        )}
       >
         All Tests ({totalTests})
       </Button>
@@ -70,44 +79,30 @@ interface MetricsModalProps {
   liveMetrics?: LiveTestMetrics;
   sessionData?: EnhancedStoredData | null;
   onRestart: () => void;
-  /** Initial preference; use locked for fixed scopes (e.g. home cumulative). */
-  preference?: MetricsPreference;
-  locked?: boolean;
   className?: string;
 }
 
+/** Always shows the just-finished test, with an optional toggle to this session's cumulative average. */
 const MetricsModal: React.FC<MetricsModalProps> = ({
   isOpen,
   onOpenChange,
   liveMetrics,
   sessionData = null,
   onRestart,
-  preference: initialPreference = 'auto',
-  locked = false,
   className = '',
 }) => {
-  const [preference, setPreference] = useState<MetricsPreference>(initialPreference);
+  const [preference, setPreference] = useState<MetricsPreference>('auto');
 
   const model = useMemo(
-    () =>
-      resolveMetricsDisplay({
-        live: liveMetrics,
-        session: sessionData,
-        preference,
-        locked,
-      }),
-    [liveMetrics, sessionData, preference, locked],
+    () => resolveMetricsDisplay({ live: liveMetrics, session: sessionData, preference }),
+    [liveMetrics, sessionData, preference],
   );
 
-  const modalTitle = getMetricsModalTitle(model, {
-    locked,
-    hasLiveMetrics: !!liveMetrics,
-  });
-
-  const actionLabel = getMetricsModalActionLabel(model, locked);
+  const modalTitle = getMetricsModalTitle(model, { hasLiveMetrics: !!liveMetrics });
+  const actionLabel = getMetricsModalActionLabel(model);
   const subtitle =
     modalTitle === 'Test Complete'
-      ? `${model.wpm} WPM · ${model.accuracy}% accuracy`
+      ? `${model.wpm} wpm · ${model.accuracy}% accuracy`
       : (model.statsTitle ?? undefined);
 
   return (

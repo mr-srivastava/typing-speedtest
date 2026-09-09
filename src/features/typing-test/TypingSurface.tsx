@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import {
-  getCharStatus,
   getCurrentWordSpanIndex,
   parseReferenceSpans,
+  type TextSpan,
   typingSurfacePadding,
   typingSurfaceTypography,
 } from '@/features/typing-test/typing-surface-utils';
@@ -21,20 +21,51 @@ interface TypingSurfaceProps {
   className?: string;
 }
 
-function getCharClassName(referenceText: string, input: string, index: number): string {
-  const status = getCharStatus(referenceText, input, index);
-
-  switch (status) {
-    case 'correct':
-      return cn(getAccuracyColorClass(true), 'opacity-90');
-    case 'incorrect':
-      return cn(getAccuracyColorClass(false), 'opacity-90');
-    case 'cursor':
-      return 'bg-primary/25 rounded-sm';
-    case 'pending':
-      return 'text-muted-foreground';
-  }
+interface ReferenceSpanProps {
+  span: TextSpan;
+  index: number;
+  typedText: string;
+  isCurrentWord: boolean;
+  setSpanRef: (index: number, element: HTMLSpanElement | null) => void;
 }
+
+/**
+ * Only the span receiving the current keystroke changes. Completed and future
+ * spans keep stable primitive props, letting React skip their character trees.
+ */
+const ReferenceSpan = React.memo(function ReferenceSpan({
+  span,
+  index,
+  typedText,
+  isCurrentWord,
+  setSpanRef,
+}: ReferenceSpanProps) {
+  return (
+    <span
+      ref={(element) => setSpanRef(index, element)}
+      className={cn(isCurrentWord && 'rounded bg-primary/10 px-0.5')}
+    >
+      {span.text.split('').map((char, charIndex) => {
+        const typedChar = typedText[charIndex];
+        const isTyped = typedChar !== undefined;
+        const className = isTyped
+          ? cn(getAccuracyColorClass(typedChar === char), 'opacity-90')
+          : isCurrentWord && charIndex === typedText.length
+            ? 'bg-primary/30 text-foreground'
+            : 'text-muted-foreground';
+
+        return (
+          <span
+            key={span.startIndex + charIndex}
+            className={cn(motionTokens.transitionColors, className)}
+          >
+            {char}
+          </span>
+        );
+      })}
+    </span>
+  );
+});
 
 const TypingSurface: React.FC<TypingSurfaceProps> = ({
   referenceText,
@@ -51,6 +82,9 @@ const TypingSurface: React.FC<TypingSurfaceProps> = ({
 
   const cursorIndex = input.length;
   const currentSpanIndex = getCurrentWordSpanIndex(spans, cursorIndex);
+  const setSpanRef = useCallback((index: number, element: HTMLSpanElement | null) => {
+    spanRefs.current[index] = element;
+  }, []);
 
   useEffect(() => {
     if (!readOnly) {
@@ -71,40 +105,22 @@ const TypingSurface: React.FC<TypingSurfaceProps> = ({
     <div className={cn(`relative ${size.typingMin} max-h-[40vh] overflow-y-auto`, className)}>
       <div
         className={cn(
-          'pointer-events-none select-none whitespace-pre-wrap break-words',
+          'typing-face pointer-events-none select-none whitespace-pre-wrap break-words',
           typingSurfaceTypography,
           typingSurfacePadding,
         )}
         aria-hidden
       >
-        {spans.map((span, spanIndex) => {
-          const isCurrentWord = !span.isWhitespace && spanIndex === currentSpanIndex;
-
-          return (
-            <span
-              key={`${span.startIndex}-${span.text}`}
-              ref={(el) => {
-                spanRefs.current[spanIndex] = el;
-              }}
-              className={cn(isCurrentWord && 'rounded bg-primary/10 px-0.5')}
-            >
-              {span.text.split('').map((char, charIndex) => {
-                const globalIndex = span.startIndex + charIndex;
-                return (
-                  <span
-                    key={globalIndex}
-                    className={cn(
-                      motionTokens.transitionColors,
-                      getCharClassName(referenceText, input, globalIndex),
-                    )}
-                  >
-                    {char}
-                  </span>
-                );
-              })}
-            </span>
-          );
-        })}
+        {spans.map((span, spanIndex) => (
+          <ReferenceSpan
+            key={`${span.startIndex}-${span.text}`}
+            span={span}
+            index={spanIndex}
+            typedText={input.slice(span.startIndex, span.startIndex + span.text.length)}
+            isCurrentWord={!span.isWhitespace && spanIndex === currentSpanIndex}
+            setSpanRef={setSpanRef}
+          />
+        ))}
       </div>
 
       <textarea
@@ -120,7 +136,7 @@ const TypingSurface: React.FC<TypingSurfaceProps> = ({
         aria-label="Typing area"
         className={cn(
           'absolute inset-0 h-full w-full resize-none overflow-hidden border-0 bg-transparent',
-          'text-transparent caret-primary',
+          'typing-face text-transparent caret-primary',
           'focus:outline-none focus-visible:ring-0',
           typingSurfaceTypography,
           typingSurfacePadding,
