@@ -10,12 +10,12 @@ import {
 
 export type { TypingTestEvent, TypingTestFinishedSnapshot };
 
-export type TypingTestPhase = 'loading' | 'idle' | 'active' | 'finished';
+export type TypingTestPhase = 'loading' | 'error' | 'idle' | 'active' | 'finished';
 
-/** `Omit` over `T`, distributed across a union so a discriminated union's variant-specific keys survive. */
+/** Omit keys from each member of a union. */
 type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K> : never;
 
-/** Public state = the machine's context (minus the `getReferenceText` closure) plus its phase. */
+/** Machine context exposed without its text-loader closure. */
 export type TypingTestState = DistributiveOmit<TypingTestContext, 'getReferenceText'> & {
   phase: TypingTestPhase;
 };
@@ -23,11 +23,11 @@ export type TypingTestState = DistributiveOmit<TypingTestContext, 'getReferenceT
 export interface TypingTest {
   getState(): TypingTestState;
   dispatch(event: TypingTestEvent): void;
-  /** Subscribes to async reference-text-load completion (phase -> 'idle'). Returns an unsubscribe function. */
+  /** Runs after reference text loads. */
   onReady(listener: () => void): () => void;
 }
 
-/** Runs the typing-test state machine as an XState actor behind the same `TypingTest` interface. */
+/** Runs the typing-test machine behind the TypingTest interface. */
 export function createTypingTest(config: {
   testConfig: TestConfig;
   getReferenceText: (config: TestConfig) => Promise<string>;
@@ -50,8 +50,7 @@ export function createTypingTest(config: {
 
   function getState(): TypingTestState {
     const snapshot = actor.getSnapshot();
-    // `getReferenceText` is an implementation detail of the machine's context, not part of
-    // the public TypingTestState shape.
+    // The loader stays inside the machine.
     const { getReferenceText: _getReferenceText, ...rest } = snapshot.context;
     return {
       phase: snapshot.value as TypingTestPhase,

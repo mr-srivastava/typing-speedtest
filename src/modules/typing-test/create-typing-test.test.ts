@@ -156,6 +156,32 @@ describe('createTypingTest', () => {
     expect(state.config.mode).toBe('words');
   });
 
+  it('enters an error state when reference-text loading fails and can restart', async () => {
+    let attempt = 0;
+    const test = createTypingTest({
+      testConfig: DEFAULT_TEST_CONFIG,
+      getReferenceText: async () => {
+        attempt++;
+        if (attempt === 1) {
+          throw new Error('word list unavailable');
+        }
+        return SAMPLE;
+      },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(test.getState().phase).toBe('error');
+    expect(test.getState().loadError).toContain('word list unavailable');
+
+    await new Promise<void>((resolve) => {
+      test.onReady(resolve);
+      test.dispatch({ type: 'restart' });
+    });
+
+    expect(test.getState().phase).toBe('idle');
+    expect(test.getState().referenceText).toBe(SAMPLE);
+  });
+
   it('unsubscribes an onReady listener when the returned function is called', async () => {
     const test = createTypingTest({
       testConfig: DEFAULT_TEST_CONFIG,

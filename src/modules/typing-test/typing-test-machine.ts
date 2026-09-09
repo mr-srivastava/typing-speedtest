@@ -4,16 +4,16 @@ import type { LetterMetrics } from '@/modules/session';
 import type { TestConfig, TestTiming } from './config';
 import { diffInputToEvents, type TypingEventLog } from './event-log';
 import { deriveBurst, deriveConsistency, deriveWpmSeries, type WpmSeriesPoint } from './replay';
-import {
-  countWordAccuracy,
-  isTestComplete,
-  recordLetterAccuracy,
-  type AccuracySnapshot,
-} from './typing-engine';
+import { countWordAccuracy, isTestComplete, recordLetterAccuracy } from './typing-engine';
 
-/** Full result of a finished test: accuracy counts, final `TestTiming`, and event-sourced stats. */
-export type TypingTestFinishedSnapshot = AccuracySnapshot &
-  TestTiming & {
+/** State captured when a test ends. */
+export type TypingTestFinishedSnapshot = {
+  correctWordCount: number;
+  totalWordCount: number;
+  correctChars: number;
+  typedChars: number;
+  letterAccuracy: Record<string, LetterMetrics>;
+} & TestTiming & {
     eventLog: TypingEventLog;
     wpmSeries: WpmSeriesPoint[];
     consistency: number;
@@ -28,7 +28,7 @@ export type TypingTestEvent =
 
 export type TypingTestContext = TestTiming & {
   config: TestConfig;
-  /** Kept in context so it survives the `loading` state being re-entered on restart/reconfigure. */
+  /** Persists across reloads triggered by restart or reconfiguration. */
   getReferenceText: (config: TestConfig) => Promise<string>;
   referenceText: string;
   input: string;
@@ -40,6 +40,7 @@ export type TypingTestContext = TestTiming & {
   eventLog: TypingEventLog;
   testStartTime: number | null;
   snapshot: TypingTestFinishedSnapshot | null;
+  loadError: string | null;
 };
 
 export interface TypingTestInput {
@@ -71,10 +72,11 @@ function createLoadingContext(
     eventLog: [],
     testStartTime: null,
     snapshot: null,
+    loadError: null,
   };
 }
 
-/** Builds the finish snapshot straight from context — the counts are already accurate, kept incremental by `applyInput`. */
+/** Captures the final state and derived metrics. */
 function buildSnapshot(context: TypingTestContext): TypingTestFinishedSnapshot {
   const wpmSeries = deriveWpmSeries(context.eventLog);
   const timing: TestTiming =
@@ -100,7 +102,7 @@ function buildSnapshot(context: TypingTestContext): TypingTestFinishedSnapshot {
   };
 }
 
-/** True once `applyInput`/`tick` has driven the context into a finishing condition. */
+/** Checks whether input or time has ended the test. */
 function isComplete(context: TypingTestContext): boolean {
   if (isTestComplete(context.referenceText, context.input)) {
     return true;
@@ -137,8 +139,7 @@ export const typingTestMachine = setup({
         now - testStartTime,
       );
 
-      // correctChars is tracked incrementally off the same per-event correctness that
-      // populates the event log, instead of rescanning the whole input on every keystroke.
+      // Update the count from the input delta instead of rescanning the text.
       let correctChars = context.correctChars;
       for (const logEvent of newEvents) {
         if (logEvent.type === 'char') {
@@ -203,8 +204,13 @@ export const typingTestMachine = setup({
           target: 'idle',
           actions: assign(({ event }) => ({ referenceText: event.output })),
         },
+        onError: {
+          target: 'error',
+          actions: assign(({ event }) => ({ loadError: String(event.error) })),
+        },
       },
     },
+    error: {},
     idle: {
       on: {
         input: { target: 'active', actions: 'applyInput' },

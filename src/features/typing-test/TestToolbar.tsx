@@ -10,10 +10,11 @@ interface TestToolbarProps {
   timer: number;
   timerDuration: number;
   mode: TestMode;
-  /** Word-mode target word count, shown as "correct/target" instead of a bare count. */
+  /** Word-mode completion target. */
   targetWordCount?: number;
   started: boolean;
   finished: boolean;
+  loadError: string | null;
   onRestart: () => void;
   wpm: number;
   accuracy: number;
@@ -28,13 +29,14 @@ const TestToolbar: React.FC<TestToolbarProps> = ({
   targetWordCount,
   started,
   finished,
+  loadError,
   onRestart,
   wpm,
   accuracy,
   correctWords,
   className = '',
 }) => {
-  const restartDisabled = !started && !finished;
+  const restartDisabled = !started && !finished && !loadError;
 
   return (
     <div
@@ -59,7 +61,11 @@ const TestToolbar: React.FC<TestToolbarProps> = ({
         className={cn(layoutClasses.flexCenter, 'min-w-0 flex-1 gap-3 sm:gap-6 text-xs sm:text-sm')}
         aria-live="polite"
       >
-        {started ? (
+        {loadError ? (
+          <span className="text-destructive text-center truncate">
+            Unable to load text — restart to try again
+          </span>
+        ) : started ? (
           <>
             <span className="tabular-nums">
               <span className="font-semibold text-success">{wpm}</span>

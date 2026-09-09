@@ -46,10 +46,8 @@ const TestScreen: React.FC<TestScreenProps> = ({ defaultTimer = 60, className = 
     [recordTest],
   );
 
-  const { content, status, mode, timing, timer, metrics, snapshot, actions } = useTypingTest(
-    config,
-    { onFinished: handleFinished },
-  );
+  const { content, status, loadError, mode, timing, timer, metrics, snapshot, actions } =
+    useTypingTest(config, { onFinished: handleFinished });
 
   const isFirstConfigRender = useRef(true);
   useEffect(() => {
@@ -65,8 +63,7 @@ const TestScreen: React.FC<TestScreenProps> = ({ defaultTimer = 60, className = 
     setIsMetricsModalOpen(false);
   }, [actions]);
 
-  // Word mode counts elapsed seconds up with no countdown, so the toolbar clock needs a
-  // mode-aware source instead of timer.remaining.
+  // Word mode shows elapsed time; time mode shows the countdown.
   const displayTimer = mode === 'time' ? timer.remaining : timer.elapsedSeconds;
   const displayTimerDuration = mode === 'time' ? timer.duration : timer.elapsedSeconds;
   const targetWordCount = mode === 'words' ? config.wordCount : undefined;
@@ -81,7 +78,7 @@ const TestScreen: React.FC<TestScreenProps> = ({ defaultTimer = 60, className = 
       typedChars: metrics.typedChars,
       ...timing,
       letterAccuracy: metrics.letterAccuracy,
-      // Event-sourced stats only exist once the test has finished.
+      // These metrics are final only after the test ends.
       consistency: snapshot?.consistency,
       wpmSeries: snapshot?.wpmSeries,
     }),
@@ -118,7 +115,7 @@ const TestScreen: React.FC<TestScreenProps> = ({ defaultTimer = 60, className = 
             referenceText={content.text}
             input={content.input}
             onInputChange={actions.setInput}
-            readOnly={status.finished || status.loading}
+            readOnly={status.finished || status.loading || status.error}
             focusKey={content.text}
             timer={displayTimer}
             timerDuration={displayTimerDuration}
@@ -128,6 +125,7 @@ const TestScreen: React.FC<TestScreenProps> = ({ defaultTimer = 60, className = 
             onConfigChange={setConfig}
             started={status.started}
             finished={status.finished}
+            loadError={loadError}
             onRestart={handleRestart}
             wpm={liveWpm}
             accuracy={liveAccuracy}

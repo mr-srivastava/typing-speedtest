@@ -19,7 +19,7 @@ export interface UseTypingTestOptions {
   getReferenceText?: (config: TestConfig) => Promise<string>;
 }
 
-/** Pulls the discriminated `TestTiming` out of `state` for consumers that need to branch on mode. */
+/** Returns the timing shape for the active mode. */
 function extractTiming(state: TypingTestState): TestTiming {
   return state.mode === 'time'
     ? { mode: 'time', timerRemaining: state.timerRemaining, timerDuration: state.timerDuration }
@@ -32,14 +32,14 @@ function toHookReturn(state: TypingTestState) {
     status: {
       phase: state.phase,
       loading: state.phase === 'loading',
+      error: state.phase === 'error',
       started: state.phase === 'active' || state.phase === 'finished',
       finished: state.phase === 'finished',
     },
+    loadError: state.loadError,
     mode: state.mode,
     timing: extractTiming(state),
-    // Flattened for UI ergonomics: the inactive mode's field(s) read as 0, matching the
-    // discriminated `TestTiming`'s absence of that field for the current mode. Use `timing`
-    // above instead when mode-safe access is what's needed (WPM calc, anything downstream).
+    // The flat timer shape keeps display code simple. Use timing for mode-specific work.
     timer: {
       remaining: state.mode === 'time' ? state.timerRemaining : 0,
       duration: state.mode === 'time' ? state.timerDuration : 0,
@@ -52,7 +52,7 @@ function toHookReturn(state: TypingTestState) {
       typedChars: state.typedChars,
       letterAccuracy: state.letterAccuracy,
     },
-    /** Event-sourced stats (wpmSeries/consistency/burst) — populated once the test finishes. */
+    /** Available after the test finishes. */
     snapshot: state.snapshot,
   };
 }
@@ -104,7 +104,7 @@ export function useTypingTest(testConfig: TestConfig, options: UseTypingTestOpti
 
   useEffect(() => {
     const unsubscribe = engine.onReady(() => sync());
-    sync(); // catch up in case the reference text resolved before this effect ran
+    sync(); // Covers a load that finished before the subscription was installed.
     return unsubscribe;
   }, [engine, sync]);
 
@@ -132,8 +132,7 @@ export function useTypingTest(testConfig: TestConfig, options: UseTypingTestOpti
 
   const view = toHookReturn(state);
 
-  // Stable reference so consumers can depend on the whole `actions` object (e.g. in a
-  // useEffect) without it changing identity every render.
+  // Keep the action object stable for consumers that depend on it.
   const actions = useMemo(
     () => ({ restart, setInput, reconfigure }),
     [restart, setInput, reconfigure],

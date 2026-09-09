@@ -1,8 +1,8 @@
+import type { LanguageCode } from './word-lists';
+
 export type TestMode = 'time' | 'words';
 
-export type LanguageCode = 'english';
-
-/** `timeSeconds` and `wordCount` are both always present so switching `mode` doesn't lose the other preset. */
+/** Keep both values when switching modes. */
 export interface TestConfig {
   mode: TestMode;
   timeSeconds: number;
@@ -12,7 +12,7 @@ export interface TestConfig {
   language: LanguageCode;
 }
 
-/** Mode-specific live timing: time mode counts down, word mode counts up with no ceiling. */
+/** Time mode counts down. Word mode counts up. */
 export type TestTiming =
   | { mode: 'time'; timerRemaining: number; timerDuration: number }
   | { mode: 'words'; elapsedSeconds: number };

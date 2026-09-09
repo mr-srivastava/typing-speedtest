@@ -21,6 +21,7 @@ interface TestPanelProps {
   onConfigChange: (next: TestConfig) => void;
   started: boolean;
   finished: boolean;
+  loadError: string | null;
   onRestart: () => void;
   wpm: number;
   accuracy: number;
@@ -42,6 +43,7 @@ const TestPanel: React.FC<TestPanelProps> = ({
   onConfigChange,
   started,
   finished,
+  loadError,
   onRestart,
   wpm,
   accuracy,
@@ -63,6 +65,7 @@ const TestPanel: React.FC<TestPanelProps> = ({
         targetWordCount={targetWordCount}
         started={started}
         finished={finished}
+        loadError={loadError}
         onRestart={onRestart}
         wpm={wpm}
         accuracy={accuracy}

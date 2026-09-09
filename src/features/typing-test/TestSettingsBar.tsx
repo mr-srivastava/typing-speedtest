@@ -11,22 +11,16 @@ import { Button } from '@/shared/ui/button';
 import {
   TIME_PRESETS,
   WORD_COUNT_PRESETS,
-  type LanguageCode,
+  LANGUAGES,
   type TestConfig,
   type TestMode,
 } from '@/modules/typing-test';
 import { cn } from '@/shared/lib/cn';
 
-const LANGUAGE_LABELS: Record<LanguageCode, string> = {
-  english: 'English',
-};
-
-const LANGUAGES = Object.keys(LANGUAGE_LABELS) as LanguageCode[];
-
 interface TestSettingsBarProps {
   config: TestConfig;
   onConfigChange: (next: TestConfig) => void;
-  /** Settings shouldn't change mid-test — disable (not hide) once a test has started. */
+  /** Settings lock after typing begins. */
   disabled: boolean;
   className?: string;
 }
@@ -137,19 +131,19 @@ const TestSettingsBar: React.FC<TestSettingsBarProps> = ({
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline" size="sm" disabled={disabled}>
-            {LANGUAGE_LABELS[config.language]}
+            {LANGUAGES.find(({ code }) => code === config.language)?.label}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start">
           <DropdownMenuRadioGroup
             value={config.language}
             onValueChange={(value) =>
-              onConfigChange({ ...config, language: value as LanguageCode })
+              onConfigChange({ ...config, language: value as TestConfig['language'] })
             }
           >
             {LANGUAGES.map((language) => (
-              <DropdownMenuRadioItem key={language} value={language}>
-                {LANGUAGE_LABELS[language]}
+              <DropdownMenuRadioItem key={language.code} value={language.code}>
+                {language.label}
               </DropdownMenuRadioItem>
             ))}
           </DropdownMenuRadioGroup>
