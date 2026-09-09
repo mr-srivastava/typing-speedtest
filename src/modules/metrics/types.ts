@@ -1,4 +1,4 @@
-import type { LetterMetrics } from '@/modules/session/types';
+import type { LetterMetrics } from '@/modules/typing-test/types';
 import type { TestTiming } from '@/modules/typing-test/config';
 import type { WpmSeriesPoint } from '@/modules/typing-test/replay';
 

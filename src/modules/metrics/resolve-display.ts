@@ -1,4 +1,5 @@
-import type { EnhancedStoredData, LetterMetrics } from '@/modules/session/types';
+import type { EnhancedStoredData } from '@/modules/session/types';
+import type { LetterMetrics } from '@/modules/typing-test/types';
 import { calculateCurrentAccuracy, calculateWpm, resolveLiveElapsedSeconds } from './calculate';
 import type { LiveTestMetrics, MetricsDisplayModel, MetricsPreference, MetricsView } from './types';
 

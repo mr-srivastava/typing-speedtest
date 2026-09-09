@@ -1,4 +1,4 @@
-import type { MetricsDisplayModel } from '@/modules/metrics';
+import type { MetricsDisplayModel } from '@/modules/metrics/types';
 
 export function getMetricsModalTitle(
   model: MetricsDisplayModel,

@@ -1,10 +1,10 @@
 import { assign, fromPromise, setup } from 'xstate';
 
-import type { LetterMetrics } from '@/modules/session';
 import type { TestConfig, TestTiming } from './config';
 import { diffInputToEvents, type TypingEventLog } from './event-log';
 import { deriveBurst, deriveConsistency, deriveWpmSeries, type WpmSeriesPoint } from './replay';
 import { countWordAccuracy, isTestComplete, recordLetterAccuracy } from './typing-engine';
+import type { LetterMetrics } from './types';
 
 /** State captured when a test ends. */
 export type TypingTestFinishedSnapshot = {

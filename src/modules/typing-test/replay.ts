@@ -1,5 +1,5 @@
-import { calculateWpm } from '@/modules/metrics';
 import type { TypingEventLog, TypingLogEvent } from './event-log';
+import { calculateWpm } from './scoring';
 
 export interface WpmSeriesPoint {
   second: number;

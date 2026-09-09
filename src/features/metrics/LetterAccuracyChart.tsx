@@ -2,8 +2,8 @@
 
 import { useMemo, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { LetterMetrics } from '@/modules/session';
-import { calculateOverallWeightedAccuracy } from '@/modules/metrics';
+import type { LetterMetrics } from '@/modules/typing-test/types';
+import { calculateOverallWeightedAccuracy } from '@/modules/metrics/calculate';
 import { cn } from '@/shared/lib/cn';
 import { layoutClasses, radiusClasses } from '@/shared/layout/layout-utils';
 import {

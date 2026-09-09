@@ -1,22 +1,13 @@
 'use client';
-import React, { useCallback, useEffect, useMemo, useRef, useState, startTransition } from 'react';
+import React, { useCallback, useEffect, useRef, useState, startTransition } from 'react';
 import dynamic from 'next/dynamic';
 import TestPanel from '@/features/typing-test/TestPanel';
 import { AppShell } from '@/shared/layout/AppShell';
-import {
-  DEFAULT_TEST_CONFIG,
-  useTypingTest,
-  type TestConfig,
-  type TypingTestFinishedSnapshot,
-} from '@/modules/typing-test';
-import { useSession } from '@/modules/session';
-import {
-  buildTestSession,
-  calculateCurrentAccuracy,
-  calculateWpm,
-  resolveLiveElapsedSeconds,
-  type LiveTestMetrics,
-} from '@/modules/metrics';
+import { DEFAULT_TEST_CONFIG, type TestConfig } from '@/modules/typing-test/config';
+import type { TypingTestFinishedSnapshot } from '@/modules/typing-test/create-typing-test';
+import { useTypingTest } from '@/modules/typing-test/use-typing-test';
+import { useSession } from '@/modules/session/session-provider';
+import { buildTestSession } from '@/modules/metrics/build-test-session';
 import { layoutClasses } from '@/shared/layout/layout-utils';
 import { cn } from '@/shared/lib/cn';
 
@@ -46,8 +37,10 @@ const TestScreen: React.FC<TestScreenProps> = ({ defaultTimer = 60, className = 
     [recordTest],
   );
 
-  const { content, status, loadError, mode, timing, timer, metrics, snapshot, actions } =
-    useTypingTest(config, { onFinished: handleFinished });
+  const { content, status, loadError, mode, timer, metrics, analytics, actions } = useTypingTest(
+    config,
+    { onFinished: handleFinished },
+  );
 
   const isFirstConfigRender = useRef(true);
   useEffect(() => {
@@ -67,40 +60,6 @@ const TestScreen: React.FC<TestScreenProps> = ({ defaultTimer = 60, className = 
   const displayTimer = mode === 'time' ? timer.remaining : timer.elapsedSeconds;
   const displayTimerDuration = mode === 'time' ? timer.duration : timer.elapsedSeconds;
   const targetWordCount = mode === 'words' ? config.wordCount : undefined;
-
-  const liveElapsedSeconds = useMemo(() => resolveLiveElapsedSeconds(timing), [timing]);
-
-  const liveMetrics: LiveTestMetrics = useMemo(
-    () => ({
-      correctWordCount: metrics.correctWordCount,
-      totalWordCount: metrics.totalWordCount,
-      correctChars: metrics.correctChars,
-      typedChars: metrics.typedChars,
-      ...timing,
-      letterAccuracy: metrics.letterAccuracy,
-      // These metrics are final only after the test ends.
-      consistency: snapshot?.consistency,
-      wpmSeries: snapshot?.wpmSeries,
-    }),
-    [
-      timing,
-      metrics.correctWordCount,
-      metrics.totalWordCount,
-      metrics.correctChars,
-      metrics.typedChars,
-      metrics.letterAccuracy,
-      snapshot,
-    ],
-  );
-
-  const liveWpm = useMemo(
-    () => calculateWpm(metrics.correctChars, liveElapsedSeconds),
-    [metrics.correctChars, liveElapsedSeconds],
-  );
-  const liveAccuracy = useMemo(
-    () => calculateCurrentAccuracy(metrics.correctWordCount, metrics.totalWordCount),
-    [metrics.correctWordCount, metrics.totalWordCount],
-  );
 
   return (
     <AppShell headerVariant="minimal" className={className}>
@@ -127,8 +86,8 @@ const TestScreen: React.FC<TestScreenProps> = ({ defaultTimer = 60, className = 
             finished={status.finished}
             loadError={loadError}
             onRestart={handleRestart}
-            wpm={liveWpm}
-            accuracy={liveAccuracy}
+            wpm={analytics.wpm}
+            accuracy={analytics.accuracy}
             correctWords={metrics.correctWordCount}
           />
 
@@ -136,7 +95,7 @@ const TestScreen: React.FC<TestScreenProps> = ({ defaultTimer = 60, className = 
             key={`${isMetricsModalOpen}-${data?.cumulative.totalTests ?? 0}`}
             isOpen={isMetricsModalOpen}
             onOpenChange={setIsMetricsModalOpen}
-            liveMetrics={liveMetrics}
+            liveMetrics={analytics}
             sessionData={data}
             onRestart={handleRestart}
             preference="auto"

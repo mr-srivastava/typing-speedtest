@@ -3,7 +3,7 @@ import React, { useCallback, useState, startTransition } from 'react';
 import dynamic from 'next/dynamic';
 import HeroSection from '@/features/home/HeroSection';
 import { toOverallMetricsData } from '@/features/metrics/metrics-display-utils';
-import { useSession } from '@/modules/session';
+import { useSession } from '@/modules/session/session-provider';
 import { AppShell } from '@/shared/layout/AppShell';
 
 const MetricsModal = dynamic(

@@ -1,10 +1,8 @@
 import type { TestMode } from '@/modules/typing-test/config';
 import type { WpmSeriesPoint } from '@/modules/typing-test/replay';
+import type { LetterMetrics } from '@/modules/typing-test/types';
 
-export interface LetterMetrics {
-  correct: number;
-  total: number;
-}
+export type { LetterMetrics } from '@/modules/typing-test/types';
 
 export interface CumulativeStats {
   totalTests: number;

@@ -11,10 +11,10 @@ import { Button } from '@/shared/ui/button';
 import {
   TIME_PRESETS,
   WORD_COUNT_PRESETS,
-  LANGUAGES,
   type TestConfig,
   type TestMode,
-} from '@/modules/typing-test';
+} from '@/modules/typing-test/config';
+import { LANGUAGES } from '@/modules/typing-test/word-lists';
 import { cn } from '@/shared/lib/cn';
 
 interface TestSettingsBarProps {

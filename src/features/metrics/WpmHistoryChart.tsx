@@ -2,7 +2,7 @@ import { CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/shared/ui/chart';
 import { wpmHistoryChartConfig } from '@/shared/lib/chart-config';
-import type { WpmSeriesPoint } from '@/modules/typing-test';
+import type { WpmSeriesPoint } from '@/modules/typing-test/replay';
 import { cn } from '@/shared/lib/cn';
 
 interface WpmHistoryChartProps {

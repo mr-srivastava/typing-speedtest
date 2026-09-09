@@ -1,6 +1,6 @@
 /** Tracks letter attempts only. Backspace does not undo them. */
 
-import type { LetterMetrics } from '@/modules/session';
+import type { LetterMetrics } from './types';
 
 export interface WordAccuracy {
   correct: number;

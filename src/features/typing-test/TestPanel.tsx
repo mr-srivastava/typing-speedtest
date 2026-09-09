@@ -3,7 +3,7 @@ import { Card } from '@/shared/ui/card';
 import TestToolbar from '@/features/typing-test/TestToolbar';
 import TestSettingsBar from '@/features/typing-test/TestSettingsBar';
 import TypingSurface from '@/features/typing-test/TypingSurface';
-import type { TestConfig, TestMode } from '@/modules/typing-test';
+import type { TestConfig, TestMode } from '@/modules/typing-test/config';
 import { gradients } from '@/shared/lib/theme';
 import { cn } from '@/shared/lib/cn';
 

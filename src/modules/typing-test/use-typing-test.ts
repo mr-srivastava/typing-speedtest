@@ -10,6 +10,7 @@ import {
   type TypingTestState,
 } from './create-typing-test';
 import getReferenceText from './text-provider';
+import { deriveLiveTypingAnalytics } from './analytics';
 
 export type { TypingTestFinishedSnapshot };
 export type { TypingTestPhase } from './create-typing-test';
@@ -52,6 +53,7 @@ function toHookReturn(state: TypingTestState) {
       typedChars: state.typedChars,
       letterAccuracy: state.letterAccuracy,
     },
+    analytics: deriveLiveTypingAnalytics(state),
     /** Available after the test finishes. */
     snapshot: state.snapshot,
   };

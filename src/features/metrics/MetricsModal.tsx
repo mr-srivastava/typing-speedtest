@@ -6,12 +6,9 @@ import {
   getMetricsModalActionLabel,
   getMetricsModalTitle,
 } from '@/features/metrics/metrics-modal-utils';
-import type { EnhancedStoredData } from '@/modules/session';
-import {
-  resolveMetricsDisplay,
-  type LiveTestMetrics,
-  type MetricsPreference,
-} from '@/modules/metrics';
+import type { EnhancedStoredData } from '@/modules/session/types';
+import { resolveMetricsDisplay } from '@/modules/metrics/resolve-display';
+import type { LiveTestMetrics, MetricsPreference } from '@/modules/metrics/types';
 import { Button } from '@/shared/ui/button';
 import { radiusClasses } from '@/shared/layout/layout-utils';
 import { cn } from '@/shared/lib/cn';

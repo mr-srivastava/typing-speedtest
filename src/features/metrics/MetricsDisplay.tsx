@@ -6,7 +6,7 @@ import OverallStatsBlock from '@/features/metrics/OverallStatsBlock';
 import { type OverallMetricsData } from '@/features/metrics/metrics-display-utils';
 import { layoutClasses, textClasses } from '@/shared/layout/layout-utils';
 import { width as widthTokens } from '@/shared/lib/tokens';
-import type { MetricsDisplayModel } from '@/modules/metrics';
+import type { MetricsDisplayModel } from '@/modules/metrics/types';
 import MetricGroup from '@/shared/ui/MetricGroup';
 import { cn } from '@/shared/lib/cn';
 import { wpmChartConfig, accuracyChartConfig } from '@/shared/lib/chart-config';
