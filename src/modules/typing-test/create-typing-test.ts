@@ -1,42 +1,23 @@
-import type { LetterMetrics } from '@/modules/session';
-import type { TestConfig, TestTiming } from './config';
-import { diffInputToEvents, type TypingEventLog } from './event-log';
-import { deriveBurst, deriveConsistency, deriveWpmSeries, type WpmSeriesPoint } from './replay';
-import { buildFinishedSnapshot, evaluateInput, type AccuracySnapshot } from './typing-engine';
+import { createActor } from 'xstate';
 
-/**
- * Full result of a finished test: `buildFinishedSnapshot`'s accuracy counts, this test's
- * `TestTiming`, and the event-sourced stats derived by replaying the event log.
- */
-export type TypingTestFinishedSnapshot = AccuracySnapshot &
-  TestTiming & {
-    eventLog: TypingEventLog;
-    wpmSeries: WpmSeriesPoint[];
-    consistency: number;
-    burst: number;
-  };
+import type { TestConfig } from './config';
+import {
+  typingTestMachine,
+  type TypingTestContext,
+  type TypingTestEvent,
+  type TypingTestFinishedSnapshot,
+} from './typing-test-machine';
+
+export type { TypingTestEvent, TypingTestFinishedSnapshot };
 
 export type TypingTestPhase = 'loading' | 'idle' | 'active' | 'finished';
 
-export type TypingTestEvent =
-  | { type: 'input'; value: string }
-  | { type: 'restart' }
-  | { type: 'reconfigure'; config: TestConfig }
-  | { type: 'tick' };
+/** `Omit` over `T`, distributed across a union so a discriminated union's variant-specific keys survive. */
+type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K> : never;
 
-export type TypingTestState = TestTiming & {
+/** Public state = the machine's context (minus the `getReferenceText` closure) plus its phase. */
+export type TypingTestState = DistributiveOmit<TypingTestContext, 'getReferenceText'> & {
   phase: TypingTestPhase;
-  config: TestConfig;
-  referenceText: string;
-  input: string;
-  correctWordCount: number;
-  totalWordCount: number;
-  correctChars: number;
-  typedChars: number;
-  letterAccuracy: Record<string, LetterMetrics>;
-  eventLog: TypingEventLog;
-  testStartTime: number | null;
-  snapshot: TypingTestFinishedSnapshot | null;
 };
 
 export interface TypingTest {
@@ -46,149 +27,41 @@ export interface TypingTest {
   onReady(listener: () => void): () => void;
 }
 
-function createInitialTiming(cfg: TestConfig): TestTiming {
-  return cfg.mode === 'time'
-    ? { mode: 'time', timerRemaining: cfg.timeSeconds, timerDuration: cfg.timeSeconds }
-    : { mode: 'words', elapsedSeconds: 0 };
-}
-
+/** Runs the typing-test state machine as an XState actor behind the same `TypingTest` interface. */
 export function createTypingTest(config: {
   testConfig: TestConfig;
   getReferenceText: (config: TestConfig) => Promise<string>;
 }): TypingTest {
-  const { getReferenceText } = config;
-  let testConfig = config.testConfig;
+  const actor = createActor(typingTestMachine, {
+    input: { testConfig: config.testConfig, getReferenceText: config.getReferenceText },
+  });
+
   const readyListeners = new Set<() => void>();
-  let loadingToken = 0;
+  let prevValue = actor.getSnapshot().value;
 
-  function createLoadingState(cfg: TestConfig): TypingTestState {
-    return {
-      phase: 'loading',
-      config: cfg,
-      ...createInitialTiming(cfg),
-      referenceText: '',
-      input: '',
-      correctWordCount: 0,
-      totalWordCount: 0,
-      correctChars: 0,
-      typedChars: 0,
-      letterAccuracy: {},
-      eventLog: [],
-      testStartTime: null,
-      snapshot: null,
-    };
-  }
-
-  function loadReferenceText(cfg: TestConfig): void {
-    const token = ++loadingToken;
-    state = createLoadingState(cfg);
-    void getReferenceText(cfg).then((text) => {
-      if (token !== loadingToken) {
-        return; // superseded by a later restart/reconfigure
-      }
-      state = { ...state, phase: 'idle', referenceText: text };
+  actor.subscribe((snapshot) => {
+    if (prevValue !== 'idle' && snapshot.value === 'idle') {
       readyListeners.forEach((listener) => listener());
-    });
-  }
+    }
+    prevValue = snapshot.value;
+  });
 
-  let state: TypingTestState = createLoadingState(testConfig);
-  loadReferenceText(testConfig);
+  actor.start();
 
-  /** Finishes the test using the current `state` as-is — callers update timing fields first. */
-  function finish(): void {
-    const accuracy = buildFinishedSnapshot(state.referenceText, state.input, state.letterAccuracy);
-    const wpmSeries = deriveWpmSeries(state.eventLog);
-    const timing: TestTiming =
-      state.mode === 'time'
-        ? { mode: 'time', timerRemaining: state.timerRemaining, timerDuration: state.timerDuration }
-        : { mode: 'words', elapsedSeconds: state.elapsedSeconds };
-
-    const snapshot: TypingTestFinishedSnapshot = {
-      ...accuracy,
-      ...timing,
-      eventLog: state.eventLog,
-      wpmSeries,
-      consistency: deriveConsistency(wpmSeries),
-      burst: deriveBurst(state.eventLog),
+  function getState(): TypingTestState {
+    const snapshot = actor.getSnapshot();
+    // `getReferenceText` is an implementation detail of the machine's context, not part of
+    // the public TypingTestState shape.
+    const { getReferenceText: _getReferenceText, ...rest } = snapshot.context;
+    return {
+      phase: snapshot.value as TypingTestPhase,
+      ...rest,
     };
-
-    state = {
-      ...state,
-      phase: 'finished',
-      correctWordCount: accuracy.correctWordCount,
-      totalWordCount: accuracy.totalWordCount,
-      correctChars: accuracy.correctChars,
-      typedChars: accuracy.typedChars,
-      snapshot,
-    };
-  }
-
-  function dispatch(event: TypingTestEvent): void {
-    if (event.type === 'restart') {
-      loadReferenceText(testConfig);
-      return;
-    }
-
-    if (event.type === 'reconfigure') {
-      testConfig = event.config;
-      loadReferenceText(testConfig);
-      return;
-    }
-
-    if (state.phase === 'loading' || state.phase === 'finished') {
-      return;
-    }
-
-    if (event.type === 'tick') {
-      if (state.phase !== 'active') {
-        return;
-      }
-
-      if (state.mode === 'words') {
-        state = { ...state, elapsedSeconds: state.elapsedSeconds + 1 };
-        return;
-      }
-
-      const nextRemaining = Math.max(0, state.timerRemaining - 1);
-      state = { ...state, timerRemaining: nextRemaining };
-      if (nextRemaining === 0) {
-        finish();
-      }
-      return;
-    }
-
-    // input
-    const now = Date.now();
-    const testStartTime = state.testStartTime ?? now;
-    const newEvents = diffInputToEvents(
-      state.input,
-      event.value,
-      state.referenceText,
-      now - testStartTime,
-    );
-    const result = evaluateInput(state.referenceText, event.value, state.letterAccuracy);
-
-    state = {
-      ...state,
-      phase: state.phase === 'idle' ? 'active' : state.phase,
-      testStartTime,
-      input: event.value,
-      eventLog: [...state.eventLog, ...newEvents],
-      correctWordCount: result.correctWordCount,
-      totalWordCount: result.totalWordCount,
-      correctChars: result.correctChars,
-      typedChars: result.typedChars,
-      letterAccuracy: result.letterAccuracy,
-    };
-
-    if (result.isComplete) {
-      finish();
-    }
   }
 
   return {
-    getState: () => state,
-    dispatch,
+    getState,
+    dispatch: (event) => actor.send(event),
     onReady: (listener) => {
       readyListeners.add(listener);
       return () => readyListeners.delete(listener);

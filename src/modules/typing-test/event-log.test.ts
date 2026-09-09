@@ -20,7 +20,12 @@ describe('diffInputToEvents', () => {
 
   it('emits one backspace event on a single-char removal', () => {
     const events = diffInputToEvents('hell', 'hel', REF, 200);
-    expect(events).toEqual([{ type: 'backspace', t: 200 }]);
+    expect(events).toEqual([{ type: 'backspace', t: 200, wasCorrect: true }]);
+  });
+
+  it('marks a backspace as incorrect when it removes a mistyped char', () => {
+    const events = diffInputToEvents('helx', 'hel', REF, 250);
+    expect(events).toEqual([{ type: 'backspace', t: 250, wasCorrect: false }]);
   });
 
   it('emits one event per char for a multi-char paste', () => {
@@ -35,9 +40,9 @@ describe('diffInputToEvents', () => {
   it('emits one backspace per char for a multi-char deletion', () => {
     const events = diffInputToEvents('hello', 'he', REF, 300);
     expect(events).toEqual([
-      { type: 'backspace', t: 300 },
-      { type: 'backspace', t: 300 },
-      { type: 'backspace', t: 300 },
+      { type: 'backspace', t: 300, wasCorrect: true },
+      { type: 'backspace', t: 300, wasCorrect: true },
+      { type: 'backspace', t: 300, wasCorrect: true },
     ]);
   });
 
@@ -45,8 +50,8 @@ describe('diffInputToEvents', () => {
     const events = diffInputToEvents('hello', 'help', REF, 400);
     // common prefix "hel"; "lo" removed, "p" added
     expect(events).toEqual([
-      { type: 'backspace', t: 400 },
-      { type: 'backspace', t: 400 },
+      { type: 'backspace', t: 400, wasCorrect: true },
+      { type: 'backspace', t: 400, wasCorrect: true },
       { type: 'char', t: 400, char: 'p', expected: 'l', correct: false },
     ]);
   });

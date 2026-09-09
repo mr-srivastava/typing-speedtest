@@ -28,7 +28,8 @@
     "react": "^19",
     "react-dom": "^19",
     "recharts": "^2.12.7",
-    "tailwind-merge": "^2.3.0"
+    "tailwind-merge": "^2.3.0",
+    "xstate": "^5.32.6"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.3",

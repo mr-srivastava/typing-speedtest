@@ -16,10 +16,9 @@ function isCharEvent(event: TypingLogEvent): event is CharEvent {
 /**
  * Per-second instantaneous WPM/raw-WPM, derived by replaying the event log and
  * bucketing char/backspace deltas into 1-second windows since the first event.
- * A backspace pops the correctness of whichever char is currently last, so a
- * mistake corrected within the same test still nets out — same semantics as
- * `typing-engine.ts`'s char-based accuracy, just kept incrementally instead of
- * recomputed from scratch on every keystroke.
+ * Each event already carries the correctness of the char it adds or removes
+ * (computed once, in `diffInputToEvents`), so a backspace nets out its
+ * `wasCorrect` char directly — no need to reconstruct which char is "on top".
  */
 export function deriveWpmSeries(log: TypingEventLog): WpmSeriesPoint[] {
   if (log.length === 0) {
@@ -27,7 +26,6 @@ export function deriveWpmSeries(log: TypingEventLog): WpmSeriesPoint[] {
   }
 
   const totalSeconds = Math.max(1, Math.ceil(log[log.length - 1].t / 1000));
-  const correctStack: boolean[] = [];
 
   let typedChars = 0;
   let correctChars = 0;
@@ -43,15 +41,11 @@ export function deriveWpmSeries(log: TypingEventLog): WpmSeriesPoint[] {
     while (eventIndex < log.length && log[eventIndex].t <= boundaryMs) {
       const event = log[eventIndex];
       if (event.type === 'char') {
-        correctStack.push(event.correct);
         typedChars++;
         if (event.correct) correctChars++;
       } else {
-        const wasCorrect = correctStack.pop();
-        if (wasCorrect !== undefined) {
-          typedChars = Math.max(0, typedChars - 1);
-          if (wasCorrect) correctChars = Math.max(0, correctChars - 1);
-        }
+        typedChars = Math.max(0, typedChars - 1);
+        if (event.wasCorrect) correctChars = Math.max(0, correctChars - 1);
       }
       eventIndex++;
     }

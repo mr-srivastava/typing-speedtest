@@ -7,7 +7,6 @@ import {
   DEFAULT_TEST_CONFIG,
   useTypingTest,
   type TestConfig,
-  type TestTiming,
   type TypingTestFinishedSnapshot,
 } from '@/modules/typing-test';
 import { useSession } from '@/modules/session';
@@ -47,9 +46,10 @@ const TestScreen: React.FC<TestScreenProps> = ({ defaultTimer = 60, className = 
     [recordTest],
   );
 
-  const { content, status, mode, timer, metrics, snapshot, actions } = useTypingTest(config, {
-    onFinished: handleFinished,
-  });
+  const { content, status, mode, timing, timer, metrics, snapshot, actions } = useTypingTest(
+    config,
+    { onFinished: handleFinished },
+  );
 
   const isFirstConfigRender = useRef(true);
   useEffect(() => {
@@ -71,20 +71,7 @@ const TestScreen: React.FC<TestScreenProps> = ({ defaultTimer = 60, className = 
   const displayTimerDuration = mode === 'time' ? timer.duration : timer.elapsedSeconds;
   const targetWordCount = mode === 'words' ? config.wordCount : undefined;
 
-  // The hook exposes a flattened timer shape for UI ergonomics; rebuild the discriminated
-  // TestTiming once here for anything that needs mode-safe access (WPM calc, the modal).
-  const currentTiming: TestTiming = useMemo(
-    () =>
-      mode === 'time'
-        ? { mode: 'time', timerRemaining: timer.remaining, timerDuration: timer.duration }
-        : { mode: 'words', elapsedSeconds: timer.elapsedSeconds },
-    [mode, timer.remaining, timer.duration, timer.elapsedSeconds],
-  );
-
-  const liveElapsedSeconds = useMemo(
-    () => resolveLiveElapsedSeconds(currentTiming),
-    [currentTiming],
-  );
+  const liveElapsedSeconds = useMemo(() => resolveLiveElapsedSeconds(timing), [timing]);
 
   const liveMetrics: LiveTestMetrics = useMemo(
     () => ({
@@ -92,14 +79,14 @@ const TestScreen: React.FC<TestScreenProps> = ({ defaultTimer = 60, className = 
       totalWordCount: metrics.totalWordCount,
       correctChars: metrics.correctChars,
       typedChars: metrics.typedChars,
-      ...currentTiming,
+      ...timing,
       letterAccuracy: metrics.letterAccuracy,
       // Event-sourced stats only exist once the test has finished.
       consistency: snapshot?.consistency,
       wpmSeries: snapshot?.wpmSeries,
     }),
     [
-      currentTiming,
+      timing,
       metrics.correctWordCount,
       metrics.totalWordCount,
       metrics.correctChars,

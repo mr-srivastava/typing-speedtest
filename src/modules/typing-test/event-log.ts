@@ -10,7 +10,7 @@
 
 export type TypingLogEvent =
   | { type: 'char'; t: number; char: string; expected: string; correct: boolean }
-  | { type: 'backspace'; t: number };
+  | { type: 'backspace'; t: number; wasCorrect: boolean };
 
 export type TypingEventLog = TypingLogEvent[];
 
@@ -18,6 +18,11 @@ export type TypingEventLog = TypingLogEvent[];
  * Diffs `prevInput` -> `nextInput` into 0+ timestamped events, all stamped `t`.
  * Handles the common single-char append/remove path, and multi-char deltas
  * (paste, IME commit) by emitting one event per changed character.
+ *
+ * Each event carries the correctness of the character it adds or removes
+ * (checked against `referenceText` at that position) — the single place this
+ * fact is computed. Callers (live counters, replay-derived stats) both read
+ * it off the event rather than re-deriving character correctness themselves.
  */
 export function diffInputToEvents(
   prevInput: string,
@@ -40,8 +45,12 @@ export function diffInputToEvents(
 
   const events: TypingLogEvent[] = [];
 
+  // Removed from the end backward: the i-th backspace removes the char that was at
+  // prevInput.length - 1 - i.
   for (let i = 0; i < removedCount; i++) {
-    events.push({ type: 'backspace', t });
+    const removedIndex = prevInput.length - 1 - i;
+    const wasCorrect = prevInput[removedIndex] === referenceText[removedIndex];
+    events.push({ type: 'backspace', t, wasCorrect });
   }
 
   for (let i = 0; i < added.length; i++) {

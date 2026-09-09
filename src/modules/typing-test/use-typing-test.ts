@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { TestConfig } from './config';
+import type { TestConfig, TestTiming } from './config';
 import {
   createTypingTest,
   type TypingTestEvent,
@@ -19,6 +19,14 @@ export interface UseTypingTestOptions {
   getReferenceText?: (config: TestConfig) => Promise<string>;
 }
 
+/** Pulls the real discriminated `TestTiming` out of `state` — the mode-safe source consumers
+ *  that need to branch on it (WPM calc, the results modal) should read from directly. */
+function extractTiming(state: TypingTestState): TestTiming {
+  return state.mode === 'time'
+    ? { mode: 'time', timerRemaining: state.timerRemaining, timerDuration: state.timerDuration }
+    : { mode: 'words', elapsedSeconds: state.elapsedSeconds };
+}
+
 function toHookReturn(state: TypingTestState) {
   return {
     content: { text: state.referenceText, input: state.input },
@@ -29,8 +37,10 @@ function toHookReturn(state: TypingTestState) {
       finished: state.phase === 'finished',
     },
     mode: state.mode,
+    timing: extractTiming(state),
     // Flattened for UI ergonomics: the inactive mode's field(s) read as 0, matching the
-    // discriminated `TestTiming`'s absence of that field for the current mode.
+    // discriminated `TestTiming`'s absence of that field for the current mode. Use `timing`
+    // above instead when mode-safe access is what's needed (WPM calc, anything downstream).
     timer: {
       remaining: state.mode === 'time' ? state.timerRemaining : 0,
       duration: state.mode === 'time' ? state.timerDuration : 0,

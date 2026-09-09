@@ -6,8 +6,8 @@ function charAt(t: number, correct = true): TypingLogEvent {
   return { type: 'char', t, char: 'a', expected: correct ? 'a' : 'b', correct };
 }
 
-function backspaceAt(t: number): TypingLogEvent {
-  return { type: 'backspace', t };
+function backspaceAt(t: number, wasCorrect = true): TypingLogEvent {
+  return { type: 'backspace', t, wasCorrect };
 }
 
 describe('deriveWpmSeries', () => {
@@ -24,7 +24,12 @@ describe('deriveWpmSeries', () => {
   });
 
   it('nets a backspace against the char it removes', () => {
-    const log: TypingEventLog = [charAt(100), charAt(200, false), backspaceAt(300), charAt(400)];
+    const log: TypingEventLog = [
+      charAt(100),
+      charAt(200, false),
+      backspaceAt(300, false),
+      charAt(400),
+    ];
     const series = deriveWpmSeries(log);
     expect(series[0].rawWpm).toBeGreaterThan(0);
     // both chars left standing are correct, so correct wpm should equal raw wpm
