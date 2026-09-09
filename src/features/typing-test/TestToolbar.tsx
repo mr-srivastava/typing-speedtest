@@ -41,7 +41,7 @@ const TestToolbar: React.FC<TestToolbarProps> = ({
   return (
     <div
       className={cn(
-        'flex flex-wrap items-center justify-between gap-2 border-b border-border px-4 py-2 sm:h-16 sm:gap-3 sm:py-0 md:px-6',
+        'flex flex-wrap items-center justify-between gap-2 px-1 py-2 sm:h-14 sm:gap-3 sm:py-0',
         className,
       )}
     >

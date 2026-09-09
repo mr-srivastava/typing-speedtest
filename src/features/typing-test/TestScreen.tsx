@@ -1,12 +1,14 @@
 'use client';
 import React, { startTransition, useCallback, useState, useSyncExternalStore } from 'react';
 import dynamic from 'next/dynamic';
+import { ChartNoAxesColumn } from 'lucide-react';
 import TestPanel from '@/features/typing-test/TestPanel';
 import TestIntro from '@/features/home/TestIntro';
 import ComingSoonStrip from '@/features/home/ComingSoonStrip';
 import MobileDesktopNotice from '@/features/home/MobileDesktopNotice';
 import StatsPanel from '@/features/metrics/StatsPanel';
 import { AppShell } from '@/shared/layout/AppShell';
+import { Button } from '@/shared/ui/button';
 import {
   DEFAULT_TEST_CONFIG,
   type TestConfig,
@@ -96,37 +98,45 @@ function DesktopTestScreen({
     onMetricsModalOpenChange(false);
   }, [onMetricsModalOpenChange, restart]);
 
-  const overallMetrics = data ? toOverallMetricsData(data.cumulative) : null;
+  const showStatsTrigger = isHydrated && !isLoading && hasSession;
 
   return (
-    <AppShell className={className}>
+    <AppShell
+      className={className}
+      headerActions={
+        showStatsTrigger ? (
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setIsStatsOpen((open) => !open)}
+            aria-expanded={isStatsOpen}
+            aria-label={isStatsOpen ? 'Hide stats' : 'View stats'}
+            className={cn(isStatsOpen && 'text-primary')}
+          >
+            <ChartNoAxesColumn className="h-4 w-4" />
+          </Button>
+        ) : null
+      }
+    >
       <div
         className={cn(
           layoutClasses.containerPadding,
-          'flex flex-col items-center gap-7 py-9 md:py-12',
+          'flex flex-col items-center gap-8 py-10 md:py-16',
         )}
       >
-        <div className="relative flex w-full flex-col items-center">
-          <TestIntro
-            isLoading={isLoading}
-            isHydrated={isHydrated}
-            overallMetrics={overallMetrics}
-            statsOpen={isStatsOpen}
-            onToggleStats={hasSession ? () => setIsStatsOpen((open) => !open) : undefined}
-          />
-
-          <StatsPanel open={isStatsOpen} sessionData={data} onClose={() => setIsStatsOpen(false)} />
-        </div>
+        <TestIntro />
 
         <TestPanel
           config={config}
           onConfigChange={onConfigChange}
           onRestart={handleRestart}
-          className="w-full max-w-3xl"
+          className="w-full max-w-screen-2xl"
         />
 
         <ComingSoonStrip hasSession={hasSession} />
       </div>
+
+      <StatsPanel open={isStatsOpen} sessionData={data} onClose={() => setIsStatsOpen(false)} />
 
       <CompletionModal
         data={data}

@@ -1,5 +1,6 @@
 'use client';
 import React from 'react';
+import { AtSign, Clock, Globe, Hash, Type } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,6 +18,11 @@ import {
 } from '@/modules/typing-test';
 import { cn } from '@/shared/lib/cn';
 
+const MODE_TABS: { value: TestMode; label: string; icon: typeof Clock }[] = [
+  { value: 'time', label: 'time', icon: Clock },
+  { value: 'words', label: 'words', icon: Type },
+];
+
 interface TestSettingsBarProps {
   config: TestConfig;
   onConfigChange: (next: TestConfig) => void;
@@ -29,18 +35,54 @@ interface ToggleButtonProps {
   active: boolean;
   disabled: boolean;
   onClick: () => void;
+  icon: typeof Clock;
   children: React.ReactNode;
 }
 
-function ToggleButton({ active, disabled, onClick, children }: ToggleButtonProps) {
+function ToggleButton({ active, disabled, onClick, icon: Icon, children }: ToggleButtonProps) {
   return (
     <Button
-      variant={active ? 'default' : 'outline'}
+      variant="ghost"
       size="sm"
       disabled={disabled}
       onClick={onClick}
       aria-pressed={active}
+      className={cn(
+        'gap-1.5 font-normal hover:bg-transparent',
+        active ? 'text-primary hover:text-primary' : 'text-muted-foreground hover:text-foreground',
+      )}
     >
+      <Icon className="h-3.5 w-3.5" />
+      {children}
+    </Button>
+  );
+}
+
+interface TabItemProps {
+  active: boolean;
+  disabled: boolean;
+  onClick: () => void;
+  icon?: typeof Clock;
+  children: React.ReactNode;
+}
+
+/** Flat, borderless tab used for mode/value selectors — no dropdown chrome. */
+function TabItem({ active, disabled, onClick, icon: Icon, children }: TabItemProps) {
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      disabled={disabled}
+      onClick={onClick}
+      aria-pressed={active}
+      className={cn(
+        'gap-1.5 font-normal hover:bg-transparent',
+        active
+          ? 'font-semibold text-primary hover:text-primary'
+          : 'text-muted-foreground hover:text-foreground',
+      )}
+    >
+      {Icon ? <Icon className="h-3.5 w-3.5" /> : null}
       {children}
     </Button>
   );
@@ -54,7 +96,6 @@ const TestSettingsBar: React.FC<TestSettingsBarProps> = ({
 }) => {
   const valuePresets = config.mode === 'time' ? TIME_PRESETS : WORD_COUNT_PRESETS;
   const currentValue = config.mode === 'time' ? config.timeSeconds : config.wordCount;
-  const valueLabel = config.mode === 'time' ? `${currentValue}s` : `${currentValue} words`;
 
   function setMode(mode: TestMode) {
     onConfigChange({ ...config, mode });
@@ -69,58 +110,12 @@ const TestSettingsBar: React.FC<TestSettingsBarProps> = ({
   return (
     <div
       className={cn(
-        'flex flex-wrap items-center gap-x-1 gap-y-2 border-b border-border px-4 py-2.5 md:px-6',
+        'flex flex-wrap items-center justify-center gap-x-1 gap-y-3 px-1 py-4 sm:gap-x-2',
         className,
       )}
     >
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            size="sm"
-            disabled={disabled}
-            className="font-normal text-muted-foreground hover:text-foreground"
-          >
-            {config.mode === 'time' ? 'Time' : 'Words'}
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="start">
-          <DropdownMenuRadioGroup
-            value={config.mode}
-            onValueChange={(value) => setMode(value as TestMode)}
-          >
-            <DropdownMenuRadioItem value="time">Time</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="words">Words</DropdownMenuRadioItem>
-          </DropdownMenuRadioGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
-
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            size="sm"
-            disabled={disabled}
-            className="font-normal text-muted-foreground hover:text-foreground"
-          >
-            {valueLabel}
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="start">
-          <DropdownMenuRadioGroup
-            value={String(currentValue)}
-            onValueChange={(value) => setValue(Number(value))}
-          >
-            {valuePresets.map((preset) => (
-              <DropdownMenuRadioItem key={preset} value={String(preset)}>
-                {preset}
-              </DropdownMenuRadioItem>
-            ))}
-          </DropdownMenuRadioGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
-
       <ToggleButton
+        icon={AtSign}
         active={config.punctuationEnabled}
         disabled={disabled}
         onClick={() =>
@@ -131,6 +126,7 @@ const TestSettingsBar: React.FC<TestSettingsBarProps> = ({
       </ToggleButton>
 
       <ToggleButton
+        icon={Hash}
         active={config.numbersEnabled}
         disabled={disabled}
         onClick={() => onConfigChange({ ...config, numbersEnabled: !config.numbersEnabled })}
@@ -138,14 +134,44 @@ const TestSettingsBar: React.FC<TestSettingsBarProps> = ({
         numbers
       </ToggleButton>
 
+      <span className="mx-3 hidden h-4 w-px bg-border sm:block" aria-hidden />
+
+      {MODE_TABS.map((tab) => (
+        <TabItem
+          key={tab.value}
+          icon={tab.icon}
+          active={config.mode === tab.value}
+          disabled={disabled}
+          onClick={() => setMode(tab.value)}
+        >
+          {tab.label}
+        </TabItem>
+      ))}
+
+      <span className="mx-3 hidden h-4 w-px bg-border sm:block" aria-hidden />
+
+      {valuePresets.map((preset) => (
+        <TabItem
+          key={preset}
+          active={currentValue === preset}
+          disabled={disabled}
+          onClick={() => setValue(preset)}
+        >
+          {preset}
+        </TabItem>
+      ))}
+
+      <span className="mx-3 hidden h-4 w-px bg-border sm:block" aria-hidden />
+
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
             size="sm"
             disabled={disabled}
-            className="font-normal text-muted-foreground hover:text-foreground"
+            className="gap-1.5 font-normal text-muted-foreground hover:text-foreground"
           >
+            <Globe className="h-3.5 w-3.5" />
             {LANGUAGES.find(({ code }) => code === config.language)?.label}
           </Button>
         </DropdownMenuTrigger>

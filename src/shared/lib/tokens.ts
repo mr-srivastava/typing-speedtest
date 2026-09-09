@@ -21,7 +21,7 @@ export const pad = {
 
 /** Width intents */
 export const width = {
-  content: 'max-w-6xl',
+  content: 'max-w-screen-2xl',
   section: 'max-w-4xl',
   panel: 'max-w-3xl',
   prose: 'max-w-2xl',

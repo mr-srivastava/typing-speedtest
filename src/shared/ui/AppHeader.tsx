@@ -8,9 +8,11 @@ import { cn } from '@/shared/lib/cn';
 
 interface AppHeaderProps {
   className?: string;
+  /** Optional slot rendered before the theme toggle — e.g. a "View stats" trigger. */
+  actions?: React.ReactNode;
 }
 
-const AppHeader: React.FC<AppHeaderProps> = ({ className = '' }) => {
+const AppHeader: React.FC<AppHeaderProps> = ({ className = '', actions }) => {
   return (
     <header className={cn('w-full', className)}>
       <div
@@ -37,13 +39,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({ className = '' }) => {
         </Button>
 
         <div className={cn(layoutClasses.flexStart, layoutClasses.gap2)}>
-          <Button
-            variant="ghost"
-            disabled
-            className="hidden text-xs font-normal text-muted-foreground sm:flex"
-          >
-            leaderboard <span className="ml-1 opacity-60">soon</span>
-          </Button>
+          {actions}
           <ThemeToggle />
         </div>
       </div>

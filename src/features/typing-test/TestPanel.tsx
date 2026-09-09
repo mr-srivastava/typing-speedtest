@@ -1,5 +1,4 @@
 import React from 'react';
-import { Card } from '@/shared/ui/card';
 import TestToolbar from '@/features/typing-test/TestToolbar';
 import TestSettingsBar from '@/features/typing-test/TestSettingsBar';
 import TypingSurface from '@/features/typing-test/TypingSurface';
@@ -29,12 +28,7 @@ const TestPanel: React.FC<TestPanelProps> = ({
   const timerDuration = state.mode === 'time' ? state.timerDuration : state.elapsedSeconds;
 
   return (
-    <Card
-      className={cn(
-        'w-full overflow-hidden rounded-lg border-border/80 bg-card shadow-none',
-        className,
-      )}
-    >
+    <div className={cn('flex w-full flex-col gap-1', className)}>
       <TestToolbar
         timer={timer}
         timerDuration={timerDuration}
@@ -55,8 +49,9 @@ const TestPanel: React.FC<TestPanelProps> = ({
         onInputChange={setInput}
         readOnly={finished || state.phase === 'loading' || state.phase === 'error'}
         focusKey={state.referenceText}
+        className="mt-8 sm:mt-12"
       />
-    </Card>
+    </div>
   );
 };
 

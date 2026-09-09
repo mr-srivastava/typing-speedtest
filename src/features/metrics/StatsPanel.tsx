@@ -53,15 +53,15 @@ const StatsPanel: React.FC<StatsPanelProps> = ({ open, sessionData, onClose, cla
           key="stats-panel"
           role="dialog"
           aria-label="Your stats"
-          initial={{ opacity: 0, transform: 'translate(-50%, -4px)' }}
-          animate={{ opacity: 1, transform: 'translate(-50%, 0px)' }}
-          exit={{ opacity: 0, transform: 'translate(-50%, -4px)' }}
+          initial={{ opacity: 0, transform: 'translateY(-4px)' }}
+          animate={{ opacity: 1, transform: 'translateY(0px)' }}
+          exit={{ opacity: 0, transform: 'translateY(-4px)' }}
           transition={{
             duration: reduceMotion ? 0.01 : motionTokens.durationUi,
             ease: motionTokens.easeOut,
           }}
           className={cn(
-            'absolute left-1/2 top-full z-30 mt-3 max-h-[70vh] w-[calc(100vw-2rem)] max-w-2xl overflow-y-auto rounded-lg border border-border bg-card p-4 shadow-2xl shadow-black/10 sm:p-6',
+            'fixed right-4 top-[4.5rem] z-30 max-h-[75vh] w-[calc(100vw-2rem)] max-w-3xl overflow-y-auto rounded-lg border border-border bg-card p-4 shadow-2xl shadow-black/10 sm:right-6 sm:top-24 sm:p-6',
             className,
           )}
         >
@@ -73,9 +73,6 @@ const StatsPanel: React.FC<StatsPanelProps> = ({ open, sessionData, onClose, cla
               <h2 className="mt-1 text-lg font-semibold leading-tight tracking-tight sm:text-xl">
                 Your stats
               </h2>
-              {model.statsTitle ? (
-                <p className="mt-1 text-sm text-muted-foreground">{model.statsTitle}</p>
-              ) : null}
             </div>
             <Button
               variant="ghost"
@@ -88,7 +85,7 @@ const StatsPanel: React.FC<StatsPanelProps> = ({ open, sessionData, onClose, cla
             </Button>
           </div>
 
-          <MetricsDisplay model={model} compact />
+          <MetricsDisplay model={model} />
         </motion.div>
       ) : null}
     </AnimatePresence>

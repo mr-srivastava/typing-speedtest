@@ -55,6 +55,6 @@ export function getCharStatus(referenceText: string, input: string, index: numbe
 }
 
 export const typingSurfaceTypography =
-  'text-base md:text-lg font-mono leading-relaxed tracking-normal';
+  'text-lg md:text-xl font-mono leading-loose tracking-wide [word-spacing:0.3em]';
 
-export const typingSurfacePadding = 'p-4 md:p-6';
+export const typingSurfacePadding = 'px-1 py-4 md:py-6';
