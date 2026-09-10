@@ -70,10 +70,6 @@
   --color-chart-4: hsl(var(--chart-4));
   --color-chart-5: hsl(var(--chart-5));
 
-  --color-beam-start: hsl(var(--beam-start));
-  --color-beam-mid: hsl(var(--beam-mid));
-  --color-beam-end: hsl(var(--beam-end));
-
   /* Radius */
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
@@ -160,11 +156,6 @@
     --chart-4: 17 88% 61%;
     --chart-5: 210 80% 50%;
 
-    /* Ambient beams (derived from chart palette) */
-    --beam-start: var(--chart-2);
-    --beam-mid: var(--chart-3);
-    --beam-end: 280 75% 65%;
-
     /* Radius */
     --radius: 0.75rem;
 
@@ -212,10 +203,6 @@
     --chart-3: 262 83% 60%;
     --chart-4: 17 88% 63%;
     --chart-5: 210 80% 55%;
-
-    --beam-start: var(--chart-2);
-    --beam-mid: var(--chart-3);
-    --beam-end: 280 75% 70%;
 
     --radius: 0.75rem;
 

@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import MetricsDisplay from '@/features/metrics/MetricsDisplay';
 import {

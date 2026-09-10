@@ -5,6 +5,7 @@ export function useOutsideClick(
   callback: (event: MouseEvent | TouchEvent) => void,
 ) {
   const callbackRef = useRef(callback);
+  // oxlint-disable-next-line react/refs -- stable-callback ref pattern, not read during render
   callbackRef.current = callback;
 
   useEffect(() => {

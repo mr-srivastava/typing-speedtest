@@ -10,6 +10,7 @@ export function useSession(store: SessionStore) {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
+    // oxlint-disable-next-line react/set-state-in-effect -- loads from storage, unavailable during SSR/render
     setData(store.load());
     setIsReady(true);
   }, [store]);
