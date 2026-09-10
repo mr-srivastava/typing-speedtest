@@ -1,7 +1,7 @@
 'use client';
 import React, { startTransition, useCallback, useState, useSyncExternalStore } from 'react';
 import dynamic from 'next/dynamic';
-import { ChartNoAxesColumn } from 'lucide-react';
+import { BarChartIcon } from '@radix-ui/react-icons';
 import TestPanel from '@/features/typing-test/TestPanel';
 import TestIntro from '@/features/home/TestIntro';
 import MobileDesktopNotice from '@/features/home/MobileDesktopNotice';
@@ -112,7 +112,7 @@ function DesktopTestScreen({
             aria-label={isStatsOpen ? 'Hide stats' : 'View stats'}
             className={cn(isStatsOpen && 'text-primary')}
           >
-            <ChartNoAxesColumn className="h-4 w-4" />
+            <BarChartIcon className="h-4 w-4" />
           </Button>
         ) : null
       }

@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { X } from 'lucide-react';
+import { Cross2Icon } from '@radix-ui/react-icons';
 import MetricsDisplay from '@/features/metrics/MetricsDisplay';
 import {
   getMetricsSheetActionLabel,
@@ -236,7 +236,7 @@ const MetricsSheet: React.FC<MetricsSheetProps> = ({
                   aria-label={hasLiveMetrics ? 'Close' : 'Hide stats'}
                   className="shrink-0"
                 >
-                  <X className="h-4 w-4" />
+                  <Cross2Icon className="h-4 w-4" />
                 </Button>
               </div>
 

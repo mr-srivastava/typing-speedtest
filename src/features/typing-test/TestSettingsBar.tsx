@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { AtSign, Clock, Globe, Hash, Type } from 'lucide-react';
+import { ClockIcon, GlobeIcon, QuoteIcon, TextIcon, ValueIcon } from '@radix-ui/react-icons';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,9 +18,9 @@ import {
 } from '@/modules/typing-test';
 import { cn } from '@/shared/lib/cn';
 
-const MODE_TABS: { value: TestMode; label: string; icon: typeof Clock }[] = [
-  { value: 'time', label: 'time', icon: Clock },
-  { value: 'words', label: 'words', icon: Type },
+const MODE_TABS: { value: TestMode; label: string; icon: typeof ClockIcon }[] = [
+  { value: 'time', label: 'time', icon: ClockIcon },
+  { value: 'words', label: 'words', icon: TextIcon },
 ];
 
 interface TestSettingsBarProps {
@@ -35,7 +35,7 @@ interface ToggleButtonProps {
   active: boolean;
   disabled: boolean;
   onClick: () => void;
-  icon: typeof Clock;
+  icon: typeof ClockIcon;
   children: React.ReactNode;
 }
 
@@ -62,7 +62,7 @@ interface TabItemProps {
   active: boolean;
   disabled: boolean;
   onClick: () => void;
-  icon?: typeof Clock;
+  icon?: typeof ClockIcon;
   children: React.ReactNode;
 }
 
@@ -115,7 +115,7 @@ const TestSettingsBar: React.FC<TestSettingsBarProps> = ({
       )}
     >
       <ToggleButton
-        icon={AtSign}
+        icon={QuoteIcon}
         active={config.punctuationEnabled}
         disabled={disabled}
         onClick={() =>
@@ -126,7 +126,7 @@ const TestSettingsBar: React.FC<TestSettingsBarProps> = ({
       </ToggleButton>
 
       <ToggleButton
-        icon={Hash}
+        icon={ValueIcon}
         active={config.numbersEnabled}
         disabled={disabled}
         onClick={() => onConfigChange({ ...config, numbersEnabled: !config.numbersEnabled })}
@@ -171,7 +171,7 @@ const TestSettingsBar: React.FC<TestSettingsBarProps> = ({
             disabled={disabled}
             className="gap-1.5 font-normal text-muted-foreground hover:text-foreground"
           >
-            <Globe className="h-3.5 w-3.5" />
+            <GlobeIcon className="h-3.5 w-3.5" />
             {LANGUAGES.find(({ code }) => code === config.language)?.label}
           </Button>
         </DropdownMenuTrigger>
