@@ -4,20 +4,18 @@ import { themeColorClasses } from '@/shared/lib/theme';
 import { cn } from '@/shared/lib/cn';
 
 interface MobileDesktopNoticeProps {
-  isLoading: boolean;
-  isHydrated: boolean;
+  isReady: boolean;
   overallMetrics: OverallMetricsData | null;
   className?: string;
 }
 
 /** A non-interactive continuation of the desktop composition for touch-only screens. */
 const MobileDesktopNotice: React.FC<MobileDesktopNoticeProps> = ({
-  isLoading,
-  isHydrated,
+  isReady,
   overallMetrics,
   className = '',
 }) => {
-  const showStats = isHydrated && !isLoading && overallMetrics;
+  const showStats = isReady && overallMetrics;
 
   return (
     <section

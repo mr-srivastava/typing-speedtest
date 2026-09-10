@@ -1,4 +1,4 @@
-import type { LetterMetrics, TestConfig, TestMode, WpmSeriesPoint } from '@/modules/typing-test';
+import type { LetterMetrics, TestConfig, TypingTestResult } from '@/modules/typing-test';
 
 export type { LetterMetrics } from '@/modules/typing-test';
 
@@ -86,23 +86,13 @@ export type SavedTestConfig = Pick<
   'mode' | 'timeSeconds' | 'wordCount' | 'language' | 'punctuationEnabled' | 'numbersEnabled'
 >;
 
-export interface TestSession {
-  wpm: number;
-  rawWpm: number;
-  accuracy: number;
+/** A persisted test: the scored result plus the canonical config and compact telemetry it was recorded with. */
+export type TestSession = TypingTestResult & {
   testDate: string;
-  testDuration: number;
-  wordsTyped: number;
-  correctWords: number;
-  letterAccuracy: Record<string, LetterMetrics>;
-  mode: TestMode;
-  consistency: number;
-  burst: number;
-  wpmSeries: WpmSeriesPoint[];
   config: SavedTestConfig;
   counters: TestCounters;
   insights: TestInsights;
-}
+};
 
 export interface EnhancedStoredData {
   lastSession: TestSession;

@@ -2,7 +2,7 @@ import { assign, fromPromise, setup } from 'xstate';
 
 import type { TestConfig, TestTiming } from './config';
 import { diffInputToEvents, type TypingEventLog } from './event-log';
-import { deriveBurst, deriveConsistency, deriveWpmSeries, type WpmSeriesPoint } from './replay';
+import { deriveBurst, deriveConsistency, deriveWpmSeries } from './replay';
 import { buildTypingTestResult, type TypingTestResult, type TypingTestResultInput } from './result';
 import {
   countWordAccuracyFromReferenceWords,
@@ -12,20 +12,11 @@ import {
 } from './typing-engine';
 import type { LetterMetrics } from './types';
 
-/** State captured when a test ends. */
-export type TypingTestFinishedSnapshot = {
-  correctWordCount: number;
-  totalWordCount: number;
-  correctChars: number;
-  typedChars: number;
-  letterAccuracy: Record<string, LetterMetrics>;
-} & TestTiming & {
-    eventLog: TypingEventLog;
-    wpmSeries: WpmSeriesPoint[];
-    consistency: number;
-    burst: number;
-    result: TypingTestResult;
-  };
+/** State captured when a test ends: the scoring input, plus the raw log and derived result. */
+export type TypingTestFinishedSnapshot = TypingTestResultInput & {
+  eventLog: TypingEventLog;
+  result: TypingTestResult;
+};
 
 export type TypingTestEvent =
   | { type: 'input'; value: string }

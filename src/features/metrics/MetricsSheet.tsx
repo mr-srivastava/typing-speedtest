@@ -63,16 +63,23 @@ function ViewToggle({ showCumulative, onToggle, totalTests }: ViewToggleProps) {
   );
 }
 
-interface MetricsSheetProps {
+type MetricsSheetProps = {
   open: boolean;
   onClose: () => void;
   sessionData: EnhancedStoredData | null;
-  /** Present when opened right after a test finishes; absent for the header "view stats" trigger. */
-  liveMetrics?: LiveTestMetrics;
-  /** Only shown (as a footer action) when opened from a just-finished test. */
-  onRestart?: () => void;
   className?: string;
-}
+} & (
+  | {
+      /** Opened right after a test finishes: shows the result with a restart action. */
+      liveMetrics: LiveTestMetrics;
+      onRestart: () => void;
+    }
+  | {
+      /** Opened from the header "view stats" trigger: locked to cumulative stats, no restart. */
+      liveMetrics?: undefined;
+      onRestart?: undefined;
+    }
+);
 
 /**
  * Full-screen sheet sliding in from the right. Shows the just-finished test (with a toggle to

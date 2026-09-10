@@ -34,9 +34,7 @@ const TestPanel: React.FC<TestPanelProps> = ({
         timerDuration={timerDuration}
         mode={state.mode}
         targetWordCount={state.mode === 'words' ? config.wordCount : undefined}
-        started={started}
-        finished={finished}
-        loadError={state.loadError}
+        phase={state.phase}
         onRestart={onRestart}
         wpm={analytics.wpm}
         accuracy={analytics.accuracy}

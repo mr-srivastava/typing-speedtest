@@ -1,13 +1,9 @@
 import React from 'react';
-import MetricBadge from '@/shared/ui/MetricBadge';
+import MetricBadge, { type MetricBadgeProps } from '@/shared/ui/MetricBadge';
 import { layoutClasses } from '@/shared/layout/layout-utils';
 import { cn } from '@/shared/lib/cn';
 
-interface MetricItem {
-  value: string | number;
-  label?: string;
-  variant?: 'success' | 'default' | 'muted';
-}
+type MetricItem = Omit<MetricBadgeProps, 'className'>;
 
 interface MetricGroupProps {
   metrics: MetricItem[];

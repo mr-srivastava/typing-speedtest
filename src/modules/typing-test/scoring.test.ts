@@ -1,10 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  calculateCurrentAccuracy,
-  calculateWpm,
-  getElapsedSecondsForWpm,
-  resolveTestElapsedSeconds,
-} from './scoring';
+import { calculateCurrentAccuracy, calculateWpm, resolveTestElapsedSeconds } from './scoring';
 
 describe('typing-test scoring', () => {
   it('preserves the five-character WPM convention', () => {
@@ -13,7 +8,9 @@ describe('typing-test scoring', () => {
   });
 
   it('uses a one-second floor for active time and word tests', () => {
-    expect(getElapsedSecondsForWpm(60, 60)).toBe(1);
+    expect(resolveTestElapsedSeconds({ mode: 'time', timerDuration: 60, timerRemaining: 60 })).toBe(
+      1,
+    );
     expect(resolveTestElapsedSeconds({ mode: 'time', timerDuration: 60, timerRemaining: 10 })).toBe(
       50,
     );

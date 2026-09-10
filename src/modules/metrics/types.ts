@@ -1,4 +1,4 @@
-import type { LetterMetrics, TestTiming, WpmSeriesPoint } from '@/modules/typing-test';
+import type { LetterMetrics, LiveTypingAnalytics, WpmSeriesPoint } from '@/modules/typing-test';
 import type { CoachingInsight } from './coaching';
 import type {
   CorrectionCluster,
@@ -7,19 +7,8 @@ import type {
   TestSession,
 } from '@/modules/session/types';
 
-export type LiveTestMetrics = TestTiming & {
-  correctWordCount: number;
-  totalWordCount: number;
-  correctChars: number;
-  typedChars: number;
-  letterAccuracy: Record<string, LetterMetrics>;
-  wpm: number;
-  rawWpm: number;
-  accuracy: number;
-  /** Only available once the test has finished (event-sourced stats derived at finish time). */
-  consistency?: number;
-  wpmSeries?: WpmSeriesPoint[];
-};
+/** The SDK's live analytics snapshot, as consumed by the metrics display pipeline. */
+export type LiveTestMetrics = LiveTypingAnalytics;
 
 export type MetricsView =
   | { scope: 'live' }

@@ -1,23 +1,22 @@
 import type { TestTiming } from './config';
 import type { TypingTestState } from './create-typing-test';
-import type { WpmSeriesPoint } from './replay';
+import type { TypingTestResultInput } from './result';
 import { calculateCurrentAccuracy, calculateWpm, resolveTestElapsedSeconds } from './scoring';
-import type { LetterMetrics } from './types';
 
-/** UI-ready analytics derived from one SDK state snapshot. */
-export type LiveTypingAnalytics = TestTiming & {
-  correctWordCount: number;
-  totalWordCount: number;
-  correctChars: number;
-  typedChars: number;
-  letterAccuracy: Record<string, LetterMetrics>;
-  wpm: number;
-  rawWpm: number;
-  accuracy: number;
-  /** Only populated after event-log analytics have been finalized. */
-  consistency?: number;
-  wpmSeries?: WpmSeriesPoint[];
-};
+/**
+ * Same raw counts the finished-test scorer takes, plus the score itself.
+ * `consistency`/`wpmSeries` are event-sourced and only populated once analytics are finalized.
+ */
+export type LiveTypingAnalytics = TestTiming &
+  Pick<
+    TypingTestResultInput,
+    'correctWordCount' | 'totalWordCount' | 'correctChars' | 'typedChars' | 'letterAccuracy'
+  > &
+  Partial<Pick<TypingTestResultInput, 'consistency' | 'wpmSeries'>> & {
+    wpm: number;
+    rawWpm: number;
+    accuracy: number;
+  };
 
 /**
  * Keeps all per-test measurements in the frontend-agnostic SDK. Consumers get

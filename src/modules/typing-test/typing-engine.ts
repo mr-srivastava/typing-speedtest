@@ -2,11 +2,6 @@
 
 import type { LetterMetrics } from './types';
 
-export interface WordAccuracy {
-  correct: number;
-  total: number;
-}
-
 export function splitWords(text: string): string[] {
   return text
     .trim()
@@ -14,7 +9,7 @@ export function splitWords(text: string): string[] {
     .filter((word) => word.length > 0);
 }
 
-export function countWordAccuracy(referenceText: string, input: string): WordAccuracy {
+export function countWordAccuracy(referenceText: string, input: string): LetterMetrics {
   return countWordAccuracyFromReferenceWords(splitWords(referenceText), input);
 }
 
@@ -22,7 +17,7 @@ export function countWordAccuracy(referenceText: string, input: string): WordAcc
 export function countWordAccuracyFromReferenceWords(
   referenceWords: readonly string[],
   input: string,
-): WordAccuracy {
+): LetterMetrics {
   const typedWords = splitWords(input);
 
   let correct = 0;

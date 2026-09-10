@@ -88,7 +88,7 @@ function DesktopTestScreen({
   isCompletionSheetOpen,
   onCompletionSheetOpenChange,
 }: TestScreenContentProps) {
-  const { data, isLoading, isHydrated, hasSession } = useSession();
+  const { data, isReady, hasSession } = useSession();
   const { restart } = useTypingTestActions();
   const [isStatsOpen, setIsStatsOpen] = useState(false);
 
@@ -97,7 +97,7 @@ function DesktopTestScreen({
     onCompletionSheetOpenChange(false);
   }, [onCompletionSheetOpenChange, restart]);
 
-  const showStatsTrigger = isHydrated && !isLoading && hasSession;
+  const showStatsTrigger = isReady && hasSession;
 
   return (
     <AppShell
@@ -175,16 +175,12 @@ function DesktopTypingTest({ defaultTimer = 60, className = '' }: TestScreenProp
 }
 
 function MobileTestScreen({ className }: Pick<TestScreenProps, 'className'>) {
-  const { data, isLoading, isHydrated } = useSession();
+  const { data, isReady } = useSession();
   const overallMetrics = data ? toOverallMetricsData(data.cumulative) : null;
 
   return (
     <AppShell className={className}>
-      <MobileDesktopNotice
-        isLoading={isLoading}
-        isHydrated={isHydrated}
-        overallMetrics={overallMetrics}
-      />
+      <MobileDesktopNotice isReady={isReady} overallMetrics={overallMetrics} />
     </AppShell>
   );
 }

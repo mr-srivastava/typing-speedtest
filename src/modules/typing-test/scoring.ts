@@ -16,8 +16,3 @@ export function resolveTestElapsedSeconds(timing: TestTiming): number {
   if (timing.mode === 'words') return Math.max(1, timing.elapsedSeconds);
   return Math.max(1, timing.timerDuration - timing.timerRemaining);
 }
-
-/** Retained as a focused helper for consumers with countdown values. */
-export function getElapsedSecondsForWpm(timerDuration: number, timerRemaining: number): number {
-  return Math.max(1, timerDuration - timerRemaining);
-}

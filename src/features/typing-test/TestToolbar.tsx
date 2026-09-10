@@ -2,7 +2,7 @@ import React from 'react';
 import { ResetIcon } from '@radix-ui/react-icons';
 import TimerDisplay from '@/shared/ui/TimerDisplay';
 import { Button } from '@/shared/ui/button';
-import type { TestMode } from '@/modules/typing-test';
+import type { TestMode, TypingTestPhase } from '@/modules/typing-test';
 import { layoutClasses } from '@/shared/layout/layout-utils';
 import { cn } from '@/shared/lib/cn';
 
@@ -12,9 +12,7 @@ interface TestToolbarProps {
   mode: TestMode;
   /** Word-mode completion target. */
   targetWordCount?: number;
-  started: boolean;
-  finished: boolean;
-  loadError: string | null;
+  phase: TypingTestPhase;
   onRestart: () => void;
   wpm: number;
   accuracy: number;
@@ -27,16 +25,16 @@ const TestToolbar: React.FC<TestToolbarProps> = ({
   timerDuration,
   mode,
   targetWordCount,
-  started,
-  finished,
-  loadError,
+  phase,
   onRestart,
   wpm,
   accuracy,
   correctWords,
   className = '',
 }) => {
-  const restartDisabled = !started && !finished && !loadError;
+  const started = phase === 'active' || phase === 'finished';
+  const hasLoadError = phase === 'error';
+  const restartDisabled = phase === 'idle' || phase === 'loading';
 
   return (
     <div
@@ -71,7 +69,7 @@ const TestToolbar: React.FC<TestToolbarProps> = ({
         )}
         aria-live="polite"
       >
-        {loadError ? (
+        {hasLoadError ? (
           <span className="text-destructive text-center truncate">
             Unable to load text — restart to try again
           </span>
