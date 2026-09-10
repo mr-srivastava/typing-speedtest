@@ -4,7 +4,6 @@ import WpmHistoryChart from '@/features/metrics/WpmHistoryChart';
 import LetterAccuracyChart from '@/features/metrics/LetterAccuracyChart';
 import OverallStatsBlock from '@/features/metrics/OverallStatsBlock';
 import { type OverallMetricsData } from '@/features/metrics/metrics-display-utils';
-import { textClasses } from '@/shared/layout/layout-utils';
 import { width as widthTokens } from '@/shared/lib/tokens';
 import type { MetricsDisplayModel } from '@/modules/metrics/types';
 import MetricGroup from '@/shared/ui/MetricGroup';
@@ -28,10 +27,6 @@ const MetricsDisplay: React.FC<MetricsDisplayProps> = ({
   return (
     <div className={cn('w-full text-center', compact ? 'space-y-7' : 'space-y-10', className)}>
       {overallMetrics ? <OverallStatsBlock metrics={overallMetrics} className="mb-2" /> : null}
-
-      {model.statsTitle && !compact ? (
-        <div className={cn(textClasses.mutedSmall)}>{model.statsTitle}</div>
-      ) : null}
 
       <div className="grid grid-cols-1 divide-y divide-border/70 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
         <div

@@ -7,10 +7,15 @@ import {
   getMetricsSheetActionLabel,
   getMetricsSheetTitle,
 } from '@/features/metrics/metrics-sheet-utils';
+import {
+  getFormattedMetricsData,
+  toOverallMetricsData,
+} from '@/features/metrics/metrics-display-utils';
 import { resolveMetricsDisplay } from '@/modules/metrics/resolve-display';
 import type { LiveTestMetrics, MetricsPreference } from '@/modules/metrics/types';
 import type { EnhancedStoredData } from '@/modules/session/types';
 import { Button } from '@/shared/ui/button';
+import MetricGroup from '@/shared/ui/MetricGroup';
 import { motion as motionTokens, width } from '@/shared/lib/tokens';
 import { cn } from '@/shared/lib/cn';
 
@@ -157,7 +162,11 @@ const MetricsSheet: React.FC<MetricsSheetProps> = ({
     ? title === 'Test Complete'
       ? `${model.wpm} wpm · ${model.accuracy}% accuracy`
       : model.statsTitle
-    : model.statsTitle;
+    : null;
+  const glanceMetrics =
+    !hasLiveMetrics && sessionData
+      ? getFormattedMetricsData(toOverallMetricsData(sessionData.cumulative)).detailMetrics
+      : null;
   const actionLabel = hasLiveMetrics ? getMetricsSheetActionLabel(model) : null;
   const isRestartAction = actionLabel === 'Restart';
 
@@ -205,6 +214,12 @@ const MetricsSheet: React.FC<MetricsSheetProps> = ({
                   </h2>
                   {subtitle ? (
                     <p className="mt-1.5 text-sm text-muted-foreground">{subtitle}</p>
+                  ) : null}
+                  {glanceMetrics ? (
+                    <MetricGroup
+                      metrics={glanceMetrics}
+                      className="mt-2 flex-wrap text-sm text-muted-foreground"
+                    />
                   ) : null}
                 </div>
                 <Button
