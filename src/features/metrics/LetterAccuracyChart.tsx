@@ -3,20 +3,17 @@
 import { useMemo, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import type { LetterMetrics } from '@/modules/typing-test';
-import { calculateOverallWeightedAccuracy } from '@/modules/metrics/calculate';
+import type { KeyTelemetry } from '@/modules/session/types';
 import { cn } from '@/shared/lib/cn';
 import { layoutClasses } from '@/shared/layout/layout-utils';
-import {
-  accuracyLegendData,
-  getLegendItemClasses,
-  getLetterAccuracyColorClass,
-} from '@/shared/layout/theme-display-utils';
+import { accuracyLegendData, getLegendItemClasses } from '@/shared/layout/theme-display-utils';
 import { motion as motionTokens, size, space } from '@/shared/lib/tokens';
 
 interface LetterAccuracyChartProps {
   letterAccuracyData: Record<string, LetterMetrics>;
   /** Bigger keys and spacing for spacious, full-screen layouts */
   large?: boolean;
+  keyTelemetry?: Record<string, KeyTelemetry>;
   className?: string;
 }
 
@@ -34,6 +31,7 @@ function formatAccuracy(correct: number, total: number): string {
 const LetterAccuracyChart: React.FC<LetterAccuracyChartProps> = ({
   letterAccuracyData,
   large = false,
+  keyTelemetry,
   className = '',
 }) => {
   const reduceMotion = useReducedMotion();
@@ -57,19 +55,18 @@ const LetterAccuracyChart: React.FC<LetterAccuracyChartProps> = ({
 
   const slideAnimate = reduceMotion ? { opacity: 1 } : { opacity: 1, transform: 'translateY(0px)' };
 
-  const overallWeightedAccuracy = useMemo(
-    () => calculateOverallWeightedAccuracy(letterAccuracyData),
-    [letterAccuracyData],
-  );
-
-  /** Pinned click wins over hover preview. */
+  /** A pinned key stays selected while hover offers a lightweight preview. */
   const activeLetter = selectedLetter ?? hoveredLetter;
   const activeMetrics = activeLetter
     ? letterAccuracyData[activeLetter] || { correct: 0, total: 0 }
     : null;
 
   const getAccuracyColor = (correct: number, total: number) => {
-    return getLetterAccuracyColorClass(correct, total, overallWeightedAccuracy);
+    if (total < 5) return 'bg-muted text-muted-foreground';
+    const accuracy = (correct / total) * 100;
+    if (accuracy >= 92) return 'bg-success/80 text-on-status';
+    if (accuracy >= 80) return 'bg-warning text-on-status';
+    return 'bg-destructive/80 text-on-status';
   };
 
   const handleSelectLetter = (letter: string) => {
@@ -79,7 +76,8 @@ const LetterAccuracyChart: React.FC<LetterAccuracyChartProps> = ({
 
   const renderKey = (letter: string) => {
     const metrics = letterAccuracyData[letter] || { correct: 0, total: 0 };
-    const isActive = activeLetter === letter;
+    const isSelected = selectedLetter === letter;
+    const isHovered = hoveredLetter === letter && !isSelected;
     const accuracyLabel = formatAccuracy(metrics.correct, metrics.total);
 
     return (
@@ -102,7 +100,8 @@ const LetterAccuracyChart: React.FC<LetterAccuracyChartProps> = ({
           'rounded-sm',
           layoutClasses.flexCenter,
           getAccuracyColor(metrics.correct, metrics.total),
-          isActive && 'opacity-100 ring-2 ring-foreground/60 ring-offset-2 ring-offset-card',
+          isHovered && 'opacity-100 ring-1 ring-foreground/35 ring-offset-1 ring-offset-card',
+          isSelected && 'opacity-100 ring-2 ring-foreground/70 ring-offset-2 ring-offset-card',
         )}
       >
         {letter.toUpperCase()}
@@ -113,7 +112,13 @@ const LetterAccuracyChart: React.FC<LetterAccuracyChartProps> = ({
   const renderKeyboardRow = (row: string[], rowIndex: number) => (
     <motion.div
       key={rowIndex}
-      className={cn('flex justify-center', large ? space.loose : space.comfortable, 'mb-3')}
+      className={cn(
+        'flex justify-center',
+        large ? space.loose : space.comfortable,
+        rowIndex === 1 && 'translate-x-3',
+        rowIndex === 2 && 'translate-x-6',
+        'mb-3',
+      )}
       initial={slideInitial}
       animate={slideAnimate}
       transition={slideTransition(0.04 * rowIndex)}
@@ -156,7 +161,7 @@ const LetterAccuracyChart: React.FC<LetterAccuracyChartProps> = ({
           Key accuracy
         </p>
         <p className="text-xs text-muted-foreground mt-1">
-          Weighted average {overallWeightedAccuracy}% · Hover or tap a key for details
+          Grey needs 5 presses · Hover to preview, click to pin
         </p>
       </motion.div>
 
@@ -181,23 +186,31 @@ const LetterAccuracyChart: React.FC<LetterAccuracyChartProps> = ({
           motionTokens.transitionColors,
           activeLetter ? 'bg-muted/40' : 'bg-transparent',
         )}
-        role="status"
-        aria-live="polite"
+        aria-live={selectedLetter ? 'polite' : 'off'}
       >
         {activeLetter && activeMetrics ? (
           <div key={activeLetter}>
-            <div className="text-lg font-semibold tracking-wide">{activeLetter.toUpperCase()}</div>
-            <div className="mt-1 text-sm text-foreground">
-              {activeMetrics.correct} / {activeMetrics.total} correct
+            <div className="text-[10px] font-medium tracking-[0.16em] text-muted-foreground uppercase">
+              {activeLetter.toUpperCase()} key {selectedLetter ? 'selected' : 'preview'}
             </div>
-            <div className="mt-1 text-sm text-muted-foreground">
+            <div className="mt-1 text-lg font-semibold tabular-nums">
               {activeMetrics.total > 0
                 ? `${((activeMetrics.correct / activeMetrics.total) * 100).toFixed(1)}% accuracy`
                 : 'No presses yet'}
             </div>
+            <div className="mt-1 text-sm text-muted-foreground">
+              {activeMetrics.correct} of {activeMetrics.total} correct
+            </div>
+            {keyTelemetry?.[activeLetter]?.errorPairs[0] ? (
+              <div className="mt-1 text-xs text-muted-foreground">
+                Most often: {activeLetter.toUpperCase()} →{' '}
+                {keyTelemetry[activeLetter].errorPairs[0].typed.toUpperCase()} (
+                {keyTelemetry[activeLetter].errorPairs[0].count}×)
+              </div>
+            ) : null}
           </div>
         ) : (
-          <p className="text-sm text-muted-foreground">Select a key to inspect accuracy</p>
+          <p className="text-sm text-muted-foreground">Hover a key to preview its accuracy</p>
         )}
       </div>
 
@@ -216,7 +229,7 @@ const LetterAccuracyChart: React.FC<LetterAccuracyChartProps> = ({
               getLegendItemClasses('medium').spacing,
             )}
           />
-          <span>{accuracyLegendData.aboveAverage.label}</span>
+          <span>Solid</span>
         </div>
         <div className={getLegendItemClasses('medium').container}>
           <div
@@ -227,7 +240,7 @@ const LetterAccuracyChart: React.FC<LetterAccuracyChartProps> = ({
               getLegendItemClasses('medium').spacing,
             )}
           />
-          <span>{accuracyLegendData.nearAverage.label}</span>
+          <span>Inconsistent</span>
         </div>
         <div className={getLegendItemClasses('medium').container}>
           <div
@@ -238,7 +251,7 @@ const LetterAccuracyChart: React.FC<LetterAccuracyChartProps> = ({
               getLegendItemClasses('medium').spacing,
             )}
           />
-          <span>{accuracyLegendData.belowAverage.label}</span>
+          <span>Weak</span>
         </div>
       </motion.div>
     </div>

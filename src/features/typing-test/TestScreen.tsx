@@ -156,9 +156,9 @@ function DesktopTypingTest({ defaultTimer = 60, className = '' }: TestScreenProp
   const handleFinished = useCallback(
     (snapshot: TypingTestFinishedSnapshot) => {
       startTransition(() => setIsMetricsModalOpen(true));
-      recordTest(buildTestSession(snapshot));
+      recordTest(buildTestSession(snapshot, config));
     },
-    [recordTest],
+    [recordTest, config],
   );
 
   return (

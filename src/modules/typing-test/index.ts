@@ -10,6 +10,7 @@ export { deriveLiveTypingAnalytics } from './analytics';
 export type { LiveTypingAnalytics } from './analytics';
 export type { LetterMetrics } from './types';
 export { buildTypingTestResult } from './result';
+export { calculateWpm } from './scoring';
 export type { TypingTestResult, TypingTestResultInput } from './result';
 export { default as getReferenceText } from './text-provider';
 export type { TestMode, TestConfig, TestTiming } from './config';

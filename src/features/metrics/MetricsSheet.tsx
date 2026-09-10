@@ -160,7 +160,7 @@ const MetricsSheet: React.FC<MetricsSheetProps> = ({
   const title = hasLiveMetrics ? getMetricsSheetTitle(model, { hasLiveMetrics }) : 'Your stats';
   const subtitle = hasLiveMetrics
     ? title === 'Test Complete'
-      ? `${model.wpm} wpm · ${model.accuracy}% accuracy`
+      ? `${model.wpm} adjusted WPM · ${model.characterAccuracy}% character accuracy`
       : model.statsTitle
     : null;
   const glanceMetrics =
@@ -193,11 +193,11 @@ const MetricsSheet: React.FC<MetricsSheetProps> = ({
           <div className="flex w-full flex-1 flex-col overflow-y-auto p-4 sm:p-6">
             <div
               className={cn(
-                'mx-auto my-auto flex w-full flex-col',
-                hasLiveMetrics ? width.panel : 'max-w-6xl',
+                'mx-auto flex w-full flex-col',
+                hasLiveMetrics ? width.panel : 'max-w-4xl',
               )}
             >
-              <div className="mb-6 flex items-start justify-between gap-4 sm:mb-8">
+              <div className="mb-4 flex items-start justify-between gap-4 sm:mb-5">
                 <div className="min-w-0">
                   {eyebrow ? (
                     <p className="typing-face text-[10px] font-medium tracking-[0.2em] text-muted-foreground uppercase">

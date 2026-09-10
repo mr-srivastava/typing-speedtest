@@ -1,4 +1,5 @@
 import type { CumulativeStats, TestSession } from './types';
+import { calculateWpm } from '@/modules/typing-test';
 
 /** Weighted average of `current` and `next`, weighted by their sample sizes. */
 function weightedAverage(
@@ -12,18 +13,8 @@ function weightedAverage(
   return (current * currentWeight + next * nextWeight) / totalWeight;
 }
 
-/** Like `weightedAverage`, but keeps `current` untouched if `next` is missing (older tests lack this stat). */
-function weightedAverageOptional(
-  current: number | undefined,
-  currentWeight: number,
-  next: number | undefined,
-  nextWeight: number,
-): number | undefined {
-  if (next === undefined) return current;
-  return weightedAverage(current ?? next, currentWeight, next, nextWeight);
-}
-
 export function createInitialCumulativeStats(newTest: TestSession): CumulativeStats {
+  const counters = newTest.counters;
   return {
     totalTests: 1,
     totalWordsTyped: newTest.wordsTyped,
@@ -37,6 +28,15 @@ export function createInitialCumulativeStats(newTest: TestSession): CumulativeSt
     letterStats: { ...newTest.letterAccuracy },
     firstTestDate: newTest.testDate,
     lastTestDate: newTest.testDate,
+    exact: {
+      totalCorrectChars: counters.correctChars,
+      totalTypedChars: counters.typedChars,
+      totalBackspaces: counters.backspaces,
+      exactDurationSeconds: newTest.testDuration,
+      exactCorrectWords: counters.correctWords,
+      exactCompletedWords: counters.completedWords,
+      exactTestCount: 1,
+    },
   };
 }
 
@@ -49,35 +49,14 @@ export function updateCumulativeStats(
   const newTotalTimeSpent = current.totalTimeSpent + newTest.testDuration;
   const newTotalCorrectWords = current.totalCorrectWords + newTest.correctWords;
 
-  const weightedWPM = weightedAverage(
-    current.weightedWPM,
-    current.totalTimeSpent,
-    newTest.wpm,
-    newTest.testDuration,
-  );
-
-  const weightedRawWPM = weightedAverage(
-    current.weightedRawWPM ?? current.weightedWPM,
-    current.totalTimeSpent,
-    newTest.rawWpm,
-    newTest.testDuration,
-  );
-
-  const weightedAccuracy = weightedAverage(
-    current.weightedAccuracy,
-    current.totalWordsTyped,
-    newTest.accuracy,
-    newTest.wordsTyped,
-  );
-
-  const weightedConsistency = weightedAverageOptional(
+  const weightedConsistency = weightedAverage(
     current.weightedConsistency,
     current.totalTimeSpent,
     newTest.consistency,
     newTest.testDuration,
   );
 
-  const weightedBurst = weightedAverageOptional(
+  const weightedBurst = weightedAverage(
     current.weightedBurst,
     current.totalTimeSpent,
     newTest.burst,
@@ -95,19 +74,33 @@ export function updateCumulativeStats(
     }
   });
 
+  const incomingCounters = newTest.counters;
+  const exact = {
+    totalCorrectChars: current.exact.totalCorrectChars + incomingCounters.correctChars,
+    totalTypedChars: current.exact.totalTypedChars + incomingCounters.typedChars,
+    totalBackspaces: current.exact.totalBackspaces + incomingCounters.backspaces,
+    exactDurationSeconds: current.exact.exactDurationSeconds + newTest.testDuration,
+    exactCorrectWords: current.exact.exactCorrectWords + incomingCounters.correctWords,
+    exactCompletedWords: current.exact.exactCompletedWords + incomingCounters.completedWords,
+    exactTestCount: current.exact.exactTestCount + 1,
+  };
+  const weightedWPM = calculateWpm(exact.totalCorrectChars, exact.exactDurationSeconds);
+  const weightedRawWPM = calculateWpm(exact.totalTypedChars, exact.exactDurationSeconds);
+  const weightedAccuracy = Math.round((exact.exactCorrectWords / exact.exactCompletedWords) * 100);
+
   return {
     totalTests: newTotalTests,
     totalWordsTyped: newTotalWordsTyped,
     totalTimeSpent: newTotalTimeSpent,
     totalCorrectWords: newTotalCorrectWords,
-    weightedWPM: Math.round(weightedWPM),
-    weightedRawWPM: Math.round(weightedRawWPM),
-    weightedAccuracy: Math.round(weightedAccuracy),
-    weightedConsistency:
-      weightedConsistency !== undefined ? Math.round(weightedConsistency) : undefined,
-    weightedBurst: weightedBurst !== undefined ? Math.round(weightedBurst) : undefined,
+    weightedWPM,
+    weightedRawWPM,
+    weightedAccuracy,
+    weightedConsistency: Math.round(weightedConsistency),
+    weightedBurst: Math.round(weightedBurst),
     letterStats: updatedLetterStats,
     firstTestDate: current.firstTestDate || newTest.testDate,
     lastTestDate: newTest.testDate,
+    exact,
   };
 }

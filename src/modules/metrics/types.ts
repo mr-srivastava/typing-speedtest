@@ -1,4 +1,11 @@
 import type { LetterMetrics, TestTiming, WpmSeriesPoint } from '@/modules/typing-test';
+import type { CoachingInsight } from './coaching';
+import type {
+  CorrectionCluster,
+  KeyTelemetry,
+  PaceBucket,
+  TestSession,
+} from '@/modules/session/types';
 
 export type LiveTestMetrics = TestTiming & {
   correctWordCount: number;
@@ -25,6 +32,8 @@ export interface MetricsDisplayModel {
   wpm: number;
   rawWpm: number;
   accuracy: number;
+  characterAccuracy: number;
+  wordAccuracy: number;
   letterAccuracy: Record<string, LetterMetrics>;
   statsTitle: string | null;
   view: MetricsView;
@@ -35,4 +44,11 @@ export interface MetricsDisplayModel {
   consistency?: number;
   /** Per-second WPM history — only available for a single finished test, not cumulative. */
   wpmSeries?: WpmSeriesPoint[];
+  baselineWpm?: number;
+  coaching?: CoachingInsight;
+  correctionCost: number;
+  paceBuckets?: PaceBucket[];
+  keyTelemetry?: Record<string, KeyTelemetry>;
+  correctionClusters?: CorrectionCluster[];
+  recentSessions: TestSession[];
 }

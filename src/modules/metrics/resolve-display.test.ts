@@ -20,6 +20,30 @@ const live: LiveTestMetrics = {
   wpmSeries: [{ second: 1, wpm: 45, rawWpm: 48 }],
 };
 
+const config = {
+  mode: 'time' as const,
+  timeSeconds: 60,
+  wordCount: 25,
+  language: 'english' as const,
+  punctuationEnabled: false,
+  numbersEnabled: false,
+};
+
+const emptyInsights = {
+  correctionCount: 0,
+  errorPairs: [],
+  pace: [],
+  keys: {},
+  pauses: {
+    longestPauseMs: 0,
+    pausesOver500ms: 0,
+    earlyAverageWpm: 0,
+    middleAverageWpm: 0,
+    finalAverageWpm: 0,
+  },
+  correctionClusters: [],
+};
+
 function makeSession(totalTests: number): EnhancedStoredData {
   return {
     lastSession: {
@@ -31,6 +55,19 @@ function makeSession(totalTests: number): EnhancedStoredData {
       wordsTyped: 45,
       correctWords: 40,
       letterAccuracy: { a: { correct: 8, total: 10 } },
+      mode: 'time',
+      consistency: 80,
+      burst: 90,
+      wpmSeries: [],
+      config,
+      counters: {
+        correctChars: 225,
+        typedChars: 240,
+        backspaces: 3,
+        correctWords: 40,
+        completedWords: 45,
+      },
+      insights: emptyInsights,
     },
     cumulative: {
       totalTests,
@@ -41,10 +78,21 @@ function makeSession(totalTests: number): EnhancedStoredData {
       weightedRawWPM: 60,
       weightedAccuracy: 92,
       weightedConsistency: 75,
+      weightedBurst: 80,
       letterStats: { a: { correct: 20, total: 22 }, b: { correct: 5, total: 5 } },
       firstTestDate: '2026-01-01T00:00:00.000Z',
       lastTestDate: '2026-01-02T00:00:00.000Z',
+      exact: {
+        totalCorrectChars: 500,
+        totalTypedChars: 550,
+        totalBackspaces: 10,
+        exactDurationSeconds: 120,
+        exactCorrectWords: 90,
+        exactCompletedWords: 100,
+        exactTestCount: totalTests,
+      },
     },
+    recentSessions: [],
   };
 }
 

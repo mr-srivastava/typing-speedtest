@@ -1,20 +1,25 @@
-import { CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts';
+import { CartesianGrid, Line, LineChart, ReferenceDot, XAxis, YAxis } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/shared/ui/chart';
 import { wpmHistoryChartConfig } from '@/shared/lib/chart-config';
 import type { WpmSeriesPoint } from '@/modules/typing-test';
+import type { CorrectionCluster, PaceBucket } from '@/modules/session/types';
 import { cn } from '@/shared/lib/cn';
 
 interface WpmHistoryChartProps {
   data: WpmSeriesPoint[];
-  /** Tighter layout for modals, matching RadialChart's compact mode. */
+  /** Tighter layout for modal results. */
   compact?: boolean;
+  paceBuckets?: PaceBucket[];
+  correctionClusters?: CorrectionCluster[];
   className?: string;
 }
 
 const WpmHistoryChart: React.FC<WpmHistoryChartProps> = ({
   data,
   compact = false,
+  paceBuckets,
+  correctionClusters,
   className = '',
 }) => {
   return (
@@ -54,9 +59,38 @@ const WpmHistoryChart: React.FC<WpmHistoryChartProps> = ({
               strokeDasharray="4 4"
               dot={false}
             />
+            {(
+              correctionClusters ??
+              paceBuckets
+                ?.filter((bucket) => bucket.backspaces >= 2)
+                .map((bucket) => ({
+                  startSecond: bucket.second,
+                  endSecond: bucket.second,
+                  count: bucket.backspaces,
+                }))
+            )?.map((cluster) => (
+              <ReferenceDot
+                key={`${cluster.startSecond}-${cluster.endSecond}`}
+                x={cluster.startSecond}
+                y={data.find((point) => point.second === cluster.startSecond)?.rawWpm ?? 0}
+                r={3}
+                fill="hsl(var(--destructive))"
+                stroke="none"
+                aria-label={`${cluster.count} corrections from ${cluster.startSecond} to ${cluster.endSecond} seconds`}
+              />
+            ))}
           </LineChart>
         </ChartContainer>
       </CardContent>
+      {correctionClusters && correctionClusters.length > 0 ? (
+        <ul className="sr-only" aria-label="Correction clusters">
+          {correctionClusters.map((cluster) => (
+            <li key={`${cluster.startSecond}-${cluster.endSecond}`}>
+              {cluster.count} corrections from {cluster.startSecond} to {cluster.endSecond} seconds
+            </li>
+          ))}
+        </ul>
+      ) : null}
     </Card>
   );
 };

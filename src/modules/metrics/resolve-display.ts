@@ -1,6 +1,7 @@
 import type { EnhancedStoredData } from '@/modules/session/types';
 import type { LetterMetrics } from '@/modules/typing-test';
 import type { LiveTestMetrics, MetricsDisplayModel, MetricsPreference, MetricsView } from './types';
+import { deriveBaseline, deriveCoachingInsight } from './coaching';
 
 const EMPTY_LIVE: LiveTestMetrics = {
   correctWordCount: 0,
@@ -100,10 +101,7 @@ export function resolveMetricsDisplay(input: {
 
   const wpm = showingCumulative && session ? session.cumulative.weightedWPM : live.wpm;
 
-  const rawWpm =
-    showingCumulative && session
-      ? (session.cumulative.weightedRawWPM ?? session.cumulative.weightedWPM)
-      : live.rawWpm;
+  const rawWpm = showingCumulative && session ? session.cumulative.weightedRawWPM : live.rawWpm;
 
   const accuracy =
     showingCumulative && session ? session.cumulative.weightedAccuracy : live.accuracy;
@@ -111,11 +109,27 @@ export function resolveMetricsDisplay(input: {
   const consistency = showingCumulative
     ? session?.cumulative.weightedConsistency
     : live.consistency;
+  const activeSession = showingCumulative ? undefined : session?.lastSession;
+  const exact = session?.cumulative.exact;
+  const characterAccuracy = showingCumulative
+    ? exact && exact.totalTypedChars > 0
+      ? Math.round((exact.totalCorrectChars / exact.totalTypedChars) * 100)
+      : accuracy
+    : live.typedChars > 0
+      ? Math.round((live.correctChars / live.typedChars) * 100)
+      : 0;
+  const wordAccuracy = showingCumulative
+    ? exact && exact.exactCompletedWords > 0
+      ? Math.round((exact.exactCorrectWords / exact.exactCompletedWords) * 100)
+      : accuracy
+    : live.accuracy;
 
   return {
     wpm,
     rawWpm,
     accuracy,
+    characterAccuracy,
+    wordAccuracy,
     letterAccuracy: resolveLetterAccuracy(live, session, showingCumulative),
     statsTitle: generateStatsTitle(session, showingCumulative),
     view,
@@ -125,5 +139,14 @@ export function resolveMetricsDisplay(input: {
     consistency,
     // A WPM-over-time history only makes sense for one finished test, not an aggregate.
     wpmSeries: showingCumulative ? undefined : live.wpmSeries,
+    baselineWpm: activeSession
+      ? deriveBaseline(activeSession, session?.recentSessions ?? [])
+      : undefined,
+    coaching: activeSession ? deriveCoachingInsight(activeSession) : undefined,
+    correctionCost: Math.max(0, rawWpm - wpm),
+    paceBuckets: activeSession?.insights.pace,
+    keyTelemetry: activeSession?.insights.keys,
+    correctionClusters: activeSession?.insights.correctionClusters,
+    recentSessions: session?.recentSessions ?? [],
   };
 }

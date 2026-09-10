@@ -1,6 +1,17 @@
-import type { LetterMetrics, TestMode, WpmSeriesPoint } from '@/modules/typing-test';
+import type { LetterMetrics, TestConfig, TestMode, WpmSeriesPoint } from '@/modules/typing-test';
 
 export type { LetterMetrics } from '@/modules/typing-test';
+
+/** Exact per-character/word counters, aggregated across every contributing test. */
+export interface ExactCounters {
+  totalCorrectChars: number;
+  totalTypedChars: number;
+  totalBackspaces: number;
+  exactDurationSeconds: number;
+  exactCorrectWords: number;
+  exactCompletedWords: number;
+  exactTestCount: number;
+}
 
 export interface CumulativeStats {
   totalTests: number;
@@ -8,14 +19,72 @@ export interface CumulativeStats {
   totalTimeSpent: number; // in seconds
   totalCorrectWords: number; // for weighted accuracy calculation
   weightedWPM: number;
-  weightedRawWPM?: number; // optional: absent in data recorded before raw WPM tracking
+  weightedRawWPM: number;
   weightedAccuracy: number;
-  weightedConsistency?: number; // optional: absent in data recorded before event-log tracking
-  weightedBurst?: number; // optional: absent in data recorded before event-log tracking
+  weightedConsistency: number;
+  weightedBurst: number;
   letterStats: Record<string, LetterMetrics>; // aggregated across all tests
   firstTestDate: string;
   lastTestDate: string;
+  exact: ExactCounters;
 }
+
+export interface TestCounters {
+  correctChars: number;
+  typedChars: number;
+  backspaces: number;
+  correctWords: number;
+  completedWords: number;
+}
+
+export interface TypingErrorPair {
+  expected: string;
+  typed: string;
+  count: number;
+}
+
+export interface KeyTelemetry {
+  attempts: number;
+  correct: number;
+  errorPairs: TypingErrorPair[];
+}
+
+export interface PaceBucket {
+  second: number;
+  typedChars: number;
+  correctChars: number;
+  backspaces: number;
+  rawWpm: number;
+  adjustedWpm: number;
+}
+
+export interface PauseTelemetry {
+  longestPauseMs: number;
+  pausesOver500ms: number;
+  earlyAverageWpm: number;
+  middleAverageWpm: number;
+  finalAverageWpm: number;
+}
+
+export interface CorrectionCluster {
+  startSecond: number;
+  endSecond: number;
+  count: number;
+}
+
+export interface TestInsights {
+  correctionCount: number;
+  errorPairs: TypingErrorPair[];
+  pace: PaceBucket[];
+  keys: Record<string, KeyTelemetry>;
+  pauses: PauseTelemetry;
+  correctionClusters: CorrectionCluster[];
+}
+
+export type SavedTestConfig = Pick<
+  TestConfig,
+  'mode' | 'timeSeconds' | 'wordCount' | 'language' | 'punctuationEnabled' | 'numbersEnabled'
+>;
 
 export interface TestSession {
   wpm: number;
@@ -26,13 +95,18 @@ export interface TestSession {
   wordsTyped: number;
   correctWords: number;
   letterAccuracy: Record<string, LetterMetrics>;
-  mode?: TestMode; // optional: absent in data recorded before mode/customization support
-  consistency?: number; // optional: absent in data recorded before event-log tracking
-  burst?: number; // optional: absent in data recorded before event-log tracking
-  wpmSeries?: WpmSeriesPoint[]; // optional: absent in data recorded before event-log tracking
+  mode: TestMode;
+  consistency: number;
+  burst: number;
+  wpmSeries: WpmSeriesPoint[];
+  config: SavedTestConfig;
+  counters: TestCounters;
+  insights: TestInsights;
 }
 
 export interface EnhancedStoredData {
   lastSession: TestSession;
   cumulative: CumulativeStats;
+  /** Most recent compact test records, newest first. */
+  recentSessions: TestSession[];
 }
