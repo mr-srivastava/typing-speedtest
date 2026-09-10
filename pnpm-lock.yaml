@@ -53,6 +53,9 @@ importers:
       xstate:
         specifier: ^5.32.6
         version: 5.32.6
+      zod:
+        specifier: ^4.6.0
+        version: 4.6.0
     devDependencies:
       '@tailwindcss/postcss':
         specifier: ^4.3.3
@@ -2153,6 +2156,9 @@ packages:
   xstate@5.32.6:
     resolution: {integrity: sha512-WfA8WNrh6r9osuGwVm+aIPM4jmMW2LKHV1Yv9thYpOtL4HVF/kobh95K/O8v2jDCpDmP2EoY+6uvuqHXCZ6ZLw==}
 
+  zod@4.6.0:
+    resolution: {integrity: sha512-iIvwyDnebKYpww2ta0DjaNOL8RnVLmPMhgWyOzlW9y0EIIxv5gl+H6Y0ONpt83HqjGqkk78uWp6xWtpxzZdPbw==}
+
 snapshots:
 
   '@alloc/quick-lru@5.2.0': {}
@@ -3779,3 +3785,5 @@ snapshots:
       stackback: 0.0.2
 
   xstate@5.32.6: {}
+
+  zod@4.6.0: {}

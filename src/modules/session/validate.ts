@@ -1,193 +1,126 @@
-import type {
-  CorrectionCluster,
-  CumulativeStats,
-  EnhancedStoredData,
-  ExactCounters,
-  KeyTelemetry,
-  LetterMetrics,
-  PaceBucket,
-  PauseTelemetry,
-  SavedTestConfig,
-  TestCounters,
-  TestInsights,
-  TestSession,
-  TypingErrorPair,
-} from './types';
+import { z } from 'zod';
+import type { EnhancedStoredData } from './types';
 
-function isNumberRecord<K extends string>(
-  value: unknown,
-  keys: readonly K[],
-): value is Record<K, number> {
-  if (typeof value !== 'object' || value === null) return false;
-  return keys.every((key) => isFiniteNonNegativeNumber((value as Record<string, unknown>)[key]));
-}
+const finiteNonNegative = z.number().finite().nonnegative();
 
-function isFiniteNonNegativeNumber(value: unknown): value is number {
-  return typeof value === 'number' && Number.isFinite(value) && value >= 0;
-}
+const letterMetricsSchema = z.record(
+  z.string(),
+  z.object({ correct: z.number(), total: z.number() }),
+);
 
-function isArrayOf<T>(value: unknown, itemGuard: (item: unknown) => item is T): value is T[] {
-  return Array.isArray(value) && value.every(itemGuard);
-}
+const errorPairSchema = z.object({
+  expected: z.string(),
+  typed: z.string(),
+  count: finiteNonNegative,
+});
 
-function isErrorPair(value: unknown): value is TypingErrorPair {
-  if (typeof value !== 'object' || value === null) return false;
-  const pair = value as Record<string, unknown>;
-  return (
-    typeof pair.expected === 'string' &&
-    typeof pair.typed === 'string' &&
-    isFiniteNonNegativeNumber(pair.count)
-  );
-}
+const configSchema = z.object({
+  mode: z.enum(['time', 'words']),
+  timeSeconds: finiteNonNegative,
+  wordCount: finiteNonNegative,
+  language: z.string(),
+  punctuationEnabled: z.boolean(),
+  numbersEnabled: z.boolean(),
+});
 
-function isConfig(value: unknown): value is SavedTestConfig {
-  if (typeof value !== 'object' || value === null) return false;
-  const config = value as Record<string, unknown>;
-  return (
-    (config.mode === 'time' || config.mode === 'words') &&
-    isFiniteNonNegativeNumber(config.timeSeconds) &&
-    isFiniteNonNegativeNumber(config.wordCount) &&
-    typeof config.language === 'string' &&
-    typeof config.punctuationEnabled === 'boolean' &&
-    typeof config.numbersEnabled === 'boolean'
-  );
-}
+const countersSchema = z.object({
+  correctChars: finiteNonNegative,
+  typedChars: finiteNonNegative,
+  backspaces: finiteNonNegative,
+  correctWords: finiteNonNegative,
+  completedWords: finiteNonNegative,
+});
 
-function isCounters(value: unknown): value is TestCounters {
-  return isNumberRecord(value, [
-    'correctChars',
-    'typedChars',
-    'backspaces',
-    'correctWords',
-    'completedWords',
-  ]);
-}
+const paceBucketSchema = z.object({
+  second: finiteNonNegative,
+  typedChars: finiteNonNegative,
+  correctChars: finiteNonNegative,
+  backspaces: finiteNonNegative,
+  rawWpm: finiteNonNegative,
+  adjustedWpm: finiteNonNegative,
+});
 
-function isPaceBucket(value: unknown): value is PaceBucket {
-  return isNumberRecord(value, [
-    'second',
-    'typedChars',
-    'correctChars',
-    'backspaces',
-    'rawWpm',
-    'adjustedWpm',
-  ]);
-}
+const pauseTelemetrySchema = z.object({
+  longestPauseMs: finiteNonNegative,
+  pausesOver500ms: finiteNonNegative,
+  earlyAverageWpm: finiteNonNegative,
+  middleAverageWpm: finiteNonNegative,
+  finalAverageWpm: finiteNonNegative,
+});
 
-function isPauseTelemetry(value: unknown): value is PauseTelemetry {
-  return isNumberRecord(value, [
-    'longestPauseMs',
-    'pausesOver500ms',
-    'earlyAverageWpm',
-    'middleAverageWpm',
-    'finalAverageWpm',
-  ]);
-}
+const correctionClusterSchema = z.object({
+  startSecond: finiteNonNegative,
+  endSecond: finiteNonNegative,
+  count: finiteNonNegative,
+});
 
-function isCorrectionCluster(value: unknown): value is CorrectionCluster {
-  return isNumberRecord(value, ['startSecond', 'endSecond', 'count']);
-}
+const keyTelemetrySchema = z.object({
+  attempts: finiteNonNegative,
+  correct: finiteNonNegative,
+  errorPairs: z.array(errorPairSchema),
+});
 
-function isExactCounters(value: unknown): value is ExactCounters {
-  return isNumberRecord(value, [
-    'totalCorrectChars',
-    'totalTypedChars',
-    'totalBackspaces',
-    'exactDurationSeconds',
-    'exactCorrectWords',
-    'exactCompletedWords',
-    'exactTestCount',
-  ]);
-}
+const insightsSchema = z.object({
+  correctionCount: finiteNonNegative,
+  errorPairs: z.array(errorPairSchema),
+  pace: z.array(paceBucketSchema),
+  keys: z.record(z.string(), keyTelemetrySchema),
+  pauses: pauseTelemetrySchema,
+  correctionClusters: z.array(correctionClusterSchema),
+});
 
-function isKeyTelemetry(value: unknown): value is KeyTelemetry {
-  if (!isNumberRecord(value, ['attempts', 'correct'])) return false;
-  const telemetry = value as Record<string, unknown>;
-  return isArrayOf(telemetry.errorPairs, isErrorPair);
-}
+const sessionSchema = z.object({
+  wpm: z.number(),
+  rawWpm: z.number(),
+  accuracy: z.number(),
+  testDate: z.string(),
+  testDuration: z.number(),
+  wordsTyped: z.number(),
+  correctWords: z.number(),
+  letterAccuracy: letterMetricsSchema,
+  mode: z.enum(['time', 'words']),
+  consistency: finiteNonNegative,
+  burst: finiteNonNegative,
+  wpmSeries: z.array(
+    z.object({ second: finiteNonNegative, wpm: finiteNonNegative, rawWpm: finiteNonNegative }),
+  ),
+  config: configSchema,
+  counters: countersSchema,
+  insights: insightsSchema,
+});
 
-function isKeyTelemetryRecord(value: unknown): value is Record<string, KeyTelemetry> {
-  if (typeof value !== 'object' || value === null) return false;
-  return Object.values(value).every(isKeyTelemetry);
-}
+const exactCountersSchema = z.object({
+  totalCorrectChars: finiteNonNegative,
+  totalTypedChars: finiteNonNegative,
+  totalBackspaces: finiteNonNegative,
+  exactDurationSeconds: finiteNonNegative,
+  exactCorrectWords: finiteNonNegative,
+  exactCompletedWords: finiteNonNegative,
+  exactTestCount: finiteNonNegative,
+});
 
-function isInsights(value: unknown): value is TestInsights {
-  if (typeof value !== 'object' || value === null) return false;
-  const insights = value as Record<string, unknown>;
-  return (
-    isFiniteNonNegativeNumber(insights.correctionCount) &&
-    isArrayOf(insights.errorPairs, isErrorPair) &&
-    isArrayOf(insights.pace, isPaceBucket) &&
-    isKeyTelemetryRecord(insights.keys) &&
-    isPauseTelemetry(insights.pauses) &&
-    isArrayOf(insights.correctionClusters, isCorrectionCluster)
-  );
-}
+const cumulativeStatsSchema = z.object({
+  totalTests: z.number(),
+  totalWordsTyped: z.number(),
+  totalTimeSpent: z.number(),
+  totalCorrectWords: z.number(),
+  weightedWPM: z.number(),
+  weightedRawWPM: z.number(),
+  weightedAccuracy: z.number(),
+  weightedConsistency: z.number(),
+  weightedBurst: z.number(),
+  letterStats: letterMetricsSchema,
+  firstTestDate: z.string(),
+  lastTestDate: z.string(),
+  exact: exactCountersSchema,
+});
 
-function isLetterMetricsRecord(val: unknown): val is Record<string, LetterMetrics> {
-  if (typeof val !== 'object' || val === null) return false;
-  for (const v of Object.values(val)) {
-    if (
-      typeof v !== 'object' ||
-      v === null ||
-      typeof (v as Record<string, unknown>).correct !== 'number' ||
-      typeof (v as Record<string, unknown>).total !== 'number'
-    )
-      return false;
-  }
-  return true;
-}
-
-function isSession(value: unknown): value is TestSession {
-  if (typeof value !== 'object' || value === null) return false;
-  const session = value as Record<string, unknown>;
-  return (
-    typeof session.wpm === 'number' &&
-    typeof session.accuracy === 'number' &&
-    typeof session.testDate === 'string' &&
-    typeof session.testDuration === 'number' &&
-    typeof session.wordsTyped === 'number' &&
-    typeof session.correctWords === 'number' &&
-    isLetterMetricsRecord(session.letterAccuracy) &&
-    (session.mode === 'time' || session.mode === 'words') &&
-    isFiniteNonNegativeNumber(session.consistency) &&
-    isFiniteNonNegativeNumber(session.burst) &&
-    isArrayOf(session.wpmSeries, (point) => isNumberRecord(point, ['second', 'wpm', 'rawWpm'])) &&
-    isConfig(session.config) &&
-    isCounters(session.counters) &&
-    isInsights(session.insights)
-  );
-}
-
-function isCumulativeStats(value: unknown): value is CumulativeStats {
-  if (typeof value !== 'object' || value === null) return false;
-  const cumulative = value as Record<string, unknown>;
-  return (
-    typeof cumulative.totalTests === 'number' &&
-    typeof cumulative.totalWordsTyped === 'number' &&
-    typeof cumulative.totalTimeSpent === 'number' &&
-    typeof cumulative.totalCorrectWords === 'number' &&
-    typeof cumulative.weightedWPM === 'number' &&
-    typeof cumulative.weightedRawWPM === 'number' &&
-    typeof cumulative.weightedAccuracy === 'number' &&
-    typeof cumulative.weightedConsistency === 'number' &&
-    typeof cumulative.weightedBurst === 'number' &&
-    typeof cumulative.firstTestDate === 'string' &&
-    typeof cumulative.lastTestDate === 'string' &&
-    isLetterMetricsRecord(cumulative.letterStats) &&
-    isExactCounters(cumulative.exact)
-  );
-}
+const storedDataSchema = z.object({
+  lastSession: sessionSchema,
+  cumulative: cumulativeStatsSchema,
+  recentSessions: z.array(sessionSchema).max(30),
+});
 
 export function validateStoredData(value: unknown): value is EnhancedStoredData {
-  if (typeof value !== 'object' || value === null) return false;
-  const o = value as Record<string, unknown>;
-  const recentSessions = o.recentSessions;
-
-  return (
-    isSession(o.lastSession) &&
-    isCumulativeStats(o.cumulative) &&
-    isArrayOf(recentSessions, isSession) &&
-    recentSessions.length <= 30
-  );
+  return storedDataSchema.safeParse(value).success;
 }
