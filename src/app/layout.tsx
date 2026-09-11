@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Epilogue, Kanit } from 'next/font/google';
 import { ThemeProvider } from '@/shared/ui/theme-provider';
-import { SessionProvider } from '@/modules/session';
+import { SessionProvider } from '@/modules/session/session-provider';
 import './globals.css';
 
 import { cn } from '@/shared/lib/cn';

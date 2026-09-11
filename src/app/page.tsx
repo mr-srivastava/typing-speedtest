@@ -1,6 +1,8 @@
 import React from 'react';
-import HomeScreen from '@/features/home/HomeScreen';
+import TestScreen from '@/features/typing-test/TestScreen';
+
+const defaultTimer = 60;
 
 export default function Home() {
-  return <HomeScreen />;
+  return <TestScreen defaultTimer={defaultTimer} />;
 }

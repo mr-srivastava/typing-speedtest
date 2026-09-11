@@ -21,11 +21,12 @@ export const pad = {
 
 /** Width intents */
 export const width = {
-  content: 'max-w-6xl',
+  content: 'max-w-screen-2xl',
   section: 'max-w-4xl',
   panel: 'max-w-3xl',
   prose: 'max-w-2xl',
   chart: 'max-w-xs',
+  chartLarge: 'max-w-sm',
 } as const;
 
 /** Height / size intents */
@@ -37,11 +38,13 @@ export const size = {
   iconSm: 'h-3 w-3',
   icon: 'h-4 w-4',
   key: 'h-8 w-8',
+  keyLarge: 'h-10 w-10',
   cta: 'min-h-12 min-w-60',
   typingMin: 'min-h-48',
   detailStrip: 'min-h-16',
   chartCompact: 'max-h-32',
   chartDefault: 'max-h-36',
+  chartLarge: 'max-h-48',
   fieldMin: 'min-h-16',
 } as const;
 

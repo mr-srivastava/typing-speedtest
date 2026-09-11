@@ -8,8 +8,8 @@ import type { EnhancedStoredData, TestSession } from './types';
 
 interface SessionContextType {
   data: EnhancedStoredData | null;
-  isLoading: boolean;
-  isHydrated: boolean;
+  /** False until the client has mounted and loaded from storage. */
+  isReady: boolean;
   hasSession: boolean;
   recordTest: (testSession: TestSession) => void;
   clearSession: () => void;

@@ -6,21 +6,68 @@ import type { LiveTestMetrics } from './types';
 const live: LiveTestMetrics = {
   correctWordCount: 30,
   totalWordCount: 32,
+  // elapsed = 60-20 = 40s; 150 correct chars / 5 / (40/60) = 45 WPM; 160 typed chars = 48 raw WPM
+  correctChars: 150,
+  typedChars: 160,
   timerRemaining: 20,
   timerDuration: 60,
   letterAccuracy: { a: { correct: 5, total: 6 } },
+  wpm: 45,
+  rawWpm: 48,
+  accuracy: 94,
+  mode: 'time',
+  consistency: 88,
+  wpmSeries: [{ second: 1, wpm: 45, rawWpm: 48 }],
+};
+
+const config = {
+  mode: 'time' as const,
+  timeSeconds: 60,
+  wordCount: 25,
+  language: 'english' as const,
+  punctuationEnabled: false,
+  numbersEnabled: false,
+};
+
+const emptyInsights = {
+  correctionCount: 0,
+  errorPairs: [],
+  pace: [],
+  keys: {},
+  pauses: {
+    longestPauseMs: 0,
+    pausesOver500ms: 0,
+    earlyAverageWpm: 0,
+    middleAverageWpm: 0,
+    finalAverageWpm: 0,
+  },
+  correctionClusters: [],
 };
 
 function makeSession(totalTests: number): EnhancedStoredData {
   return {
     lastSession: {
       wpm: 45,
+      rawWpm: 48,
       accuracy: 90,
       testDate: '2026-01-01T00:00:00.000Z',
       testDuration: 60,
       wordsTyped: 45,
       correctWords: 40,
       letterAccuracy: { a: { correct: 8, total: 10 } },
+      mode: 'time',
+      consistency: 80,
+      burst: 90,
+      wpmSeries: [],
+      config,
+      counters: {
+        correctChars: 225,
+        typedChars: 240,
+        backspaces: 3,
+        correctWords: 40,
+        completedWords: 45,
+      },
+      insights: emptyInsights,
     },
     cumulative: {
       totalTests,
@@ -28,11 +75,24 @@ function makeSession(totalTests: number): EnhancedStoredData {
       totalTimeSpent: 120,
       totalCorrectWords: 90,
       weightedWPM: 55,
+      weightedRawWPM: 60,
       weightedAccuracy: 92,
+      weightedConsistency: 75,
+      weightedBurst: 80,
       letterStats: { a: { correct: 20, total: 22 }, b: { correct: 5, total: 5 } },
       firstTestDate: '2026-01-01T00:00:00.000Z',
       lastTestDate: '2026-01-02T00:00:00.000Z',
+      exact: {
+        totalCorrectChars: 500,
+        totalTypedChars: 550,
+        totalBackspaces: 10,
+        exactDurationSeconds: 120,
+        exactCorrectWords: 90,
+        exactCompletedWords: 100,
+        exactTestCount: totalTests,
+      },
     },
+    recentSessions: [],
   };
 }
 
@@ -43,11 +103,15 @@ describe('resolveMetricsDisplay', () => {
     expect(model.view).toEqual({ scope: 'live' });
     expect(model.canToggle).toBe(false);
     expect(model.showingCumulative).toBe(false);
-    // 30 words in 40 seconds → 45 WPM
+    // 150 correct chars in 40 seconds → 45 WPM
     expect(model.wpm).toBe(45);
+    // 160 typed chars in 40 seconds → 48 raw WPM
+    expect(model.rawWpm).toBe(48);
     expect(model.accuracy).toBe(94);
     expect(model.letterAccuracy).toEqual(live.letterAccuracy);
     expect(model.statsTitle).toBeNull();
+    expect(model.consistency).toBe(88);
+    expect(model.wpmSeries).toEqual([{ second: 1, wpm: 45, rawWpm: 48 }]);
   });
 
   it('returns live without toggle when session has 1 test', () => {
@@ -87,12 +151,17 @@ describe('resolveMetricsDisplay', () => {
     expect(model.canToggle).toBe(true);
     expect(model.showingCumulative).toBe(true);
     expect(model.wpm).toBe(55);
+    expect(model.rawWpm).toBe(60);
     expect(model.accuracy).toBe(92);
     expect(model.letterAccuracy).toEqual({
       a: { correct: 20, total: 22 },
       b: { correct: 5, total: 5 },
     });
     expect(model.statsTitle).toBe('3 tests • 2 minutes total');
+    // cumulative view: consistency comes from the weighted average, but there's no sensible
+    // per-second history to chart across multiple tests
+    expect(model.consistency).toBe(75);
+    expect(model.wpmSeries).toBeUndefined();
   });
 
   it('locks to cumulative-only when locked is true', () => {

@@ -1,127 +1,97 @@
-import type { LetterMetrics } from '@/modules/session';
+import { createActor } from 'xstate';
+
+import type { TestConfig } from './config';
 import {
-  buildFinishedSnapshot,
-  evaluateInput,
+  typingTestMachine,
+  type TypingTestContext,
+  type TypingTestEvent,
   type TypingTestFinishedSnapshot,
-} from './typing-engine';
+} from './typing-test-machine';
 
-export type { TypingTestFinishedSnapshot };
+export type { TypingTestEvent, TypingTestFinishedSnapshot };
 
-export type TypingTestPhase = 'idle' | 'active' | 'finished';
+export type TypingTestPhase = 'loading' | 'error' | 'idle' | 'active' | 'finished';
 
-export type TypingTestEvent =
-  | { type: 'input'; value: string }
-  | { type: 'restart' }
-  | { type: 'tick' };
+/** Omit keys from each member of a union. */
+type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K> : never;
 
-export interface TypingTestState {
+/** Machine context exposed without its text-loader closure. */
+export type TypingTestState = DistributiveOmit<
+  TypingTestContext,
+  'getReferenceText' | 'referenceWords'
+> & {
   phase: TypingTestPhase;
-  referenceText: string;
-  input: string;
-  timerRemaining: number;
-  duration: number;
-  correctWordCount: number;
-  totalWordCount: number;
-  letterAccuracy: Record<string, LetterMetrics>;
-  snapshot: TypingTestFinishedSnapshot | null;
-}
+};
 
 export interface TypingTest {
   getState(): TypingTestState;
-  dispatch(event: TypingTestEvent): TypingTestState;
+  /** Notifies whenever the SDK state changes. */
+  subscribe(listener: () => void): () => void;
+  dispatch(event: TypingTestEvent): void;
+  /** Runs after reference text loads. */
+  onReady(listener: () => void): () => void;
+  /** No-op if already started. Only needed when created with `autoStart: false`. */
+  start(): void;
 }
 
-export function createTypingTest(config: { duration: number; getText: () => string }): TypingTest {
-  const { duration, getText } = config;
+/** Runs the typing-test machine behind the TypingTest interface. */
+export function createTypingTest(config: {
+  testConfig: TestConfig;
+  getReferenceText: (config: TestConfig) => Promise<string>;
+  /**
+   * Set false to defer starting the actor — and thus loading reference text — until `start()`
+   * is called explicitly. Reading `getState()`/`subscribe()` is safe either way: before start,
+   * state simply stays at its initial 'loading' snapshot.
+   */
+  autoStart?: boolean;
+}): TypingTest {
+  const actor = createActor(typingTestMachine, {
+    input: { testConfig: config.testConfig, getReferenceText: config.getReferenceText },
+  });
 
-  function createInitialState(): TypingTestState {
+  const readyListeners = new Set<() => void>();
+  const stateListeners = new Set<() => void>();
+  let prevValue = actor.getSnapshot().value;
+  let state = toState(actor.getSnapshot());
+
+  actor.subscribe((snapshot) => {
+    state = toState(snapshot);
+    stateListeners.forEach((listener) => listener());
+
+    if (prevValue !== 'idle' && snapshot.value === 'idle') {
+      readyListeners.forEach((listener) => listener());
+    }
+    prevValue = snapshot.value;
+  });
+
+  if (config.autoStart ?? true) {
+    actor.start();
+  }
+
+  function toState(snapshot: ReturnType<typeof actor.getSnapshot>): TypingTestState {
+    // The loader stays inside the machine.
+    const {
+      getReferenceText: _getReferenceText,
+      referenceWords: _referenceWords,
+      ...rest
+    } = snapshot.context;
     return {
-      phase: 'idle',
-      referenceText: getText(),
-      input: '',
-      timerRemaining: duration,
-      duration,
-      correctWordCount: 0,
-      totalWordCount: 0,
-      letterAccuracy: {},
-      snapshot: null,
+      phase: snapshot.value as TypingTestPhase,
+      ...rest,
     };
-  }
-
-  let state: TypingTestState = createInitialState();
-
-  function finish(snapshot: TypingTestFinishedSnapshot) {
-    state = {
-      ...state,
-      phase: 'finished',
-      snapshot,
-    };
-  }
-
-  function dispatch(event: TypingTestEvent): TypingTestState {
-    if (event.type === 'restart') {
-      state = createInitialState();
-      return state;
-    }
-
-    if (state.phase === 'finished') {
-      return state;
-    }
-
-    if (event.type === 'tick') {
-      if (state.phase !== 'active') {
-        return state;
-      }
-
-      const nextRemaining = Math.max(0, state.timerRemaining - 1);
-      if (nextRemaining === 0) {
-        const snapshot = buildFinishedSnapshot(
-          state.referenceText,
-          state.input,
-          0,
-          state.letterAccuracy,
-        );
-        state = {
-          ...state,
-          timerRemaining: 0,
-          correctWordCount: snapshot.correctWordCount,
-          totalWordCount: snapshot.totalWordCount,
-        };
-        finish(snapshot);
-        return state;
-      }
-
-      state = { ...state, timerRemaining: nextRemaining };
-      return state;
-    }
-
-    // input
-    const result = evaluateInput(state.referenceText, event.value, state.letterAccuracy);
-
-    state = {
-      ...state,
-      phase: state.phase === 'idle' ? 'active' : state.phase,
-      input: event.value,
-      correctWordCount: result.correctWordCount,
-      totalWordCount: result.totalWordCount,
-      letterAccuracy: result.letterAccuracy,
-    };
-
-    if (result.isComplete) {
-      const snapshot = buildFinishedSnapshot(
-        state.referenceText,
-        event.value,
-        state.timerRemaining,
-        result.letterAccuracy,
-      );
-      finish(snapshot);
-    }
-
-    return state;
   }
 
   return {
     getState: () => state,
-    dispatch,
+    subscribe: (listener) => {
+      stateListeners.add(listener);
+      return () => stateListeners.delete(listener);
+    },
+    dispatch: (event) => actor.send(event),
+    onReady: (listener) => {
+      readyListeners.add(listener);
+      return () => readyListeners.delete(listener);
+    },
+    start: () => actor.start(),
   };
 }

@@ -2,7 +2,7 @@ import React from 'react';
 import { cn } from '@/shared/lib/cn';
 import { themeColorClasses } from '@/shared/lib/theme';
 
-interface MetricBadgeProps {
+export interface MetricBadgeProps {
   value: string | number;
   label?: string;
   variant?: 'success' | 'default' | 'muted';

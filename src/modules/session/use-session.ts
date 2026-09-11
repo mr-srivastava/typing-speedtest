@@ -6,16 +6,13 @@ import type { EnhancedStoredData, TestSession } from './types';
 
 export function useSession(store: SessionStore) {
   const [data, setData] = useState<EnhancedStoredData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isHydrated, setIsHydrated] = useState(false);
+  /** False until the client has mounted and loaded from storage — guards against SSR/CSR mismatch. */
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    setIsHydrated(true);
-    try {
-      setData(store.load());
-    } finally {
-      setIsLoading(false);
-    }
+    // oxlint-disable-next-line react/set-state-in-effect -- loads from storage, unavailable during SSR/render
+    setData(store.load());
+    setIsReady(true);
   }, [store]);
 
   const recordTest = useCallback(
@@ -34,12 +31,11 @@ export function useSession(store: SessionStore) {
   return useMemo(
     () => ({
       data,
-      isLoading,
-      isHydrated,
+      isReady,
       hasSession: !!data,
       recordTest,
       clearSession,
     }),
-    [data, isLoading, isHydrated, recordTest, clearSession],
+    [data, isReady, recordTest, clearSession],
   );
 }

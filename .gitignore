@@ -20,6 +20,7 @@
 .DS_Store
 *.pem
 .kiro
+.serena
 
 # debug
 npm-debug.log*

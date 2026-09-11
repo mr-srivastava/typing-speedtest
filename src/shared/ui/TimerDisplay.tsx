@@ -1,28 +1,24 @@
 import React from 'react';
-import { Orbitron } from 'next/font/google';
-import { radiusClasses, surfaceClasses } from '@/shared/layout/layout-utils';
 import { getTimerWarningClass } from '@/shared/layout/theme-display-utils';
 import { cn } from '@/shared/lib/cn';
-
-const orbitron = Orbitron({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800', '900'],
-});
 
 const MIN_IN_SEC = 60;
 
 interface TimerDisplayProps {
   timer: number;
   timerDuration?: number;
+  /** 'words' mode counts up with no fixed ceiling, so the near-expiry warning never applies. */
+  mode?: 'time' | 'words';
   className?: string;
 }
 
 const TimerDisplay: React.FC<TimerDisplayProps> = ({
   timer,
   timerDuration = 60,
+  mode = 'time',
   className = '',
 }) => {
-  const isNearExpiry = timer !== timerDuration && timer % MIN_IN_SEC <= 10;
+  const isNearExpiry = mode === 'time' && timer !== timerDuration && timer % MIN_IN_SEC <= 10;
 
   function formatNumberWithTwoDigit(num: number) {
     return num.toLocaleString('en-US', {
@@ -38,17 +34,14 @@ const TimerDisplay: React.FC<TimerDisplayProps> = ({
   }
 
   return (
-    <div className={cn('px-2 py-2 text-right cursor-default', className)}>
+    <div className={cn('typing-face px-2 py-2 text-right cursor-default', className)}>
       <span
         className={cn(
-          'inline-flex items-center backdrop-blur px-3 py-1 text-2xl md:text-3xl',
-          surfaceClasses.field,
-          radiusClasses.pill,
+          'inline-flex items-center px-1 py-1 text-lg font-medium tracking-tight md:text-xl',
           getTimerWarningClass(isNearExpiry),
-          orbitron.className,
         )}
         aria-live="polite"
-        aria-label="Time remaining"
+        aria-label={mode === 'words' ? 'Time elapsed' : 'Time remaining'}
       >
         {getTime()}
       </span>

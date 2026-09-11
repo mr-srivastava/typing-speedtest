@@ -1,21 +1,31 @@
 'use client';
-import React, { useCallback, useMemo, useState, startTransition } from 'react';
+import React, { startTransition, useCallback, useState, useSyncExternalStore } from 'react';
 import dynamic from 'next/dynamic';
+import { BarChartIcon } from '@radix-ui/react-icons';
 import TestPanel from '@/features/typing-test/TestPanel';
+import TestIntro from '@/features/home/TestIntro';
+import MobileDesktopNotice from '@/features/home/MobileDesktopNotice';
+import MetricsSheet from '@/features/metrics/MetricsSheet';
 import { AppShell } from '@/shared/layout/AppShell';
-import { useTypingTest, type TypingTestFinishedSnapshot } from '@/modules/typing-test';
-import { useSession } from '@/modules/session';
+import { Button } from '@/shared/ui/button';
 import {
-  buildTestSession,
-  calculateCurrentAccuracy,
-  calculateLiveWpm,
-  type LiveTestMetrics,
-} from '@/modules/metrics';
+  DEFAULT_TEST_CONFIG,
+  type TestConfig,
+  type TypingTestFinishedSnapshot,
+} from '@/modules/typing-test';
+import { useSession } from '@/modules/session/session-provider';
+import { buildTestSession } from '@/modules/metrics/build-test-session';
+import { toOverallMetricsData } from '@/features/metrics/metrics-display-utils';
 import { layoutClasses } from '@/shared/layout/layout-utils';
 import { cn } from '@/shared/lib/cn';
+import {
+  TypingTestProvider,
+  useTypingTestActions,
+  useTypingTestAnalytics,
+} from './typing-test-react';
 
-const MetricsModal = dynamic(
-  () => import('@/features/metrics/MetricsModal').then((mod) => mod.default),
+const DynamicMetricsSheet = dynamic(
+  () => import('@/features/metrics/MetricsSheet').then((mod) => mod.default),
   { ssr: false },
 );
 
@@ -24,90 +34,164 @@ interface TestScreenProps {
   className?: string;
 }
 
-const TestScreen: React.FC<TestScreenProps> = ({ defaultTimer = 60, className = '' }) => {
-  const { recordTest, data } = useSession();
-  const [isMetricsModalOpen, setIsMetricsModalOpen] = useState(false);
+const desktopMediaQuery = '(min-width: 768px)';
+
+function subscribeToDesktopViewport(onStoreChange: () => void) {
+  const mediaQuery = window.matchMedia(desktopMediaQuery);
+  mediaQuery.addEventListener('change', onStoreChange);
+  return () => mediaQuery.removeEventListener('change', onStoreChange);
+}
+
+function getDesktopViewportSnapshot() {
+  return window.matchMedia(desktopMediaQuery).matches;
+}
+
+/** The server starts with the non-interactive state; the client promotes eligible viewports. */
+function useDesktopViewport() {
+  return useSyncExternalStore(subscribeToDesktopViewport, getDesktopViewportSnapshot, () => false);
+}
+
+interface CompletionSheetProps {
+  isOpen: boolean;
+  data: ReturnType<typeof useSession>['data'];
+  onOpenChange: (isOpen: boolean) => void;
+  onRestart: () => void;
+}
+
+/** Scoped so live analytics are only subscribed to while the completion sheet can show them. */
+function CompletionSheet({ data, isOpen, onOpenChange, onRestart }: CompletionSheetProps) {
+  const analytics = useTypingTestAnalytics();
+
+  return (
+    <DynamicMetricsSheet
+      open={isOpen}
+      onClose={() => onOpenChange(false)}
+      liveMetrics={analytics}
+      sessionData={data}
+      onRestart={onRestart}
+    />
+  );
+}
+
+interface TestScreenContentProps {
+  config: TestConfig;
+  onConfigChange: (config: TestConfig) => void;
+  className: string;
+  isCompletionSheetOpen: boolean;
+  onCompletionSheetOpenChange: (isOpen: boolean) => void;
+}
+
+function DesktopTestScreen({
+  config,
+  onConfigChange,
+  className,
+  isCompletionSheetOpen,
+  onCompletionSheetOpenChange,
+}: TestScreenContentProps) {
+  const { data, isReady, hasSession } = useSession();
+  const { restart } = useTypingTestActions();
+  const [isStatsOpen, setIsStatsOpen] = useState(false);
+
+  const handleRestart = useCallback(() => {
+    restart();
+    onCompletionSheetOpenChange(false);
+  }, [onCompletionSheetOpenChange, restart]);
+
+  const showStatsTrigger = isReady && hasSession;
+
+  return (
+    <AppShell
+      className={className}
+      headerActions={
+        showStatsTrigger ? (
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setIsStatsOpen((open) => !open)}
+            aria-expanded={isStatsOpen}
+            aria-label={isStatsOpen ? 'Hide stats' : 'View stats'}
+            className={cn(isStatsOpen && 'text-primary')}
+          >
+            <BarChartIcon className="h-4 w-4" />
+          </Button>
+        ) : null
+      }
+    >
+      <div
+        className={cn(
+          layoutClasses.containerPadding,
+          'flex flex-col items-center gap-6 pt-12 pb-16 sm:pt-16 md:pt-20',
+        )}
+      >
+        <TestIntro />
+
+        <TestPanel
+          config={config}
+          onConfigChange={onConfigChange}
+          onRestart={handleRestart}
+          className="w-full max-w-screen-2xl"
+        />
+      </div>
+
+      <MetricsSheet open={isStatsOpen} sessionData={data} onClose={() => setIsStatsOpen(false)} />
+
+      <CompletionSheet
+        data={data}
+        isOpen={isCompletionSheetOpen}
+        onOpenChange={onCompletionSheetOpenChange}
+        onRestart={handleRestart}
+      />
+    </AppShell>
+  );
+}
+
+function DesktopTypingTest({ defaultTimer = 60, className = '' }: TestScreenProps) {
+  const { recordTest } = useSession();
+  const [config, setConfig] = useState<TestConfig>(() => ({
+    ...DEFAULT_TEST_CONFIG,
+    timeSeconds: defaultTimer,
+  }));
+  const [isCompletionSheetOpen, setIsMetricsModalOpen] = useState(false);
 
   const handleFinished = useCallback(
     (snapshot: TypingTestFinishedSnapshot) => {
       startTransition(() => setIsMetricsModalOpen(true));
-      recordTest(buildTestSession(snapshot, defaultTimer));
+      recordTest(buildTestSession(snapshot, config));
     },
-    [defaultTimer, recordTest],
-  );
-
-  const { content, status, timer, metrics, actions } = useTypingTest(defaultTimer, {
-    onFinished: handleFinished,
-  });
-
-  const handleRestart = useCallback(() => {
-    actions.restart();
-    setIsMetricsModalOpen(false);
-  }, [actions]);
-
-  const liveMetrics: LiveTestMetrics = useMemo(
-    () => ({
-      correctWordCount: metrics.correctWordCount,
-      totalWordCount: metrics.totalWordCount,
-      timerRemaining: timer.remaining,
-      timerDuration: timer.duration,
-      letterAccuracy: metrics.letterAccuracy,
-    }),
-    [
-      metrics.correctWordCount,
-      metrics.totalWordCount,
-      metrics.letterAccuracy,
-      timer.remaining,
-      timer.duration,
-    ],
-  );
-
-  const liveWpm = useMemo(
-    () => calculateLiveWpm(metrics.correctWordCount, timer.duration, timer.remaining),
-    [metrics.correctWordCount, timer.duration, timer.remaining],
-  );
-  const liveAccuracy = useMemo(
-    () => calculateCurrentAccuracy(metrics.correctWordCount, metrics.totalWordCount),
-    [metrics.correctWordCount, metrics.totalWordCount],
+    [recordTest, config],
   );
 
   return (
-    <AppShell headerVariant="minimal" className={className}>
-      <main
-        className={cn(
-          layoutClasses.containerPadding,
-          'flex flex-1 min-h-0 items-center justify-center py-6',
-        )}
-      >
-        <div className="w-full max-w-3xl">
-          <TestPanel
-            referenceText={content.text}
-            input={content.input}
-            onInputChange={actions.setInput}
-            readOnly={status.finished}
-            focusKey={content.text}
-            timer={timer.remaining}
-            timerDuration={timer.duration}
-            started={status.started}
-            finished={status.finished}
-            onRestart={handleRestart}
-            wpm={liveWpm}
-            accuracy={liveAccuracy}
-            correctWords={metrics.correctWordCount}
-          />
+    <TypingTestProvider config={config} onFinished={handleFinished}>
+      <DesktopTestScreen
+        config={config}
+        onConfigChange={setConfig}
+        className={className}
+        isCompletionSheetOpen={isCompletionSheetOpen}
+        onCompletionSheetOpenChange={setIsMetricsModalOpen}
+      />
+    </TypingTestProvider>
+  );
+}
 
-          <MetricsModal
-            key={`${isMetricsModalOpen}-${data?.cumulative.totalTests ?? 0}`}
-            isOpen={isMetricsModalOpen}
-            onOpenChange={setIsMetricsModalOpen}
-            liveMetrics={liveMetrics}
-            sessionData={data}
-            onRestart={handleRestart}
-            preference="auto"
-          />
-        </div>
-      </main>
+function MobileTestScreen({ className }: Pick<TestScreenProps, 'className'>) {
+  const { data, isReady } = useSession();
+  const overallMetrics = data ? toOverallMetricsData(data.cumulative) : null;
+
+  return (
+    <AppShell className={className}>
+      <MobileDesktopNotice isReady={isReady} overallMetrics={overallMetrics} />
     </AppShell>
+  );
+}
+
+const TestScreen: React.FC<TestScreenProps> = ({ defaultTimer = 60, className = '' }) => {
+  const isDesktop = useDesktopViewport();
+
+  return isDesktop ? (
+    <DesktopTypingTest defaultTimer={defaultTimer} className={className} />
+  ) : (
+    <MobileTestScreen className={className} />
   );
 };
 

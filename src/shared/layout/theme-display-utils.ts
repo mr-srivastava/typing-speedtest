@@ -44,24 +44,6 @@ export const getAccuracyColorClass = (isCorrect: boolean): string => {
   return isCorrect ? themeColorClasses.successBg : themeColorClasses.dangerBg;
 };
 
-export const getLetterAccuracyColorClass = (
-  correct: number,
-  total: number,
-  overallAccuracy: number,
-): string => {
-  if (total === 0) return 'bg-muted text-muted-foreground';
-
-  const accuracy = (correct / total) * 100;
-
-  if (accuracy > overallAccuracy + 5) {
-    return themeColorClasses.successBg;
-  }
-  if (accuracy < overallAccuracy - 5) {
-    return themeColorClasses.dangerBg;
-  }
-  return themeColorClasses.warningBg;
-};
-
 export const getTimerWarningClass = (isNearExpiry: boolean): string => {
   return isNearExpiry ? themeColorClasses.warningAnimated : '';
 };

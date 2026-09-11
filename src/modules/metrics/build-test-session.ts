@@ -1,19 +1,22 @@
 import type { TestSession } from '@/modules/session/types';
-import type { TypingTestFinishedSnapshot } from '@/modules/typing-test/typing-engine';
-import { calculateCurrentAccuracy, calculateLiveWpm, getElapsedSecondsForWpm } from './calculate';
+import type { TestConfig, TypingTestFinishedSnapshot } from '@/modules/typing-test';
+import { deriveTestInsights } from './session-insights';
 
 export function buildTestSession(
   snapshot: TypingTestFinishedSnapshot,
-  timerDuration: number,
+  config: TestConfig,
 ): TestSession {
-  const testDuration = getElapsedSecondsForWpm(timerDuration, snapshot.timer);
   return {
-    wpm: calculateLiveWpm(snapshot.correctWordCount, timerDuration, snapshot.timer),
-    accuracy: calculateCurrentAccuracy(snapshot.correctWordCount, snapshot.totalWordCount),
+    ...snapshot.result,
     testDate: new Date().toISOString(),
-    testDuration,
-    wordsTyped: Math.round(snapshot.totalWordCount),
-    correctWords: Math.round(snapshot.correctWordCount),
-    letterAccuracy: snapshot.letterAccuracy,
+    config: { ...config },
+    counters: {
+      correctChars: snapshot.correctChars,
+      typedChars: snapshot.typedChars,
+      backspaces: snapshot.eventLog.filter((event) => event.type === 'backspace').length,
+      correctWords: snapshot.correctWordCount,
+      completedWords: snapshot.totalWordCount,
+    },
+    insights: deriveTestInsights(snapshot.eventLog, snapshot.wpmSeries),
   };
 }

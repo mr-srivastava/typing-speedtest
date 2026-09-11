@@ -1,13 +1,20 @@
-import type { EnhancedStoredData, LetterMetrics } from '@/modules/session/types';
-import { calculateCurrentAccuracy, calculateLiveWpm } from './calculate';
+import type { EnhancedStoredData } from '@/modules/session/types';
+import type { LetterMetrics } from '@/modules/typing-test';
 import type { LiveTestMetrics, MetricsDisplayModel, MetricsPreference, MetricsView } from './types';
+import { deriveBaseline, deriveCoachingInsight } from './coaching';
 
 const EMPTY_LIVE: LiveTestMetrics = {
   correctWordCount: 0,
   totalWordCount: 0,
+  correctChars: 0,
+  typedChars: 0,
+  mode: 'time',
   timerRemaining: 0,
   timerDuration: 60,
   letterAccuracy: {},
+  wpm: 0,
+  rawWpm: 0,
+  accuracy: 0,
 };
 
 function resolveView(
@@ -92,24 +99,54 @@ export function resolveMetricsDisplay(input: {
   const view = resolveView(session, preference, locked);
   const showingCumulative = resolveShowingCumulative(view, preference, canToggle);
 
-  const wpm =
-    showingCumulative && session
-      ? session.cumulative.weightedWPM
-      : calculateLiveWpm(live.correctWordCount, live.timerDuration, live.timerRemaining);
+  const wpm = showingCumulative && session ? session.cumulative.weightedWPM : live.wpm;
+
+  const rawWpm = showingCumulative && session ? session.cumulative.weightedRawWPM : live.rawWpm;
 
   const accuracy =
-    showingCumulative && session
-      ? session.cumulative.weightedAccuracy
-      : calculateCurrentAccuracy(live.correctWordCount, live.totalWordCount);
+    showingCumulative && session ? session.cumulative.weightedAccuracy : live.accuracy;
+
+  const consistency = showingCumulative
+    ? session?.cumulative.weightedConsistency
+    : live.consistency;
+  const activeSession = showingCumulative ? undefined : session?.lastSession;
+  const exact = session?.cumulative.exact;
+  const characterAccuracy = showingCumulative
+    ? exact && exact.totalTypedChars > 0
+      ? Math.round((exact.totalCorrectChars / exact.totalTypedChars) * 100)
+      : accuracy
+    : live.typedChars > 0
+      ? Math.round((live.correctChars / live.typedChars) * 100)
+      : 0;
+  const wordAccuracy = showingCumulative
+    ? exact && exact.exactCompletedWords > 0
+      ? Math.round((exact.exactCorrectWords / exact.exactCompletedWords) * 100)
+      : accuracy
+    : live.accuracy;
 
   return {
     wpm,
+    rawWpm,
     accuracy,
+    characterAccuracy,
+    wordAccuracy,
     letterAccuracy: resolveLetterAccuracy(live, session, showingCumulative),
     statsTitle: generateStatsTitle(session, showingCumulative),
     view,
     canToggle: view.scope === 'toggle',
     showingCumulative,
     totalTests: session?.cumulative.totalTests ?? 0,
+    consistency,
+    // A WPM-over-time history only makes sense for one finished test, not an aggregate.
+    wpmSeries: showingCumulative ? undefined : live.wpmSeries,
+    baselineWpm: activeSession
+      ? deriveBaseline(activeSession, session?.recentSessions ?? [])
+      : undefined,
+    coaching: activeSession ? deriveCoachingInsight(activeSession) : undefined,
+    correctionCost: Math.max(0, rawWpm - wpm),
+    paceBuckets: activeSession?.insights.pace,
+    keyTelemetry: activeSession?.insights.keys,
+    correctionClusters: activeSession?.insights.correctionClusters,
+    recentSessions: session?.recentSessions ?? [],
   };
 }

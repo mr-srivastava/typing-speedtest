@@ -13,9 +13,9 @@ export const themeColorClasses = {
   success: 'text-success',
   warning: 'text-warning',
   warningAnimated: 'text-warning animate-pulse',
-  successBg: 'bg-success text-on-status',
-  warningBg: 'bg-warning text-on-status',
-  dangerBg: 'bg-danger text-on-status',
+  successBg: 'bg-success/80 text-on-status',
+  warningBg: 'bg-warning/75 text-on-status',
+  dangerBg: 'bg-danger/80 text-on-status',
 };
 
 export const gradients = {
