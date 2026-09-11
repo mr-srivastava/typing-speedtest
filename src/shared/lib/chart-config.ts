@@ -1,5 +1,4 @@
 import { themeColors } from '@/shared/lib/theme';
-import type { ChartConfig } from '@/shared/ui/chart';
 
 export interface RadialMetricFeedbackMessages {
   excellent: string;
@@ -47,7 +46,12 @@ export const accuracyChartConfig: RadialMetricConfig = {
   fillColor: themeColors.success,
 };
 
-export const wpmHistoryChartConfig: ChartConfig = {
+export interface WpmHistorySeriesConfig {
+  label: string;
+  color: string;
+}
+
+export const wpmHistoryChartConfig: Record<'wpm' | 'rawWpm', WpmHistorySeriesConfig> = {
   wpm: { label: 'Correct WPM', color: themeColors.primary },
   rawWpm: { label: 'Raw WPM', color: themeColors.chart2 },
 };
